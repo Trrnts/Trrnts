@@ -12,5 +12,8 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Trrnts/Trrnts/issues"
+  },
+  "dependencies": {
+    "redis": "^0.10.3"
   }
 }
