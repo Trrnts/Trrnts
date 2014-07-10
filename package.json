@@ -2,6 +2,7 @@
   "name": "Trrnts",
   "version": "0.0.0",
   "description": "Trrnt is the front page for the BitTorrent network, providing insights through interactive analytics and data visualizations that leverage the DHT protocol.",
+
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,6 +15,8 @@
     "url": "https://github.com/Trrnts/Trrnts/issues"
   },
   "dependencies": {
-    "redis": "^0.10.3"
+    "redis": "^0.10.3",
+    "express": "~4.5.1",
+    "body-parser": "~1.4.3"
   }
 }

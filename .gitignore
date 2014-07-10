@@ -1,5 +1,4 @@
 node_modules
 bower_components
 
-# Data stored in Redis
 dump.rdb
