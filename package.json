@@ -1,0 +1,22 @@
+{
+  "name": "Trrnts",
+  "version": "0.0.0",
+  "description": "Trrnt is the front page for the BitTorrent network, providing insights through interactive analytics and data visualizations that leverage the DHT protocol.",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Trrnts/Trrnts.git"
+  },
+  "author": "",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/Trrnts/Trrnts/issues"
+  },
+  "dependencies": {
+    "express": "~4.5.1",
+    "body-parser": "~1.4.3"
+  }
+}
