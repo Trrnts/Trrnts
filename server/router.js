@@ -7,6 +7,7 @@ var router = express.Router();
 
 // http://localhost:9000/api/magnets
 router.post('/magnets', function (req, res) {
+  console.log('post');
   var magnetURI = req.body.magnetURI;
   var parsedMagnetURI = {};
   try {
@@ -36,7 +37,7 @@ router.post('/magnets', function (req, res) {
       // be 'latest' -> Security risk
       redis.hmset('magnet:' + magnet.infoHash, magnet);
       redis.zadd('magnets:createdAt', magnet.createdAt, magnet.infoHash);
-      redis.zadd('magnets:top', magnet.createdAt, magnet.score);
+      redis.zadd('magnets:top', -1, magnet.score);
       redis.lpush('magnets:latest', magnet.infoHash);
       redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
       redis.rpush('magnets:crawl', magnet.infoHash);
@@ -53,8 +54,21 @@ router.get('/magnets/top', function (req, res) {
 });
 
 // http://localhost:9000/api/magnets/latest
-router.get('/magnets/latest', function (req, res) {
-  res.send('Hello World!');
+// If ammout is bigger than the number of records on the DB it will not return undefined values
+router.get('/magnets/latest/:amount', function (req, res) {
+  console.log('GET:/api/magnets/latest/' + req.params.amount);
+
+  redis.ZRANGE('magnets:createdAt', -req.params.amount, -1, function(err, replies) {
+    var multi = redis.multi();
+
+    _.map(replies, function(infoHash) {
+      multi.hgetall( 'magnet:'+infoHash);
+    });
+
+    multi.exec(function(err, replies) {
+      res.send(replies);
+    });
+  });
 });
 
 module.exports = router;

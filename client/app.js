@@ -1,10 +1,5 @@
-var app = angular.module('Trrnts', []);
-angular.module('trrnts', ['trrnts.magnetLink', 'trrnts.services', 'ui.router'])
+angular.module('trrntsApp', [
+  'trrntsApp.controllers',
+  'trrntsApp.services'
+]);
 
-.config(function($stateProvider, $urlRouterProvider) {
-  $stateProvider
-    .state('home', {
-      url: '/',
-      templateUrl: 'magnetlink/magnetLink.html'
-    })
-});
