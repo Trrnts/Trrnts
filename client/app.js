@@ -1,0 +1,1 @@
+var app = angular.module('Trrnts', ['Trrnts.magnetLink', 'Trrnts.services']);
