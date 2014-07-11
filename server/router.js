@@ -48,6 +48,16 @@ router.post('/magnets', function (req, res) {
   });
 });
 
+// http://localhost:9000/api/nodes
+// this get request will return all of the nodes in the 'node' set of the database
+// it returns an array of strings in the format of "ipadress:port"
+router.get('/nodes', function (req, res) {
+  redis.SMEMBERS('node', function(error, result) {
+    console.log(result);
+    res.send(result);
+  });
+});
+
 // http://localhost:9000/api/magnets/top
 router.get('/magnets/top', function (req, res) {
   res.send('Hello World!');
