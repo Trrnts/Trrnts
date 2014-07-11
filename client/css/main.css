@@ -1,0 +1,18 @@
+.footer {
+  font-family: sans-serif;
+  text-align: center;
+  /*width: 60%;*/
+  padding: 10px 0 10px 0;
+  color: white;
+  margin: auto;
+  margin-top: 70px;
+  background-color: gray;
+}
+
+.center {
+  text-align: center;
+}
+
+.pure-menu-heading {
+  zoom: 3 !important;
+}
