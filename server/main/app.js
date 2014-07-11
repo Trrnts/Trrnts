@@ -2,7 +2,9 @@
 
 var express = require('express');
 var app = express();
-var routers = {};
+var routers = {
+  '/api': require('../router')
+};
 
 require('./config.js')(app, express, routers);
 
