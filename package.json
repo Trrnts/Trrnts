@@ -14,8 +14,10 @@
     "url": "https://github.com/Trrnts/Trrnts/issues"
   },
   "dependencies": {
+    "bencode": "^0.6.0",
     "body-parser": "~1.4.3",
     "express": "~4.5.1",
+    "hat": "0.0.3",
     "lodash": "^2.4.1",
     "magnet-uri": "^2.0.1",
     "redis": "^0.10.3"
