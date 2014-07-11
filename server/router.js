@@ -1,4 +1,7 @@
-var express = require('express');
+var express = require('express'),
+    redis = require('../redis'),
+    magnet = require('magnet-uri'),
+    _ = require('lodash');
 
 var router = express.Router();
 

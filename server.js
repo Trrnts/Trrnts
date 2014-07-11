@@ -1,7 +1,7 @@
 "use strict";
 
-var app   = require('./main/app.js'),
-    port  = app.get('port'),
+var app   = require('server/main/app.js'),
+    port  = process.env.PORT || app.get('port'),
     log   = 'Listening on ' + app.get('base url') + ':' + port;
 
 app.listen(port);
