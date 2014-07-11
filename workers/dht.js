@@ -42,7 +42,8 @@ DHT.prototype._onMessage = function (msg, rinfo) {
     var result = {};
     // peers have the torrent.
     result.peers = [];
-    // nodes have the torrent, but are nearest entries in the Hash Table to it.
+    // nodes do nothave the torrent, but are the nearest entries in the Hash
+    // Table to it.
     result.nodes = [];
     if (msg.r && msg.r.values) {
       result.peers = _.map(msg.r.values, compact2string);
