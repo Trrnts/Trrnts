@@ -56,6 +56,7 @@ DHT.prototype._onMessage = function (msg, rinfo) {
   }
 };
 
+// Starts the DHT client by listening on the specified port.
 DHT.prototype.start = function (callback) {
   callback = callback || function () {  };
   this.socket.bind(this.port, function (exception) {
@@ -94,4 +95,5 @@ DHT.prototype.getPeers = function (infoHash, address, callback) {
   }.bind(this));
 };
 
+// See crawler.js for usage example.
 module.exports = exports = DHT;
