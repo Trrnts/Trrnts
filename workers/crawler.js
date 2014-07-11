@@ -1,4 +1,5 @@
 var DHT = require('./dht');
+var _ = require('lodash');
 
 var Crawler = function () {
   this.dht = new DHT();
