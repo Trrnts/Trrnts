@@ -30,12 +30,13 @@ router.post('/magnets', function (req, res) {
         magnetURI: magnetURI,
         ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
         infoHash: parsedMagnetURI.infoHash,
-        ps: -1 // Points: Indicate that this magnet has not been crawled yet.
+        score: -1 // Score: Indicate that this magnet has not been crawled yet.
       };
       // magnet:[infoHash] instead of magnets:[infoHash], since infoHash might
       // be 'latest' -> Security risk
       redis.hmset('magnet:' + magnet.infoHash, magnet);
       redis.zadd('magnets:createdAt', magnet.createdAt, magnet.infoHash);
+      redis.zadd('magnets:top', magnet.createdAt, magnet.score);
       redis.lpush('magnets:latest', magnet.infoHash);
       redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
       redis.rpush('magnets:crawl', magnet.infoHash);
