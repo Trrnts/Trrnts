@@ -42,7 +42,8 @@ DHT.prototype._onMessage = function (msg, rinfo) {
     var result = {};
     // peers have the torrent.
     result.peers = [];
-    // nodes have the torrent, but are nearest entries in the Hash Table to it.
+    // nodes do not have the torrent, but are the nearest entries in the Hash
+    // Table to it.
     result.nodes = [];
     if (msg.r && msg.r.values) {
       result.peers = _.map(msg.r.values, compact2string);
@@ -56,6 +57,7 @@ DHT.prototype._onMessage = function (msg, rinfo) {
   }
 };
 
+// Starts the DHT client by listening on the specified port.
 DHT.prototype.start = function (callback) {
   callback = callback || function () {  };
   this.socket.bind(this.port, function (exception) {
@@ -94,4 +96,5 @@ DHT.prototype.getPeers = function (infoHash, address, callback) {
   }.bind(this));
 };
 
+// See crawler.js for usage example.
 module.exports = exports = DHT;
