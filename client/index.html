@@ -6,7 +6,7 @@
     <title>trrnts</title>
   </head>
 
-  <body ng-app="Trrnts">
+  <body ng-app="trrntsApp">
 
     <div class="pure-menu pure-menu-open pure-menu-horizontal">
       <div class="pure-menu-heading">Trrnt</div>
@@ -25,15 +25,18 @@
       <div class="pure-u-1-3"><p><img src="http://theindigowillow.files.wordpress.com/2013/07/khole_sm.jpg" height="360" width="360"</p></div>
     </div>
 
-    <ui-view></ui-view>
-    
+    <form class="submit-magnet" ng-submit="submit()" ng-controller="SubmitMagnetLinkController">
+      <input type="text" ng-model="magnetURI" placeholder="Magnet URI">
+      <button>Submit!</button>
+    </form>
+
     <h4 class="footer">The front page for the BitTorrent network, providing insights through interactive analytics and data visualizations that leverage the DHT protocol.</h4>
 
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.8/angular-ui-router.min.js"></script>
     <script src="app.js"></script>
-    <script src="services/services.js"></script>
-    <script src="magnetLink/magnetLink.js"></script>
+    <script src="services.js"></script>
+    <script src="controllers.js"></script>
 
   </body>
 </html>
