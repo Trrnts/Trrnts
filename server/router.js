@@ -53,7 +53,11 @@ router.get('/magnets/top', function (req, res) {
 
 // http://localhost:9000/api/magnets/latest
 router.get('/magnets/latest', function (req, res) {
-  res.send('Hello World!');
+  redis.ZRANGE('magnets:createdAt', -5, -1, function(err, replies) {
+    redis.hmget(_.map(replies, function(infoHash) { return 'magnet:'+infoHash; })  ,function(err,replies){
+      res.send(replies);
+    });
+  });
 });
 
 module.exports = router;
