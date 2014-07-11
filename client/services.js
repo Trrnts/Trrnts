@@ -5,12 +5,21 @@ angular.module('trrntsApp.services', [])
   var submit = function (magnetURI) {
     return $http({
       method: 'POST',
-      url: '/api/mangets',
+      url: '/api/magnets',
       data: {'magnetURI': magnetURI}
     });
   };
 
+  // Retrieve n number of latest magnets
+  var getLatestMagnets = function(amount){
+    return $http({
+      method: 'GET',
+      url:'api/magnets/latest/'+amount
+    });
+  };
+
   return {
-    'submit': submit
+    'submit': submit,
+    'getLatestMagnets': getLatestMagnets
   };
 });
