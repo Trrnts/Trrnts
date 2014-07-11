@@ -1,4 +1,5 @@
 var DHT = require('./dht');
+var redis = require('../redis.js')
 var _ = require('lodash');
 
 var Crawler = function () {
@@ -13,10 +14,16 @@ var Crawler = function () {
 };
 
 Crawler.prototype.crawl = function (infoHash, callback) {
-  _.each(this.nodes, function (t, node) {
+  _.each(this.nodes, function (tStamp, node) {
+
     this.dht.getPeers(infoHash, node, function (err, resp) {
       _.each(resp.nodes, function (node) {
+
         this.nodes[node] = _.now();
+
+        //add nodes to redis set
+        redis.SADD('node', node, redis.print);
+
       }, this);
       _.each(resp.peers, function (peer) {
         this.peers[peer] = _.now();
@@ -25,7 +32,8 @@ Crawler.prototype.crawl = function (infoHash, callback) {
   }, this);
   setTimeout(function () {
     this.crawl(infoHash);
-  }.bind(this), 100);
+  }.bind(this), 1000);
+  console.log('nodes.length');
   console.log(_.keys(this.nodes).length + ' nodes');
   console.log(_.keys(this.peers).length + ' peers');
 };
@@ -35,8 +43,9 @@ Crawler.prototype.start = function (callback) {
 };
 
 var crawler = new Crawler();
+var infoHash = '7AE9924651F7E6A1E47C918C1256847DCA471BF9';
 
 crawler.start(function () {
-  crawler.crawl('7AE9924651F7E6A1E47C918C1256847DCA471BF9', function (err, stats) {
+  crawler.crawl(infoHash, function (err, stats) {
   });
 });
