@@ -1,7 +1,6 @@
 angular.module('trrnts.magnetLink', [])
 
-
-.controller('magnetLink', function ($scope, mangetLink) {
+.controller('magnetLink', function ($scope, magnetLinks) {
   $scope.form = {'magnetLink': ''};
 
   $scope.submit = function () {
@@ -10,7 +9,7 @@ angular.module('trrnts.magnetLink', [])
       magnetLink.submit($scope.form.magnetLink)
       .catch(function (err) {
         console.error(err);
-      };
+      });
     }
   };
 });

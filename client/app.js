@@ -1,4 +1,4 @@
-angular.module('trrnts', ['trrnts.magnetLink', 'trrnts.services', 'ui-router'])
+angular.module('trrnts', ['trrnts.magnetLink', 'trrnts.services', 'ui.router'])
 
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider

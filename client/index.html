@@ -1,14 +1,16 @@
 <!doctype html>
-<html ng-app="Trrnts">
+<html>
   <head>
     <title>Trrnts</title>
-    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.8/angular-ui-router.min.js"></script>
+    <!--<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.8/angular-ui-router.min.js"></script>-->
+    <script src="../bower_components/angular/angular.js"></script>
+    <script src="../bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+  </head>
+  <body ng-app="trrnts">
     <script src="app.js"></script>
     <script src="services/services.js"></script>
     <script src="magnetLink/magnetLink.js"></script>
-  </head>
-  <body>
     <h1>Trrnts</h1>
     <h3>The front page for the BitTorrent network, providing insights through interactive analytics and data visualizations that leverage the DHT protocol.</h3>    
     <a ui-sref="home">Home</a>

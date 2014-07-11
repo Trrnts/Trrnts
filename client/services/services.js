@@ -1,4 +1,4 @@
-angular.module('Trrnts.services', [])
+angular.module('trrnts.services', [])
 
 .factory('magnetLinks', function($http) {    
   // Submit Magnet Links
