@@ -1,4 +1,5 @@
 var DHT = require('./dht');
+var redis = require('../redis.js')
 var _ = require('lodash');
 
 // Uses an DHT instance in order to crawl the network.
@@ -19,22 +20,30 @@ var Crawler = function () {
 // Recursively crawls the BitTorrent DHT protocol using an instance of the DHT
 // class, which is a property of the instance of the crawler.
 Crawler.prototype.crawl = function (infoHash, callback) {
-  // We currenly only send the get_peers request to nodes, not to peers. TODO
-  _.each(this.nodes, function (t, node) {
+  _.each(this.nodes, function (tStamp, node) {
     this.dht.getPeers(infoHash, node, function (err, resp) {
       _.each(resp.nodes, function (node) {
+
         this.nodes[node] = _.now();
+        //add nodes to redis set
+        redis.SADD('node', node, redis.print);
+
       }, this);
+
       _.each(resp.peers, function (peer) {
         this.peers[peer] = _.now();
       }, this);
     }.bind(this));
   }, this);
+  //current implementation simply kicks the crawler off every 100ms. This is not sustainable
+  //and will be fixed in the future.
   // Crawls every node every 100 ms, which is not efficient. We only want to
   // crawl the the new nodes/ peers. TODO
   setTimeout(function () {
     this.crawl(infoHash);
   }.bind(this), 100);
+
+  console.log('nodes.length');
   console.log(_.keys(this.nodes).length + ' nodes');
   console.log(_.keys(this.peers).length + ' peers');
 };
@@ -43,9 +52,10 @@ Crawler.prototype.start = function (callback) {
   this.dht.start(callback);
 };
 
-// Example:
-// var crawler = new Crawler();
-// crawler.start(function () {
-//   crawler.crawl('7AE9924651F7E6A1E47C918C1256847DCA471BF9', function (err, stats) {
-//   });
-// });
+var crawler = new Crawler();
+var infoHash = '7AE9924651F7E6A1E47C918C1256847DCA471BF9';
+
+crawler.start(function () {
+  crawler.crawl(infoHash, function (err, stats) {
+  });
+});
