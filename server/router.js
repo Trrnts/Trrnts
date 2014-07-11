@@ -7,6 +7,7 @@ var router = express.Router();
 
 // http://localhost:9000/api/magnets
 router.post('/magnets', function (req, res) {
+  console.log('post');
   var magnetURI = req.body.magnetURI;
   var parsedMagnetURI = {};
   try {
@@ -53,9 +54,18 @@ router.get('/magnets/top', function (req, res) {
 });
 
 // http://localhost:9000/api/magnets/latest
-router.get('/magnets/latest', function (req, res) {
-  redis.ZRANGE('magnets:createdAt', -5, -1, function(err, replies) {
-    redis.hmget(_.map(replies, function(infoHash) { return 'magnet:'+infoHash; })  ,function(err,replies){
+// If ammout is bigger than the number of records on the DB it will not return undefined values
+router.get('/magnets/latest/:amount', function (req, res) {
+  console.log('GET:/api/magnets/latest/' + req.params.amount);
+
+  redis.ZRANGE('magnets:createdAt', -req.params.amount, -1, function(err, replies) {
+    var multi = redis.multi();
+
+    _.map(replies, function(infoHash) {
+      multi.hgetall( 'magnet:'+infoHash);
+    });
+
+    multi.exec(function(err, replies) {
       res.send(replies);
     });
   });
