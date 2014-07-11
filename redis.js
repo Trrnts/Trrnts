@@ -8,8 +8,8 @@ var redis = require('redis').createClient(redisPort, redisHost);
 
 redis.on('error', function (error) {
   console.error('Error in Redis client: ' + error.message);
-  console.log('Exiting now because of error in Redis client');
-  process.exit(1);
+  // console.log('Exiting now because of error in Redis client');
+  // process.exit(1);
 });
 
 redis.on('connect', function () {
