@@ -1,8 +1,5 @@
-"use strict";
-
-var bodyParser  = require('body-parser'),
-    middle      = require('./middleware');
-
+var bodyParser = require('body-parser'),
+    middle = require('./middleware');
 
 module.exports = exports = function (app, express, routers) {
   app.set('port', process.env.PORT || 9000);

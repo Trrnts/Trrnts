@@ -1,7 +1,7 @@
-var bencode = require('bencode');
-var dgram = require('dgram');
-var hat = require('hat');
-var _ = require('lodash');
+var bencode = require('bencode'),
+    dgram = require('dgram'),
+    hat = require('hat'),
+    _ = require('lodash');
 
 // compact2string might throw an error, but we don't want this. It should return
 // null instead.

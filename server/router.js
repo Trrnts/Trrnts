@@ -81,4 +81,4 @@ router.get('/magnets/latest/:amount', function (req, res) {
   });
 });
 
-module.exports = router;
+module.exports = exports = router;
