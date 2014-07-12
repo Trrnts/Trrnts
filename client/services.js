@@ -1,6 +1,6 @@
 angular.module('trrntsApp.services', [])
 
-.factory('magnetLinksFactory', function($http) {
+.factory('MagnetLinksFactory', function($http) {
   // Submit Magnet URI
   var submit = function (magnetURI) {
     return $http({
