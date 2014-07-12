@@ -1,11 +1,11 @@
-//convert a magnet into an object that has all the things it might need within the application
+var _ = require('lowdash');
+var redis = require('../redis');
 
-//worry about where to put it later
-
-//properties
-//methods
-//make sure to set up the prototyping correctly
-
-var Magnet = function(infoHashObject){
-
-}
+exports.Magnet = function(req, parsedMagnetURI){
+  this.name = parsedMagnetURI.name;
+  this.ip = req.headers
+  this.infoHash = parsedMagnetURI.infoHash;
+  this.createdAt = _.now();
+  this.magnetURI = magnetURI;
+  this.score = -1;
+};
