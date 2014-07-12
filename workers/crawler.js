@@ -21,6 +21,7 @@ var Crawler = function () {
 // class, which is a property of the instance of the crawler.
 Crawler.prototype.crawl = function (infoHash) {
   _.each(this.nodes, function (tStamp, node) {
+    console.log('----------------------------------- ' + INSIDE CRAWL);
     this.dht.getPeers(infoHash, node, function (err, resp) {
       _.each(resp.nodes, function (node) {
 
