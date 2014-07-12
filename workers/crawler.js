@@ -26,15 +26,18 @@ Crawler.prototype.crawl = function (infoHash) {
 
         this.nodes[node] = _.now();
         //add nodes to redis set
-        redis.SADD('node', node, redis.print);
+        redis.SADD('node', node);
       }, this);
 
       _.each(resp.peers, function (peer) {
         this.peers[peer] = _.now();
-        //add peers to redis sorted set
+
+        //add peers to redis set
+        redis.SADD('peer', peer);
+
+        //store each peer in a sorted set for its magnet. We will score each magnet by 
+        //seeing how many peers there are for the magnet in the last X minutes
         redis.ZADD('magnets:' + infoHash + ':peers', _.now(), peer);
-        redis.ZCARD('magnets:' + infoHash + ':peers', function (err, resp) {
-        })
       }, this);
     }.bind(this));
   }, this);
@@ -57,6 +60,7 @@ Crawler.prototype.start = function (callback) {
 };
 
 var crawler = new Crawler();
+//TODO: set infoHash based on user submitted magnet links
 var infoHash = '7AE9924651F7E6A1E47C918C1256847DCA471BF9';
 
 crawler.start(function () {

@@ -7,8 +7,7 @@ var router = express.Router();
 
 // http://localhost:9000/api/magnets
 router.post('/magnets', function (req, res) {
-  console.log('post');
-  var magnetURI = req.body.magnetURI;
+    var magnetURI = req.body.magnetURI;
   var parsedMagnetURI = {};
   try {
     parsedMagnetURI = parseMagnetURI(magnetURI);
@@ -53,6 +52,13 @@ router.post('/magnets', function (req, res) {
 // it returns an array of strings in the format of "ipadress:port"
 router.get('/nodes', function (req, res) {
   redis.SMEMBERS('node', function(error, result) {
+    console.log(result);
+    res.send(result);
+  });
+});
+
+router.get('/peers', function (req, res) {
+  redis.SMEMBERS('peer', function(error, result) {
     console.log(result);
     res.send(result);
   });
