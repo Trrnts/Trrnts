@@ -30,6 +30,12 @@
       <button>Submit!</button>
     </form>
 
+    <div class="latest-magnets" ng-controller="LatestMagnetLinksController">
+      <div ng-repeat="magnet in latestMagnets">
+          {{magnet.name}}}
+      </div>
+    </div>
+
     <h4 class="footer">The front page for the BitTorrent network, providing insights through interactive analytics and data visualizations that leverage the DHT protocol.</h4>
 
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.js"></script>
