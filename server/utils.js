@@ -1,4 +1,4 @@
-var _ = require('lowdash');
+var _ = require('lodash');
 var redis = require('../redis');
 
 exports.Magnet = function(req, parsedMagnetURI){

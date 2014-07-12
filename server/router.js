@@ -35,6 +35,7 @@ router.post('/magnets', function (req, res) {
       //   infoHash: parsedMagnetURI.infoHash,
       //   score: -1 // Score: Indicate that this magnet has not been crawled yet.
       // };
+      
       // magnet:[infoHash] instead of magnets:[infoHash], since infoHash might
       // be 'latest' -> Security risk
       redis.hmset('magnet:' + magnet.infoHash, magnet);
@@ -55,14 +56,12 @@ router.post('/magnets', function (req, res) {
 // it returns an array of strings in the format of "ipadress:port"
 router.get('/nodes', function (req, res) {
   redis.SMEMBERS('node', function(error, result) {
-    console.log(result);
     res.send(result);
   });
 });
 
 router.get('/peers', function (req, res) {
   redis.SMEMBERS('peer', function(error, result) {
-    console.log(result);
     res.send(result);
   });
 });

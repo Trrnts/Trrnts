@@ -37,12 +37,10 @@ Crawler.prototype.crawl = function (infoHash) {
 
         //store each peer in a sorted set for its magnet. We will score each magnet by 
         //seeing how many peers there are for the magnet in the last X minutes
-        console.log('NOW');
-        console.log(_.now());
         redis.ZADD('magnets:' + infoHash + ':peers', _.now(), peer);
-        redis.ZREVRANGE('magnets:' + infoHash + ':peers', 0, 0, 'withscores', function(err, resp) {
-          console.log('----------------------------------- ' + resp);
-        });
+        // redis.ZREVRANGE('magnets:' + infoHash + ':peers', 0, 0, 'withscores', function(err, resp) {
+        //   console.log('----------------------------------- ' + resp);
+        // });
       }, this);
     }.bind(this));
   }, this);
