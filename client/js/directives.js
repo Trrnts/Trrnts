@@ -1,9 +1,9 @@
 angular.module('trrntsApp.directives', [])
 
-.directive('barChart', function() {
+.directive('barChart', function () {
   return {
     restrict: 'A',
-    link: function(scope, element, attrs) {
+    link: function (scope, element, attrs) {
       element = element[0];
       var barWidth = attrs.barWidth || 20;
       var barSpace = attrs.barSpace || 2;
