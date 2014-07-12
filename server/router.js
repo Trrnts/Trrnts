@@ -58,34 +58,18 @@ router.get('/nodes', function (req, res) {
   });
 });
 
-// http://localhost:9000/api/magnets/top
-router.get('/magnets/top/:amount', function (req, res) {
-  redis.ZRANGE('magnets:top', -req.params.amount, -1, function(err, replies) {
+// http://localhost:9000/api/magnets/top or /latest
+router.get('/magnets/:list/:num?', function (req, res, next) {
+  if (['top', 'latest'].indexOf(req.params.list) === -1) {
+    return next();
+  }
+  var num = (req.params.num && parseInt(req.params.num)) || 10;
+  redis.ZRANGE('magnets:' + req.params.list, -num, -1, function(err, replies) {
     var multi = redis.multi();
-
     _.map(replies, function (infoHash) {
       multi.hgetall('magnet:' + infoHash);
     });
-
     multi.exec(function (err, replies) {
-      res.send(replies);
-    });
-  });
-});
-
-// http://localhost:9000/api/magnets/latest
-// If ammout is bigger than the number of records on the DB it will not return undefined values
-router.get('/magnets/latest/:amount', function (req, res) {
-  console.log('GET:/api/magnets/latest/' + req.params.amount);
-
-  redis.ZRANGE('magnets:createdAt', -req.params.amount, -1, function(err, replies) {
-    var multi = redis.multi();
-
-    _.map(replies, function(infoHash) {
-      multi.hgetall( 'magnet:'+infoHash);
-    });
-
-    multi.exec(function(err, replies) {
       res.send(replies);
     });
   });
