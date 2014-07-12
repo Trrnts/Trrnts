@@ -59,8 +59,20 @@ router.get('/nodes', function (req, res) {
 });
 
 // http://localhost:9000/api/magnets/top
-router.get('/magnets/top', function (req, res) {
-  res.send('Hello World!');
+router.get('/magnets/top/:amount', function (req, res) {
+  console.log('GET:/api/magnets/top/' + req.params.amount);
+
+  redis.ZRANGE('magnets:top', -req.params.amount, -1, function(err, replies) {
+    var multi = redis.multi();
+
+    _.map(replies, function(infoHash) {
+      multi.hgetall( 'magnet:'+infoHash);
+    });
+
+    multi.exec(function(err, replies) {
+      res.send(replies);
+    });
+  });
 });
 
 // http://localhost:9000/api/magnets/latest
