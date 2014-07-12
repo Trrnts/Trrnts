@@ -9,9 +9,9 @@ exports.Magnet = function(req, parsedMagnetURI){
   this.magnetURI = req.body.magnetURI;
   this.score = -1;
 
-  redis.hmset('magnet:' + magnet.infoHash, magnet);
-  redis.zadd('magnets:top', magnet.score, magnet.infoHash);
-  redis.zadd('magnets:latest', magnet.infoHash, magnet.createdAt);
-  redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
-  redis.rpush('magnets:crawl', magnet.infoHash);
+  redis.hmset('magnet:' + this.infoHash, this);
+  redis.zadd('magnets:top', this.score, this.infoHash);
+  redis.zadd('magnets:latest', this.createdAt, this.infoHash);
+  redis.sadd('magnets:ip:' + this.ip, this.infoHash);
+  redis.rpush('magnets:crawl', this.infoHash);
 };
