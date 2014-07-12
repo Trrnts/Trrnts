@@ -38,7 +38,7 @@ with `html`, `button`, `input`, `select`, and `textarea`. Pure Grids use
 specific font stacks to ensure the greatest OS/browser compatibility.
 */
 html, button, input, select, textarea, .pure-g [class *= "pure-u"] {
-  font: 400 16px/1.7 "Open Sans", "Helvetica Neue", Helvetica, Arial sans-serif;
+  font: 400 14px/1.7 "Open Sans", "Helvetica Neue", Helvetica, Arial sans-serif;
   color: #222;
   word-wrap: break-word;
 }
@@ -48,7 +48,7 @@ html {
   background: #f9f9f9;
 }
 
-header {
+header, footer {
   padding: 1em;
   text-align: center;
 }
@@ -89,11 +89,15 @@ article h3 a {
   text-decoration: none;
 }
 
+footer {
+  text-align: left;
+}
+
 @media screen and (min-width: 48em) {
   html {
     padding: 0 3em;
   }
-  header {
+  header, footer {
     padding: 1em;
   }
   article h3 {

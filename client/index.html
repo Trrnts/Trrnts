@@ -30,7 +30,7 @@
     </header>
 
     <section class="latest-magnets pure-g" ng-controller="LatestMagnetLinksController">
-      <article class="pure-u-1- pure-u-md-1-3" ng-repeat="magnet in latestMagnets">
+      <article class="pure-u-1 pure-u-md-1-2" ng-repeat="magnet in latestMagnets">
         <h3><a href="{{magnet.magnetURI}}">{{magnet.name}}</a></h3>
         <svg bar-chart bar-width="15" bar-space="1"></svg>
       </article>
