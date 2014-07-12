@@ -1,5 +1,5 @@
 var express = require('express'),
-    Magnet = require('./utils.js').Magnet;
+    Magnet = require('./utils.js').Magnet,
     redis = require('../redis'),
     parseMagnetURI = require('magnet-uri'),
     _ = require('lodash');

@@ -1,6 +1,6 @@
 angular.module('trrntsApp.services', [])
 
-.factory('MagnetLinksFactory', function($http) {
+.factory('MagnetLinksFactory', function ($http) {
   // Submit Magnet URI
   var submit = function (magnetURI) {
     return $http({
@@ -11,10 +11,10 @@ angular.module('trrntsApp.services', [])
   };
 
   // Retrieve n number of latest magnets
-  var getLatestMagnets = function(amount){
+  var getLatestMagnets = function (amount) {
     return $http({
       method: 'GET',
-      url:'api/magnets/latest/'+amount
+      url:'api/magnets/latest/' + amount
     });
   };
 

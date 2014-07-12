@@ -1,5 +1,5 @@
 var DHT = require('./dht');
-var redis = require('../redis.js')
+var redis = require('../redis.js');
 var _ = require('lodash');
 
 // Uses an DHT instance in order to crawl the network.
@@ -21,7 +21,7 @@ var Crawler = function () {
 // class, which is a property of the instance of the crawler.
 Crawler.prototype.crawl = function (infoHash) {
   _.each(this.nodes, function (tStamp, node) {
-    console.log('----------------------------------- ' + INSIDE CRAWL);
+    console.log('----------------------------------- INSIDE CRAWL');
     this.dht.getPeers(infoHash, node, function (err, resp) {
       _.each(resp.nodes, function (node) {
 
@@ -36,7 +36,7 @@ Crawler.prototype.crawl = function (infoHash) {
         //add peers to redis set
         redis.SADD('peer', peer);
 
-        //store each peer in a sorted set for its magnet. We will score each magnet by 
+        //store each peer in a sorted set for its magnet. We will score each magnet by
         //seeing how many peers there are for the magnet in the last X minutes
         redis.ZADD('magnets:' + infoHash + ':peers', _.now(), peer);
         // redis.ZREVRANGE('magnets:' + infoHash + ':peers', 0, 0, 'withscores', function(err, resp) {
