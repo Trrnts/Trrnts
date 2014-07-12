@@ -1,6 +1,6 @@
-var DHT = require('./dht');
-var redis = require('../redis.js')
-var _ = require('lodash');
+var DHT = require('./dht'),
+    redis = require('../redis.js'),
+    _ = require('lodash');
 
 // Uses an DHT instance in order to crawl the network.
 var Crawler = function () {
@@ -34,7 +34,7 @@ Crawler.prototype.crawl = function (infoHash) {
         //add peers to redis sorted set
         redis.ZADD('magnets:' + infoHash + ':peers', _.now(), peer);
         redis.ZCARD('magnets:' + infoHash + ':peers', function (err, resp) {
-        })
+        });
       }, this);
     }.bind(this));
   }, this);

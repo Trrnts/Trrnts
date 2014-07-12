@@ -1,9 +1,3 @@
-"use strict";
-
-/*
- * MiddleWare for the entire app
- */
-
 module.exports = exports = {
   logError: function (err, req, res, next) {
     if (err) {
@@ -18,6 +12,7 @@ module.exports = exports = {
       res.send(err, 500);
     }
   },
+
   cors: function (req, res, next) {
     res.header('Access-Controll-Allow-Origin', '*');
     res.header('Access-Controll-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
