@@ -31,8 +31,11 @@ Crawler.prototype.crawl = function (infoHash, callback) {
       }, this);
 
       _.each(resp.peers, function (peer) {
-        this.peers[peer] = _.now();
+        this.peers[peer] = _.now();        
       }, this);
+
+      // Store all peers to the geoQueue 
+      //this.pushPeersToGeoQueue(peers, infoHash);    
     }.bind(this));
   }, this);
   //current implementation simply kicks the crawler off every 100ms. This is not sustainable
@@ -51,6 +54,23 @@ Crawler.prototype.crawl = function (infoHash, callback) {
 Crawler.prototype.start = function (callback) {
   this.dht.start(callback);
 };
+
+Crawler.prototype.pushPeersToGeoQueue = function (peers, infoHash, callback) {
+  if (!peers.length || infoHash === undefined) {    
+    console.log('Invalid infoHash or peers set');
+    return;
+  }
+
+  // Each peer will have format infoHash:ipAddress:port 
+  var formattedPeers = []; 
+  _.each(peers, function (peer) {
+    var formattedPeer = infoHash + ":" + peer;
+    formattedPeers.push(formattedPeer);
+  });
+      
+  redis.LPUSH.apply(redis, formattedPeers); 
+};
+
 
 var crawler = new Crawler();
 var infoHash = '7AE9924651F7E6A1E47C918C1256847DCA471BF9';
