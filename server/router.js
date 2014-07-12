@@ -37,7 +37,7 @@ router.post('/magnets', function (req, res) {
       // be 'latest' -> Security risk
       redis.hmset('magnet:' + magnet.infoHash, magnet);
       redis.zadd('magnets:createdAt', magnet.createdAt, magnet.infoHash);
-      redis.zadd('magnets:top', -1, magnet.score);
+      redis.zadd('magnets:top', magnet.score, magnet.infoHash);
       redis.lpush('magnets:latest', magnet.infoHash);
       redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
       redis.rpush('magnets:crawl', magnet.infoHash);
