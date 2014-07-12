@@ -1,7 +1,7 @@
 // Port and Host of Redis server might be defined as environment variables. If
 // not, fall back to defaults.
-var redisPort = process.env.REDIS_PORT || 6379;
-var redisHost = process.env.REDIS_HOST || '127.0.0.1';
+var redisPort = process.env.REDIS_PORT || 6379,
+    redisHost = process.env.REDIS_HOST || '127.0.0.1';
 
 // Create a new client and establish a connection to DB.
 var redis = require('redis').createClient(redisPort, redisHost);
@@ -26,4 +26,4 @@ redis.on('connect', function () {
 // See http://redis.io/commands for available commands and
 // https://github.com/mranney/node_redis for basic usage.
 
-module.exports = redis;
+module.exports = exports = redis;
