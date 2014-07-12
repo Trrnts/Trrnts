@@ -63,15 +63,13 @@ Crawler.prototype.pushPeersToGeoQueue = function (peers, infoHash, callback) {
 
   // Each peer will have format infoHash:ipAddress:port. 
   // geoQueue is key, have to first element because of .apply
-  //var formattedPeers = ['geoQueue']; 
-  // CHECK ON PAIR MACHINES IF GIVING MULTIPLE WORKS
+  var formattedPeers = ['geoQueue'];   
   _.each(peers, function (peer) {
     var formattedPeer = infoHash + ":" + peer;
-    //formattedPeers.push(formattedPeer);
-    redis.LPUSH('geoQueue', formattedPeer);
+    formattedPeers.push(formattedPeer);    
   });
 
-  //redis.LPUSH.apply(redis, formattedPeers); 
+  redis.LPUSH.apply(redis, formattedPeers); 
 };
 
 
