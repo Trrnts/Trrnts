@@ -1,6 +1,6 @@
-var request = require('request');
-var _ = require('lodash');
-var port = process.env.PORT || 9000;
+var request = require('request'),
+    _ = require('lodash'),
+    port = process.env.PORT || 9000;
 
 _.each([  'magnet:?xt=urn:btih:c0664234b44f25de6cc7b536a798c65f858079cb&dn=Noah+%282014%29+1080p+BrRip+x264+-+YIFY&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Fopen.demonii.com%3A1337',
   'magnet:?xt=urn:btih:4015ab9713a0ff6e12167c5d71eba4c5975f8669&dn=Transcendence+%282014%29+WEB-DL+XviD-MAX&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Fopen.demonii.com%3A1337',
