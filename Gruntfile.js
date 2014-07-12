@@ -23,8 +23,7 @@ module.exports = function(grunt) {
     },
 
     jshint: {
-      ignores: ['node_modules/**/*.js', '**/*.min.js'],
-      all: ['**/*.js']
+      all: ['*.js', 'client/js/**/*.js', 'workers/**/*.js', 'server/**/*.js']
     },
 
     watch: {
@@ -43,5 +42,5 @@ module.exports = function(grunt) {
 
   grunt.registerTask('hint', ['jshint']);
   grunt.registerTask('buildClient', ['concat', 'uglify']);
-  grunt.registerTask('default', ['buildClient', 'watch']);
+  grunt.registerTask('default', ['jshint', 'buildClient', 'watch']);
 };
