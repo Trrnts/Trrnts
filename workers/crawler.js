@@ -60,6 +60,7 @@ Crawler.prototype.start = function (callback) {
 };
 
 var crawler = new Crawler();
+//TODO: set infoHash based on user submitted magnet links
 var infoHash = '7AE9924651F7E6A1E47C918C1256847DCA471BF9';
 
 crawler.start(function () {
