@@ -19,7 +19,7 @@ var Crawler = function () {
 
 // Recursively crawls the BitTorrent DHT protocol using an instance of the DHT
 // class, which is a property of the instance of the crawler.
-Crawler.prototype.crawl = function (infoHash, callback) {
+Crawler.prototype.crawl = function (infoHash) {
   _.each(this.nodes, function (tStamp, node) {
     this.dht.getPeers(infoHash, node, function (err, resp) {
       _.each(resp.nodes, function (node) {
@@ -27,14 +27,18 @@ Crawler.prototype.crawl = function (infoHash, callback) {
         this.nodes[node] = _.now();
         //add nodes to redis set
         redis.SADD('node', node, redis.print);
-
       }, this);
 
       _.each(resp.peers, function (peer) {
         this.peers[peer] = _.now();
+        //add peers to redis sorted set
+        redis.ZADD('magnets:' + infoHash + ':peers', _.now(), peer);
+        redis.ZCARD('magnets:' + infoHash + ':peers', function (err, resp) {
+        })
       }, this);
     }.bind(this));
   }, this);
+
   //current implementation simply kicks the crawler off every 100ms. This is not sustainable
   //and will be fixed in the future.
   // Crawls every node every 100 ms, which is not efficient. We only want to
