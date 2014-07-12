@@ -15,13 +15,13 @@ router.post('/magnets', function (req, res) {
   } catch (e) {  }
   // Empty parsed object -> invalid magnet link!
   if (_.isEmpty(parsedMagnetURI)) {
-    res.send({'error': 'Invalid Magnet URI'});
+    res.send(400, {'error': 'Invalid Magnet URI'});
     return;
   }
   // Don't insert duplicates!
   redis.exists('magnet:' + parsedMagnetURI.infoHash, function (err, exists) {
     if (exists) {
-      res.send({'error': 'This Magnet URI has already been submitted'});
+      res.send(400, {'error': 'This Magnet URI has already been submitted'});
     } else {
       // Everything is ok, insert Magnet into database.
       // Create an empty magnet object.
