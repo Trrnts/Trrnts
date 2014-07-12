@@ -25,6 +25,8 @@ router.post('/magnets', function (req, res) {
     } else {
       // Everything is ok, insert Magnet into database.
       // Create an empty magnet object.
+
+      //THIS NEEDS TESTING ONCE THERE IS A POST REQUEST FORM
       var magnet = new Magnet(req, parsedMagnetURI);
 
       // var magnet = {
@@ -38,12 +40,12 @@ router.post('/magnets', function (req, res) {
       
       // magnet:[infoHash] instead of magnets:[infoHash], since infoHash might
       // be 'latest' -> Security risk
-      redis.hmset('magnet:' + magnet.infoHash, magnet);
-      redis.zadd('magnets:createdAt', magnet.createdAt, magnet.infoHash);
-      redis.zadd('magnets:top', magnet.score, magnet.infoHash);
-      redis.lpush('magnets:latest', magnet.infoHash);
-      redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
-      redis.rpush('magnets:crawl', magnet.infoHash);
+      // redis.hmset('magnet:' + magnet.infoHash, magnet);
+      // redis.zadd('magnets:createdAt', magnet.createdAt, magnet.infoHash);
+      // redis.zadd('magnets:top', magnet.score, magnet.infoHash);
+      // redis.lpush('magnets:latest', magnet.infoHash);
+      // redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
+      // redis.rpush('magnets:crawl', magnet.infoHash);
 
       // Insertion complete.
       res.send(magnet);
