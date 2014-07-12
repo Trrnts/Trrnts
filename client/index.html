@@ -2,40 +2,46 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800,300">
     <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
-    <title>trrnts</title>
+    <!--[if lte IE 8]>
+      <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+      <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css">
+    <!--<![endif]-->
+    <link rel="stylesheet" href="css/main.css">
+    <title>Trrnts</title>
   </head>
 
   <body ng-app="trrntsApp">
 
-    <div class="pure-menu pure-menu-open pure-menu-horizontal">
-      <div class="pure-menu-heading">Trrnt</div>
-      <ul>
-        <li>
-        </li>
-      </ul>
-    </div>
+    <header class="pure-g">
+      <div class="pure-u-1-3">
+        <!-- <small><a href="#latest" class="latest-link">Latest submissions</a></small>
+        <small><a href="#stats" class="stats-link">Stats</a></small> -->
+      </div>
+      <div class="pure-u-1-3">
+        <a href="/" class="logo">Trrnts</a>
+      </div>
+      <div class="pure-u-1-3">
+        <!-- <small><a href="#submit" class="submit">Submit a magnet</a></small> -->
+      </div>
+    </header>
 
-    <div class="pure-g center">
-      <div class="pure-u-1-3"><p><img src="http://blog.internations.org/wp-content/uploads/2011/08/pie-chart.png"  height="360" width="360"/></p></div>
-      <div class="pure-u-1-3"><p><img src="http://3.bp.blogspot.com/_CERlGVs2E6w/TT9Y7d7cuuI/AAAAAAAAAKs/B_3YizNCI6s/s1600/MarcScatter7.png" height="360" width="360"/></p></div>
-      <div class="pure-u-1-3"><p><img src="http://theindigowillow.files.wordpress.com/2013/07/khole_sm.jpg" height="360" width="360"></p></div>
-    </div>
+    <section class="latest-magnets pure-g" ng-controller="LatestMagnetLinksController">
+      <article class="pure-u-1- pure-u-md-1-3" ng-repeat="magnet in latestMagnets">
+        <h3><a href="{{magnet.magnetURI}}">{{magnet.name}}</a></h3>
+        <svg bar-chart bar-width="15" bar-space="1"></svg>
+      </article>
+    </section>
 
     <form class="submit-magnet" ng-submit="submit()" ng-controller="SubmitMagnetLinkController">
       <input type="text" ng-model="magnetURI" placeholder="Magnet URI">
       <button>Submit!</button>
     </form>
 
-    <div class="latest-magnets" ng-controller="LatestMagnetLinksController">
-      <div ng-repeat="magnet in latestMagnets">
-          {{magnet.name}}}
-      </div>
-    </div>
-    <svg bar-chart bar-width="10" bar-space='2'></svg>
-
-    <h4 class="footer">The front page for the BitTorrent network, providing insights through interactive analytics and data visualizations that leverage the DHT protocol.</h4>
+    <footer>The front page for the BitTorrent network, providing insights through interactive analytics and data visualizations that leverage the DHT protocol.</footer>
 
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.8/angular-ui-router.min.js"></script>
