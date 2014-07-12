@@ -26,7 +26,6 @@ router.post('/magnets', function (req, res) {
       // Everything is ok, insert Magnet into database.
       // Create an empty magnet object.
 
-      //THIS NEEDS TESTING ONCE THERE IS A POST REQUEST FORM
       var magnet = new Magnet(req, parsedMagnetURI);
 
       // var magnet = {
@@ -37,7 +36,7 @@ router.post('/magnets', function (req, res) {
       //   infoHash: parsedMagnetURI.infoHash,
       //   score: -1 // Score: Indicate that this magnet has not been crawled yet.
       // };
-      
+
       // magnet:[infoHash] instead of magnets:[infoHash], since infoHash might
       // be 'latest' -> Security risk
       // redis.hmset('magnet:' + magnet.infoHash, magnet);
