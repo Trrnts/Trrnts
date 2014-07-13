@@ -11,15 +11,19 @@ angular.module('trrntsApp.services', [])
   };
 
   // Retrieve n number of latest magnets
-  var getLatestMagnets = function (amount) {
+  var getLatest = function (start, stop) {
     return $http({
       method: 'GET',
-      url:'api/magnets/latest/' + amount
+      url:'api/magnets/latest',
+      params: {
+        start: start || 1,
+        stop: stop || 30
+      }
     });
   };
 
   return {
-    'submit': submit,
-    'getLatestMagnets': getLatestMagnets
+    submit: submit,
+    getLatest: getLatest
   };
 });

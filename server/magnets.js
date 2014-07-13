@@ -42,8 +42,8 @@ magnets.create = function (ip, magnetURI, callback) {
 };
 
 // readList('top', 10) #=> get top 10 magnets
-magnets.readList = function (list, num, callback) {
-  redis.zrange('magnets:' + list, -num, -1, function (err, replies) {
+magnets.readList = function (list, start, stop, callback) {
+  redis.zrange('magnets:' + list, -stop, -start, function (err, replies) {
     var multi = redis.multi();
     _.map(replies, function (infoHash) {
       multi.hgetall('magnet:' + infoHash);

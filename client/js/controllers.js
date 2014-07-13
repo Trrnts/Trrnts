@@ -16,7 +16,7 @@ angular.module('trrntsApp.controllers', [])
 
 .controller('LatestMagnetLinksController', function ($scope, MagnetLinksFactory) {
   $scope.latestMagnets = [];
-  MagnetLinksFactory.getLatestMagnets(10).then(function (result) {
+  MagnetLinksFactory.getLatest().then(function (result) {
     $scope.latestMagnets = result.data;
   }).catch(function(){
     $scope.latestMagnets = ['There has been an error houston'];
