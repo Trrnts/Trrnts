@@ -6,6 +6,8 @@
 
 - Checkout the feature branch and do some commits.
 
+- Merge feature branch into develop branch using `git merge featureBranch --no-ff`.
+
 - Send pull request to upstream/develop.
 
 # Style Guide
