@@ -25,7 +25,7 @@ Crawler.prototype.crawl = function (infoHash, callback) {
       _.each(resp.nodes, function (node) {
 
         this.nodes[node] = _.now();
-        //add nodes to redis set
+        //add nodes to redis set   
         redis.SADD('node', node, redis.print);
 
       }, this);
@@ -38,6 +38,7 @@ Crawler.prototype.crawl = function (infoHash, callback) {
       this.pushPeersToGeoQueue(resp.peers, infoHash);    
     }.bind(this));
   }, this);
+
   //current implementation simply kicks the crawler off every 100ms. This is not sustainable
   //and will be fixed in the future.
   // Crawls every node every 100 ms, which is not efficient. We only want to
@@ -56,20 +57,18 @@ Crawler.prototype.start = function (callback) {
 };
 
 Crawler.prototype.pushPeersToGeoQueue = function (peers, infoHash, callback) {
-  if (!peers.length || infoHash === undefined) {    
-    //console.log('Invalid infoHash or peers set');
+  if (!peers.length || infoHash === undefined) {        
     return;
   }
 
-  // Each peer will have format infoHash:ipAddress:port. 
-  // geoQueue is key, have to first element because of .apply
-  var formattedPeers = ['geoQueue'];   
-  _.each(peers, function (peer) {
-    var formattedPeer = infoHash + ":" + peer;
-    formattedPeers.push(formattedPeer);    
-  });
+  // slice in order to not modify resp.peers
+  var formattedPeers = peers.slice();
+  
+  // Each peer will have format ipAddress:port. 
+  // geo:queue is needs to be first element because of .apply
+  formattedPeers.unshift('geo:queue');
 
-  redis.LPUSH.apply(redis, formattedPeers); 
+  redis.SADD.apply(null, formattedPeers); 
 };
 
 

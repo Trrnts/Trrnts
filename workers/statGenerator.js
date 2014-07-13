@@ -9,31 +9,43 @@ var _ = require('lodash');
 // Map all peers stored in geoQueue & reset geoQueue
 var geoMapWorker = function () {  
   // Using MULTI because need to delete key right after getting results.
-  // That way no new items are added to queue in between LRANGE & DEL.
+  // That way no new items are added to queue in between LRANGE & DEL.  
   var multi = redis.multi();
-  multi.LRANGE('geoQueue', 0, -1);
-  multi.DEL('geoQueue', redis.print);
+  multi.SMEMBERS('geo:queue');
+  multi.DEL('geo:queue', redis.print);
   multi.exec(function (err, results) {
     if (err) {
       console.error(err);
     }
-
-    _.each(results[0], mapPeer);
+        
+    _.each(results[0], mapPeer);    
   });
 };
 
 // Map the geo Location for IP Address of a peer
 var mapPeer = function (peer) {
-  // Format InfoHash : ipAddress : port
+  // Format IP Address : port
   var peerArr = peer.split(':'); 
-  var geoObj = geoip.lookup(peerArr[1]);  
+  var geoObj = geoip.lookup(peerArr[0]);  
+
+  // geoip fails to on some ip address and returns null. For Now, check if geoObj is null and set it to ? for all properties. 
+  // Might need to change library
+  if (geoObj === null) {
+    console.log("failed geoip lookup");
+    geoObj = {};
+    geoObj.country = '?';
+    geoObj.region = '?';
+    geoObj.city = '?';
+    geoObj.ll = '?,?';
+  }
   
-  // format geoKey country : region : city : lat,long
+  // region or city can be blank if geoip cannot retreive those. 
+  // This is fine, because on retreival string will be split and 
+  // it will generate a blank element in split Array .
   var geoKey = geoObj.country + ":" + geoObj.region + ":" + geoObj.city + ":" + geoObj.ll.toString();
-    
-  redis.LPUSH(geoKey, peerArr[0]);
+  redis.SADD(geoKey, peerArr[0]);
   // Store all Geo location in Hash Table where each key is geoKey and the value represents the number of peers in that region.
-  redis.HINCRBY('geoMap', geoKey, 1);
+  redis.HINCRBY('geo:map', geoKey, 1);
 }
 
 geoMapWorker();
