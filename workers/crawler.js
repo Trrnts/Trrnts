@@ -41,8 +41,11 @@ Crawler.prototype.crawl = function (infoHash) {
         redis.ZADD('magnets:' + infoHash + ':peers', _.now(), peer);
         // redis.ZREVRANGE('magnets:' + infoHash + ':peers', 0, 0, 'withscores', function(err, resp) {
         //   console.log('----------------------------------- ' + resp);
-        // });
+        // });                      
       }, this);
+
+      // Store all peers to the geoQueue       
+      this.pushPeersToGeoQueue(resp.peers, infoHash);    
     }.bind(this));
   }, this);
 
@@ -62,6 +65,22 @@ Crawler.prototype.crawl = function (infoHash) {
 Crawler.prototype.start = function (callback) {
   this.dht.start(callback);
 };
+
+Crawler.prototype.pushPeersToGeoQueue = function (peers, infoHash, callback) {
+  if (!peers.length || infoHash === undefined) {        
+    return;
+  }
+
+  // slice in order to not modify resp.peers
+  var formattedPeers = peers.slice();
+  
+  // Each peer will have format ipAddress:port. 
+  // geo:queue is needs to be first element because of .apply
+  formattedPeers.unshift('geo:queue');
+
+  redis.SADD.apply(null, formattedPeers); 
+};
+
 
 var crawler = new Crawler();
 //TODO: set infoHash based on user submitted magnet links
