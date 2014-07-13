@@ -80,7 +80,7 @@ DHT.prototype.getPeers = function (infoHash, address, callback) {
   callback = callback || function () {  };
   var transactionID = this.nextTransactionID++;
   var message = bencode.encode({
-    t: this._transactionIdToBuffer(11),
+    t: this._transactionIdToBuffer(transactionID),
     y: 'q',
     q: 'get_peers',
     a: {
