@@ -1,53 +1,17 @@
 var express = require('express'),
-    Magnet = require('./utils.js').Magnet,
-    redis = require('../redis'),
-    parseMagnetURI = require('magnet-uri'),
-    _ = require('lodash');
+    magnets = require('./magnets');
 
 var router = express.Router();
 
 // http://localhost:9000/api/magnets
 router.post('/magnets', function (req, res) {
-  var magnetURI = req.body.magnetURI;
-  var parsedMagnetURI = {};
-  try {
-    parsedMagnetURI = parseMagnetURI(magnetURI);
-  } catch (e) {  }
-  // Empty parsed object -> invalid magnet link!
-  if (_.isEmpty(parsedMagnetURI)) {
-    res.send(400, {'error': 'Invalid Magnet URI'});
-    return;
-  }
-  // Don't insert duplicates!
-  redis.exists('magnet:' + parsedMagnetURI.infoHash, function (err, exists) {
-    if (exists) {
-      res.send(400, {'error': 'This Magnet URI has already been submitted'});
+  var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  magnets.create(ip, req.body.magnetURI, function (err, magnet) {
+    if (err) {
+      res.send(400, {error: err.message});
     } else {
-      // Everything is ok, insert Magnet into database.
-      // Create an empty magnet object.
-
-      var magnet = new Magnet(req, parsedMagnetURI);
-
-      // var magnet = {
-      //   createdAt: new Date().getTime(),
-      //   name: parsedMagnetURI.name,
-      //   magnetURI: magnetURI,
-      //   ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-      //   infoHash: parsedMagnetURI.infoHash,
-      //   score: -1 // Score: Indicate that this magnet has not been crawled yet.
-      // };
-
-      // magnet:[infoHash] instead of magnets:[infoHash], since infoHash might
-      // be 'latest' -> Security risk
-      // redis.hmset('magnet:' + magnet.infoHash, magnet);
-      // redis.zadd('magnets:createdAt', magnet.createdAt, magnet.infoHash);
-      // redis.zadd('magnets:top', magnet.score, magnet.infoHash);
-      // redis.lpush('magnets:latest', magnet.infoHash);
-      // redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
-      // redis.rpush('magnets:crawl', magnet.infoHash);
-
-      // Insertion complete.
-      res.send(magnet);
+      // Send back magnet when successful.
+      res.send(200, magnet);
     }
   });
 });
@@ -69,19 +33,15 @@ router.get('/peers', function (req, res) {
 
 // http://localhost:9000/api/magnets/top or /latest
 router.get('/magnets/:list/:num?', function (req, res, next) {
-  if (['top', 'latest'].indexOf(req.params.list) === -1) {
+  var list = req.params.list;
+  if (['top', 'latest'].indexOf(list) !== -1) {
+    var num = (req.params.num && parseInt(req.params.num)) || 10;
+    magnets.readList(list, num, function (err, top) {
+      res.send(200, top);
+    });
+  } else {
     return next();
   }
-  var num = (req.params.num && parseInt(req.params.num)) || 10;
-  redis.ZRANGE('magnets:' + req.params.list, -num, -1, function(err, replies) {
-    var multi = redis.multi();
-    _.map(replies, function (infoHash) {
-      multi.hgetall('magnet:' + infoHash);
-    });
-    multi.exec(function (err, replies) {
-      res.send(replies);
-    });
-  });
 });
 
 module.exports = exports = router;
