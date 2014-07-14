@@ -21,4 +21,13 @@ angular.module('trrntsApp.controllers', [])
   }).catch(function () {
     $scope.latest = [];
   });
+}])
+
+.controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+  $scope.top = [];
+  MagnetLinksFactory.top().then(function (result) {
+    $scope.top = result.data;
+  }).catch(function () {
+    $scope.top = [];
+  });
 }]);
