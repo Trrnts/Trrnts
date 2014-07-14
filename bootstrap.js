@@ -1,4 +1,5 @@
-//This file is used to seed the database, usage 'node bootstrap.js'
+// This file is used to seed the database with the following magnets, usage 'node bootstrap.js'
+// Can be used for testing purposes
 
 var request = require('request'),
     _ = require('lodash'),
