@@ -1,6 +1,6 @@
 angular.module('trrntsApp.controllers', [])
 
-.controller('SubmitMagnetLinkController', function ($scope, MagnetLinksFactory) {
+.controller('SubmitMagnetLinkController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
   $scope.magnetURI = '';
 
   $scope.submit = function () {
@@ -12,17 +12,17 @@ angular.module('trrntsApp.controllers', [])
       });
     }
   };
-})
+}])
 
-.controller('LatestMagnetLinksController', function ($scope, MagnetLinksFactory) {
+.controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
   $scope.latestMagnets = [];
   MagnetLinksFactory.getLatest().then(function (result) {
     $scope.latestMagnets = result.data;
   }).catch(function(){
     $scope.latestMagnets = ['There has been an error houston'];
   });
-})
+}])
 
-.controller('TopMagnetLinksController', function ($scope) {
+.controller('TopMagnetLinksController', ['$scope', function ($scope) {
   $scope.topMagnets = [];
-});
+}]);
