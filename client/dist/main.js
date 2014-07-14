@@ -1,6 +1,13 @@
 angular.module('trrntsApp', [
+<<<<<<< HEAD
   'ui.router',
   'trrntsApp.main'
+=======
+  'trrntsApp.controllers',
+  'trrntsApp.services',
+  'trrntsApp.directives',
+  'trrntsApp.filters'
+>>>>>>> 30cfbadca07075e3c0590b6b9bcdb951f0c1928f
 ])
 .config(['$stateProvider', function ($stateProvider) {
   // Angular prefixes magnet URIs with "unsafe:", which makes them unclickable.
@@ -85,6 +92,7 @@ angular.module('trrntsApp.directives', [])
   };
 });
 
+<<<<<<< HEAD
 // main.js contains the logic for nested views
 // within the angular.module we require all the local modules we need and within
 // the views object when can add and remove subviews with ease
@@ -118,6 +126,16 @@ angular.module('trrntsApp.main', [
         }
       });
 }]);
+=======
+angular.module('trrntsApp.filters', [])
+
+.filter('agoFilter', function () {
+  return function (timestamp) {
+    timestamp = parseInt(timestamp);
+    return moment(timestamp).fromNow() + ' ago';
+  };
+});
+>>>>>>> 30cfbadca07075e3c0590b6b9bcdb951f0c1928f
 
 angular.module('trrntsApp.services', [])
 

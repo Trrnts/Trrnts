@@ -5,7 +5,8 @@
 angular.module('trrntsApp.main', [
     'trrntsApp.controllers',
     'trrntsApp.services',
-    'trrntsApp.directives'
+    'trrntsApp.directives',
+    'trrntsApp.filters'
     ])
   .config(['$stateProvider',function ($stateProvider) {
     $stateProvider

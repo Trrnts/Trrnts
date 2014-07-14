@@ -2,34 +2,46 @@
 Apply a natural box layout model to all elements. See
 http://www.paulirish.com/2012/box-sizing-border-box-ftw/ for details.
 */
-*, *:before, *:after {
-  -moz-box-sizing: border-box;
+
+*,
+*:before,
+*:after {
   -webkit-box-sizing: border-box;
-  box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 /*
 Change placholder color. See http://stackoverflow.com/a/2610741/3773544 for
 details
 */
-::-webkit-input-placeholder { /* WebKit browsers */
+
+::-webkit-input-placeholder {
+  /* WebKit browsers */
+
   font-weight: 300;
   color: #ccc;
 }
 
-:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+
   font-weight: 300;
   color: #ccc;
   opacity: 1;
 }
 
-::-moz-placeholder { /* Mozilla Firefox 19+ */
+::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+
   font-weight: 300;
   color: #ccc;
   opacity: 1;
 }
 
-:-ms-input-placeholder { /* Internet Explorer 10+ */
+:-ms-input-placeholder {
+  /* Internet Explorer 10+ */
+
   font-weight: 300;
   color: #ccc;
 }
@@ -39,24 +51,51 @@ When setting the primary font stack, apply it to the Pure grid units along
 with `html`, `button`, `input`, `select`, and `textarea`. Pure Grids use
 specific font stacks to ensure the greatest OS/browser compatibility.
 */
-html, button, input, select, textarea, .pure-g [class *= "pure-u"] {
+
+html,
+button,
+input,
+select,
+textarea,
+.pure-g [class*="pure-u"] {
   font: 400 14px/1.7 "Open Sans", "Helvetica Neue", Helvetica, Arial sans-serif;
   color: #222;
   word-wrap: break-word;
 }
 
 /*
-Use some padding for a smooth visual experience.
+Use some whitespace for a smooth visual experience.
 */
+
 html {
   padding: 0 0.5em;
   background: #f9f9f9;
 }
 
+section {
+  margin-bottom: 2em;
+}
+
 /*
 Style top and latest. Styles are very similar and can be reused.
 */
-.top article, .latest article {
+
+.top header,
+.latest header {
+  text-align: left;
+}
+
+.top h2,
+.latest h2 {
+  margin: 0;
+  font-size: 80%;
+  font-weight: 300;
+  color: #ccc;
+  text-transform: uppercase;
+}
+
+.top article,
+.latest article {
   background: #fff;
   border: 1px solid #eee;
 }
@@ -70,26 +109,42 @@ Style top and latest. Styles are very similar and can be reused.
   border-bottom: 0;
 }
 
-.top article h3, .latest article h3 {
+.latest article:last-child {
+  border-bottom: 1px solid #eee;
+}
+
+.top article h3,
+.latest article h3 {
   padding: 0;
   margin: 0.5em;
   font-weight: 600;
 }
 
-.top article h3 a, .latest article h3 a {
+.top article h3 a,
+.latest article h3 a {
   color: #222;
   text-decoration: none;
 }
 
-.latest article:last-child {
-  border-bottom: 1px solid #eee;
+.top .ago,
+.latest .ago {
+  padding: 0.5em;
+  font-weight: 300;
+  color: #d8d8d8;
+  text-align: right;
+}
+
+.top .ago {
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
 
 .top article svg[bar-chart] {
-  height: 70px;
-  display: block;
   position: absolute;
   bottom: 0;
+  display: block;
+  height: 70px;
 }
 
 .top article svg[bar-chart] .bar {
@@ -99,12 +154,19 @@ Style top and latest. Styles are very similar and can be reused.
 /*
 Style header and footer. Styles are very similar.
 */
-header, footer {
-  padding: 1em;
+
+body > header {
+  padding-bottom: 0;
+}
+
+header,
+footer {
+  padding: 0.5em;
   text-align: center;
 }
 
-header a, footer a {
+header a,
+footer a {
   color: #222;
   text-decoration: none;
 }
@@ -130,14 +192,17 @@ footer {
 Make it responsive! These styles only apply on "large" screens. This stylesheet
 leverages an approach called "mobile first" (http://zurb.com/word/mobile-first).
 */
+
 @media screen and (min-width: 48em) {
   html {
     padding: 0 3em;
   }
-  header, footer {
+  header,
+  footer {
     padding: 1em;
   }
-  .top article h3, .latest article h3 {
+  .top article h3,
+  .latest article h3 {
     margin: 1em;
   }
 }
