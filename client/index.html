@@ -29,14 +29,20 @@
       </div>
     </header>
 
-    <section class="top pure-g" ng-controller="LatestMagnetLinksController">
-      <article class="pure-u-1 pure-u-md-1-2" ng-repeat="magnet in latest">
+    <section class="top pure-g" ng-controller="TopMagnetLinksController">
+      <article class="pure-u-1 pure-u-md-1-2" ng-repeat="magnet in top">
         <h3><a href="{{magnet.magnetURI}}">{{magnet.name}}</a></h3>
         <svg bar-chart bar-width="15" bar-space="1"></svg>
       </article>
     </section>
 
-    <form class="submit-magnet" ng-submit="submit()" ng-controller="SubmitMagnetLinkController">
+    <section class="latest pure-g" ng-controller="LatestMagnetLinksController">
+      <article class="pure-u-1" ng-repeat="magnet in latest">
+        <h3><a href="{{magnet.magnetURI}}">{{magnet.name}}</a></h3>
+      </article>
+    </section>
+
+    <form class="submit" ng-submit="submit()" ng-controller="SubmitMagnetLinkController">
       <input type="text" ng-model="magnetURI" placeholder="Magnet URI">
       <button>Submit!</button>
     </form>

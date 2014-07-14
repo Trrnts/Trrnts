@@ -16,21 +16,23 @@ details
   font-weight: 300;
   color: #ccc;
 }
+
 :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
   font-weight: 300;
   color: #ccc;
   opacity: 1;
 }
+
 ::-moz-placeholder { /* Mozilla Firefox 19+ */
   font-weight: 300;
   color: #ccc;
   opacity: 1;
 }
+
 :-ms-input-placeholder { /* Internet Explorer 10+ */
   font-weight: 300;
   color: #ccc;
 }
-
 
 /*
 When setting the primary font stack, apply it to the Pure grid units along
@@ -43,22 +45,71 @@ html, button, input, select, textarea, .pure-g [class *= "pure-u"] {
   word-wrap: break-word;
 }
 
+/*
+Use some padding for a smooth visual experience.
+*/
 html {
   padding: 0 0.5em;
   background: #f9f9f9;
 }
 
+/*
+Style top and latest. Styles are very similar and can be reused.
+*/
+.top article, .latest article {
+  background: #fff;
+  border: 1px solid #eee;
+}
+
+.top article {
+  position: relative;
+  height: 140px;
+}
+
+.latest article {
+  border-bottom: 0;
+}
+
+.top article h3, .latest article h3 {
+  padding: 0;
+  margin: 0.5em;
+  font-weight: 600;
+}
+
+.top article h3 a, .latest article h3 a {
+  color: #222;
+  text-decoration: none;
+}
+
+.latest article:last-child {
+  border-bottom: 1px solid #eee;
+}
+
+.top article svg[bar-chart] {
+  height: 70px;
+  display: block;
+  position: absolute;
+  bottom: 0;
+}
+
+.top article svg[bar-chart] .bar {
+  fill: #eee;
+}
+
+/*
+Style header and footer. Styles are very similar.
+*/
 header, footer {
   padding: 1em;
   text-align: center;
 }
 
-header a {
+header a, footer a {
   color: #222;
   text-decoration: none;
 }
 
-.logo {
+header .logo {
   font-weight: 700;
   border-bottom: 2px solid #222;
 }
@@ -71,28 +122,14 @@ header div:last-child {
   text-align: right;
 }
 
-.top article {
-  background: #fff;
-  position: relative;
-  border: 1px solid #eee;
-  height: 140px;
-}
-
-.top article h3 {
-  padding: 0;
-  margin: 1em;
-  font-weight: 600;
-}
-
-.top article h3 a {
-  color: #222;
-  text-decoration: none;
-}
-
 footer {
   text-align: left;
 }
 
+/*
+Make it responsive! These styles only apply on "large" screens. This stylesheet
+leverages an approach called "mobile first" (http://zurb.com/word/mobile-first).
+*/
 @media screen and (min-width: 48em) {
   html {
     padding: 0 3em;
@@ -100,18 +137,7 @@ footer {
   header, footer {
     padding: 1em;
   }
-  .top article h3 {
-    margin: 0.5em;
+  .top article h3, .latest article h3 {
+    margin: 1em;
   }
-}
-
-.top article svg[bar-chart] {
-  height: 70px;
-  display: block;
-  position: absolute;
-  bottom: 0;
-}
-
-.top article svg[bar-chart] .bar {
-  fill: #eee;
 }
