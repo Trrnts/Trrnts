@@ -1,4 +1,5 @@
-// This script is being used for inserting some sample data to play with. To get
+
+// This script is being used for inserting some sample data to play with, usage 'node bootstrap.js'. To get
 // more magnet links, go to http://thepiratebay.se/. Links to torrents point to
 // magnet links (click on magnet-icon).
 
