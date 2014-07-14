@@ -87,8 +87,10 @@ Style top and latest. Styles are very similar and can be reused.
 
 .top h2,
 .latest h2 {
-  font-weight: 600;
-  font-size: 14px;
+  text-transform: uppercase;
+  color: #ccc;
+  font-weight: 300;
+  font-size: 80%;
   margin: 0;
 }
 
