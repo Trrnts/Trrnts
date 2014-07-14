@@ -71,20 +71,20 @@ header div:last-child {
   text-align: right;
 }
 
-article {
+.top article {
   background: #fff;
   position: relative;
   border: 1px solid #eee;
   height: 140px;
 }
 
-article h3 {
+.top article h3 {
   padding: 0;
   margin: 1em;
   font-weight: 600;
 }
 
-article h3 a {
+.top article h3 a {
   color: #222;
   text-decoration: none;
 }
@@ -100,18 +100,18 @@ footer {
   header, footer {
     padding: 1em;
   }
-  article h3 {
+  .top article h3 {
     margin: 0.5em;
   }
 }
 
-article svg[bar-chart] {
+.top article svg[bar-chart] {
   height: 70px;
   display: block;
   position: absolute;
   bottom: 0;
 }
 
-article svg[bar-chart] .bar {
+.top article svg[bar-chart] .bar {
   fill: #eee;
 }
