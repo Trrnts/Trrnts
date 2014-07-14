@@ -1,3 +1,7 @@
+// This script is being used for inserting some sample data to play with. To get
+// more magnet links, go to http://thepiratebay.se/. Links to torrents point to
+// magnet links (click on magnet-icon).
+
 var request = require('request'),
     _ = require('lodash'),
     port = process.env.PORT || 9000;

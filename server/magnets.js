@@ -3,7 +3,7 @@ var _ = require('lodash'),
     parseMagnetURI = require('magnet-uri'),
     magnets = {};
 
-// create('127.0.0.1', 'magnet:?xt=urn:btih:c066...1337') #=> insert magnet link
+// create('127.0.0.1', 'magnet:?xt=urn:btih:c066...1337') #=> insert magnet URI
 // into database
 magnets.create = function (ip, magnetURI, callback) {
   var parsedMagnetURI = {};
