@@ -32,6 +32,8 @@ router.get('/peers', function (req, res) {
 });
 
 // http://localhost:9000/api/magnets/top or /latest
+// Usage: localhost:9000/api/magnets/top/40      localhost:9000/api/magnets/latest/40
+// By default the api returns the last or top 10 magnets
 router.get('/magnets/:list/:num?', function (req, res, next) {
   var list = req.params.list;
   if (['top', 'latest'].indexOf(list) !== -1) {

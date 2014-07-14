@@ -1,3 +1,5 @@
+//This file is used to seed the database, usage 'node bootstrap.js'
+
 var request = require('request'),
     _ = require('lodash'),
     port = process.env.PORT || 9000;
