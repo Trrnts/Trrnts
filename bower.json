@@ -13,6 +13,7 @@
   ],
   "dependencies": {
     "angular-ui-router": "~0.2.10",
-    "moment": "~2.7.0"
+    "moment": "~2.7.0",
+    "d3": "~3.4.10"
   }
 }
