@@ -148,7 +148,25 @@ Style top and latest. Styles are very similar and can be reused.
 }
 
 .top article svg[bar-chart] .bar {
+  cursor: pointer;
   fill: #eee;
+}
+
+/* Chrome, Safari, Opera */
+@-webkit-keyframes highlight-bar {
+  from {fill: #eee;}
+  to {fill: #0066cc;}
+}
+
+/* Standard syntax */
+@keyframes highlight-bar {
+  from {fill: #eee;}
+  to {fill: #0066cc;}
+}
+
+.top article svg[bar-chart] .bar:hover {
+  -webkit-animation: highlight-bar 1s; /* Chrome, Safari, Opera */
+  animation: highlight-bar 1s;
 }
 
 /*

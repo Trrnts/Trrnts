@@ -43,7 +43,7 @@ magnets.create = function (ip, magnetURI, callback) {
 
 // readList('top', 10) #=> get top 10 magnets
 magnets.readList = function (list, start, stop, callback) {
-  redis.zrange('magnets:' + list, -stop, -start, function (err, replies) {
+  redis.zrevrange('magnets:' + list, -stop, -start, function (err, replies) {
     var multi = redis.multi();
     _.map(replies, function (infoHash) {
       multi.hgetall('magnet:' + infoHash);
