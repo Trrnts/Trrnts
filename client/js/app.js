@@ -11,7 +11,7 @@ angular.module('trrntsApp', [
           template: '<ui-view></ui-view>'
         });
   }])
-  .run(['$state',function ($state) {
+  .run(['$state', function ($state) {
       // This transitions to 'trrntsApp.main' where we have all the logic for nested views
       $state.transitionTo('trrntsApp.main');
   }]);

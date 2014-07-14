@@ -11,7 +11,7 @@ angular.module('trrntsApp', [
           template: '<ui-view></ui-view>'
         });
   }])
-  .run(['$state',function ($state) {
+  .run(['$state', function ($state) {
       // This transitions to 'trrntsApp.main' where we have all the logic for nested views
       $state.transitionTo('trrntsApp.main');
   }]);
@@ -102,7 +102,6 @@ angular.module('trrntsApp.directives', [])
         .attr('height', function (d) { return y(d); });
         // console.log(currentBar);
       });
-
     }
   };
 });
@@ -146,7 +145,6 @@ angular.module('trrntsApp.main', [
                 templateUrl: 'views/latestMagnets.tpl.html',
                 controller: 'LatestMagnetLinksController'
           }
-
         }
       });
 }]);
