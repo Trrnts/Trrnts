@@ -35,10 +35,9 @@ angular.module('trrntsApp.directives', [])
 
 .directive('worldMap', function () {
   return {
-    restrict: 'A', 
-    /*link: function (scope, element, attrs) {
-      new Datamap({element: document.getElementByTagName('div')[3]});
-    }*/
-    template:'<div>HELLO WORLD</div>
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      var map = new Datamap({'element': element[0]});
+    },
   };
 });

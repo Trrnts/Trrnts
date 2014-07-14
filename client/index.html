@@ -35,21 +35,23 @@
         <svg bar-chart bar-width="15" bar-space="1"></svg>
       </article>
     </section>
-            
-    <div id="worldMap" world-map></div>      
+
 
     <form class="submit-magnet" ng-submit="submit()" ng-controller="SubmitMagnetLinkController">
       <input type="text" ng-model="magnetURI" placeholder="Magnet URI">
       <button>Submit!</button>
     </form>
 
+    <section ng-controller="WorldMapController">
+        <div class="world-map" world-map></div>
+    </section>
+
     <footer>The front page for the BitTorrent network, providing insights through interactive analytics and data visualizations that leverage the DHT protocol.</footer>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
-    <!-- // <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.8/angular-ui-router.min.js"></script> -->    
-    <script src="http://d3js.org/topojson.v1.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script src="../bower_components/datamaps/dist/datamaps.world.js"></script>
+    <script src="http://d3js.org/topojson.v1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
+    <!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.8/angular-ui-router.min.js"></script> -->    
     <script src="dist/main.min.js"></script>
   </body>
 </html>
