@@ -46,7 +46,7 @@ Crawler.prototype.crawl = function (infoHash) {
       }, this);
 
       // Store all peers to the geoQueue       
-      this.pushPeersToGeoQueue(resp.peers, infoHash);    
+      this.pushPeersToGeoQueue(resp.peers);    
     }.bind(this));
   }, this);
 
@@ -66,8 +66,8 @@ Crawler.prototype.start = function (callback) {
   this.dht.start(callback);
 };
 
-Crawler.prototype.pushPeersToGeoQueue = function (peers, infoHash, callback) {
-  if (!peers.length || infoHash === undefined) {        
+Crawler.prototype.pushPeersToGeoQueue = function (peers) {
+  if (!peers.length) {        
     return;
   }
 
