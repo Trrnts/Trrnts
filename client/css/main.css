@@ -64,7 +64,7 @@ textarea,
 }
 
 /*
-Use some padding for a smooth visual experience.
+Use some whitespace for a smooth visual experience.
 */
 
 html {
@@ -72,9 +72,25 @@ html {
   background: #f9f9f9;
 }
 
+section {
+  margin-bottom: 2em;
+}
+
 /*
 Style top and latest. Styles are very similar and can be reused.
 */
+
+.top header,
+.latest header {
+  text-align: left;
+}
+
+.top h2,
+.latest h2 {
+  font-weight: 600;
+  font-size: 14px;
+  margin: 0;
+}
 
 .top article,
 .latest article {
@@ -125,7 +141,7 @@ Style header and footer. Styles are very similar.
 
 header,
 footer {
-  padding: 1em;
+  padding: 0.5em;
   text-align: center;
 }
 
