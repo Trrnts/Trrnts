@@ -1,6 +1,6 @@
 angular.module('trrntsApp.controllers', [])
 
-.controller('SubmitMagnetLinkController', function ($scope, MagnetLinksFactory) {
+.controller('SubmitMagnetLinkController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
   $scope.magnetURI = '';
 
   $scope.submit = function () {
@@ -12,10 +12,9 @@ angular.module('trrntsApp.controllers', [])
       });
     }
   };
-})
+}])
 
-.controller('LatestMagnetLinksController', function ($scope, MagnetLinksFactory) {
-
+.controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
   $scope.latestMagnets = [];
 
   // We issue a GET request via the factory, then we update the scope
@@ -24,9 +23,8 @@ angular.module('trrntsApp.controllers', [])
   }).catch(function(){
     $scope.latestMagnets = ['There has been an error houston'];
   });
+}])
 
-})
-
-.controller('TopMagnetLinksController', function ($scope) {
+.controller('TopMagnetLinksController', ['$scope', function ($scope) {
   $scope.topMagnets = [];
-});
+}]);
