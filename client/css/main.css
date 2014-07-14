@@ -87,11 +87,11 @@ Style top and latest. Styles are very similar and can be reused.
 
 .top h2,
 .latest h2 {
-  text-transform: uppercase;
-  color: #ccc;
-  font-weight: 300;
-  font-size: 80%;
   margin: 0;
+  font-size: 80%;
+  font-weight: 300;
+  color: #ccc;
+  text-transform: uppercase;
 }
 
 .top article,
@@ -126,11 +126,18 @@ Style top and latest. Styles are very similar and can be reused.
   text-decoration: none;
 }
 
+.top .ago,
 .latest .ago {
-  text-align: right;
   padding: 0.5em;
-  color: #d8d8d8;
   font-weight: 300;
+  color: #d8d8d8;
+  text-align: right;
+}
+
+.top .ago {
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
 
 .top article svg[bar-chart] {
