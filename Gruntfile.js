@@ -5,7 +5,7 @@ module.exports = function(grunt) {
     concat: {
       dist: {
         src: ['client/js/**/*.js'],
-        dest: 'client/dist/main.min.js'
+        dest: 'client/dist/main.js'
       }
     },
 
@@ -17,7 +17,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'client/dist/main.min.js': ['client/dist/main.min.js']
+          'client/dist/main.min.js': ['client/dist/main.js']
         }
       }
     },

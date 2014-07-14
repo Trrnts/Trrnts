@@ -6,7 +6,7 @@ angular.module('trrntsApp.controllers', [])
   $scope.submit = function () {
     // base check: value not null
     if ($scope.magnetURI) {
-      MagnetLinksFactory.submit($scope.magnetURI)
+      MagnetLinksFactory.create($scope.magnetURI)
       .catch(function (err) {
         console.error(err);
       });
@@ -15,16 +15,10 @@ angular.module('trrntsApp.controllers', [])
 }])
 
 .controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
-  $scope.latestMagnets = [];
-
-  // We issue a GET request via the factory, then we update the scope
-  MagnetLinksFactory.getLatest(10).then(function (result) {
-    $scope.latestMagnets = result.data;
-  }).catch(function(){
-    $scope.latestMagnets = ['There has been an error houston'];
+  $scope.latest = [];
+  MagnetLinksFactory.latest().then(function (result) {
+    $scope.latest = result.data;
+  }).catch(function () {
+    $scope.latest = [];
   });
-}])
-
-.controller('TopMagnetLinksController', ['$scope', function ($scope) {
-  $scope.topMagnets = [];
 }]);
