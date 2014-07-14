@@ -155,6 +155,10 @@ Style top and latest. Styles are very similar and can be reused.
 Style header and footer. Styles are very similar.
 */
 
+body > header {
+  padding-bottom: 0;
+}
+
 header,
 footer {
   padding: 0.5em;
