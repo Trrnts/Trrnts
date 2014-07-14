@@ -31,4 +31,14 @@ angular.module('trrntsApp.directives', [])
           .attr('height', function (d) { return y(d); });
     }
   };
+})
+
+.directive('worldMap', function () {
+  return {
+    restrict: 'A', 
+    /*link: function (scope, element, attrs) {
+      new Datamap({element: document.getElementByTagName('div')[3]});
+    }*/
+    template:'<div>HELLO WORLD</div>
+  };
 });

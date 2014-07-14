@@ -25,4 +25,8 @@ angular.module('trrntsApp.controllers', [])
 
 .controller('TopMagnetLinksController', function ($scope) {
   $scope.topMagnets = [];
+})
+
+.controller('WorldMapController', function ($scope) {
+  $scope.stats = [];
 });
