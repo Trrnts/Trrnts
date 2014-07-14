@@ -28,7 +28,6 @@ angular.module('trrntsApp.main', [
                 templateUrl: 'views/latestMagnets.tpl.html',
                 controller: 'LatestMagnetLinksController'
           }
-
         }
       });
 }]);

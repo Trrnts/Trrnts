@@ -50,7 +50,6 @@ angular.module('trrntsApp.directives', [])
         .attr('height', function (d) { return y(d); });
         // console.log(currentBar);
       });
-
     }
   };
 });
