@@ -2,3 +2,4 @@ node_modules
 bower_components
 
 dump.rdb
+.DS_Store

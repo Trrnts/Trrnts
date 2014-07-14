@@ -11,8 +11,8 @@ module.exports = function(grunt) {
 
     uglify: {
       options: {
-        // Don't mangle because of Angular.
-        mangle: false,
+        mangle: true,
+        sourceMap: true,
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
       },
       dist: {

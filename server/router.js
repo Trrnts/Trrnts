@@ -17,7 +17,7 @@ router.post('/magnets', function (req, res) {
 });
 
 // http://localhost:9000/api/nodes
-// this get request will return all of the nodes in the 'node' set of the database
+// This get request will return all of the nodes in the 'node' set of the database
 // it returns an array of strings in the format of "ipadress:port"
 router.get('/nodes', function (req, res) {
   redis.SMEMBERS('node', function(error, result) {
@@ -32,16 +32,29 @@ router.get('/peers', function (req, res) {
 });
 
 // http://localhost:9000/api/magnets/top or /latest
-router.get('/magnets/:list/:num?', function (req, res, next) {
-  var list = req.params.list;
-  if (['top', 'latest'].indexOf(list) !== -1) {
-    var num = (req.params.num && parseInt(req.params.num)) || 10;
-    magnets.readList(list, num, function (err, top) {
-      res.send(200, top);
-    });
-  } else {
+// By default the api returns the last or top 10 magnets
+// Usage: localhost:9000/api/magnets/top/40      localhost:9000/api/magnets/latest/40
+      // to get top/latest 40 magnets
+router.get('/magnets/:list', function (req, res, next) {
+  var start = req.query.start || 1,
+      stop = req.query.stop || start + 10,
+      list = req.params.list;
+  if (['top', 'latest'].indexOf(list) === -1) {
     return next();
   }
+  if (start > stop) {
+    return res.send(400, {
+      error: 'Start needs to be less than stop'
+    });
+  }
+  if (stop - start > 100) {
+    return res.send(400, {
+      error: 'Maximum difference between stop and start is 100'
+    });
+  }
+  magnets.readList(list, start, stop, function (err, magnets) {
+    res.send(200, magnets);
+  });
 });
 
 module.exports = exports = router;

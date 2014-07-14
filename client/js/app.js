@@ -5,5 +5,6 @@ angular.module('trrntsApp', [
 ])
 .config(['$compileProvider', function ($compileProvider) {
   // Angular prefixes magnet URIs with "unsafe:", which makes them unclickable.
-  $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|magnet):/);
+  // Uncomment this line if you prefer clickable magnet links.
+  // $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|magnet):/);
 }]);
