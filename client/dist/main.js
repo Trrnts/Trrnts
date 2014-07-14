@@ -1,13 +1,20 @@
 angular.module('trrntsApp', [
-  'trrntsApp.controllers',
-  'trrntsApp.services',
-  'trrntsApp.directives'
+  'ui.router',
+  'trrntsApp.main'
 ])
-.config(['$compileProvider', function ($compileProvider) {
+.config(['$stateProvider', function ($stateProvider) {
   // Angular prefixes magnet URIs with "unsafe:", which makes them unclickable.
   // Uncomment this line if you prefer clickable magnet links.
   // $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|magnet):/);
-}]);
+    $stateProvider
+        .state('trrntsApp', {
+          template: '<ui-view></ui-view>'
+        });
+  }])
+  .run(['$state',function ($state) {
+      // This transitions to 'trrntsApp.main' where we have all the logic for nested views
+      $state.transitionTo('trrntsApp.main');
+  }]);
 
 angular.module('trrntsApp.controllers', [])
 
@@ -77,6 +84,40 @@ angular.module('trrntsApp.directives', [])
     }
   };
 });
+
+// main.js contains the logic for nested views
+// within the angular.module we require all the local modules we need and within
+// the views object when can add and remove subviews with ease
+
+angular.module('trrntsApp.main', [
+    'trrntsApp.controllers',
+    'trrntsApp.services',
+    'trrntsApp.directives'
+    ])
+  .config(['$stateProvider',function ($stateProvider) {
+    $stateProvider
+      .state('trrntsApp.main', {
+        url: '/',
+        views:{
+          '': { templateUrl: 'views/main.tpl.html' },
+
+          'submitMagnet@trrntsApp.main': {
+                templateUrl: 'views/submitMagnet.tpl.html',
+                controller: 'SubmitMagnetLinkController'
+          },
+
+          'topMagnets@trrntsApp.main': {
+                templateUrl: 'views/topMagnets.tpl.html',
+                controller: 'TopMagnetLinksController'
+          },
+          'latestMagnets@trrntsApp.main': {
+                templateUrl: 'views/latestMagnets.tpl.html',
+                controller: 'LatestMagnetLinksController'
+          }
+
+        }
+      });
+}]);
 
 angular.module('trrntsApp.services', [])
 
