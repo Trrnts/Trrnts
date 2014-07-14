@@ -19,12 +19,12 @@ angular.module('trrntsApp.controllers', [])
   $scope.latestMagnets = [];
 
   // We issue a GET request via the factory, then we update the scope
-  MagnetLinksFactory.getLatestMagnets(10).then(function (result) {
+  MagnetLinksFactory.getLatest(10).then(function (result) {
     $scope.latestMagnets = result.data;
   }).catch(function(){
     $scope.latestMagnets = ['There has been an error houston'];
   });
-  
+
 })
 
 .controller('TopMagnetLinksController', function ($scope) {

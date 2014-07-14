@@ -1,5 +1,7 @@
-// This file is used to seed the database with the following magnets, usage 'node bootstrap.js'
-// Can be used for testing purposes
+
+// This script is being used for inserting some sample data to play with, usage 'node bootstrap.js'. To get
+// more magnet links, go to http://thepiratebay.se/. Links to torrents point to
+// magnet links (click on magnet-icon).
 
 var request = require('request'),
     _ = require('lodash'),
