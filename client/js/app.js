@@ -1,7 +1,8 @@
 angular.module('trrntsApp', [
   'trrntsApp.controllers',
   'trrntsApp.services',
-  'trrntsApp.directives'
+  'trrntsApp.directives',
+  'trrntsApp.filters'
 ])
 .config(['$compileProvider', function ($compileProvider) {
   // Angular prefixes magnet URIs with "unsafe:", which makes them unclickable.

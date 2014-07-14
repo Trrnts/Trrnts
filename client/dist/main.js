@@ -1,7 +1,8 @@
 angular.module('trrntsApp', [
   'trrntsApp.controllers',
   'trrntsApp.services',
-  'trrntsApp.directives'
+  'trrntsApp.directives',
+  'trrntsApp.filters'
 ])
 .config(['$compileProvider', function ($compileProvider) {
   // Angular prefixes magnet URIs with "unsafe:", which makes them unclickable.
@@ -75,6 +76,15 @@ angular.module('trrntsApp.directives', [])
           .attr('y', function (d, i) { return chartHeight-y(d); })
           .attr('height', function (d) { return y(d); });
     }
+  };
+});
+
+angular.module('trrntsApp.filters', [])
+
+.filter('agoFilter', function () {
+  return function (timestamp) {
+    timestamp = parseInt(timestamp);
+    return moment(timestamp).fromNow() + ' ago';
   };
 });
 

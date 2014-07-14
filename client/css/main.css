@@ -109,6 +109,10 @@ Style top and latest. Styles are very similar and can be reused.
   border-bottom: 0;
 }
 
+.latest article:last-child {
+  border-bottom: 1px solid #eee;
+}
+
 .top article h3,
 .latest article h3 {
   padding: 0;
@@ -122,8 +126,11 @@ Style top and latest. Styles are very similar and can be reused.
   text-decoration: none;
 }
 
-.latest article:last-child {
-  border-bottom: 1px solid #eee;
+.latest .ago {
+  text-align: right;
+  padding: 0.5em;
+  color: #d8d8d8;
+  font-weight: 300;
 }
 
 .top article svg[bar-chart] {
