@@ -115,3 +115,13 @@ article svg[bar-chart] {
 article svg[bar-chart] .bar {
   fill: #eee;
 }
+
+.world-map {
+  margin-top:0.5em;
+  margin-bottom:0.5em;
+  height:80%;   
+}
+
+.world-map svg {
+  height: 75%;
+}
