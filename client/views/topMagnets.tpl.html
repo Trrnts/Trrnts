@@ -4,7 +4,7 @@
   </header>
   <article class="pure-u-1 pure-u-md-1-2" ng-repeat="magnet in top">
     <h3><a href="{{magnet.magnetURI}}">{{magnet.name}}</a></h3>
-    <svg bar-chart></svg>
+    <svg bar-chart bar-chart-height="70"></svg>
     <small class="ago">{{magnet.createdAt | agoFilter}}</small>
   </article>
 </section>

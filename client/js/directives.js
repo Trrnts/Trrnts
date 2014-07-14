@@ -7,7 +7,11 @@ angular.module('trrntsApp.directives', [])
       element = element[0];
       var barWidth = attrs.barWidth || 20;
       var barSpace = attrs.barSpace || 1;
-      var chartHeight = element.offsetHeight;
+
+      // Chart height needs to be specified using attribute AND CSS. Otherwise
+      // Fx will throw crazy errors. Don't try to do something like
+      // element.outerHeight. It won't work.
+      var chartHeight = attrs.barChartHeight || 70;
       var highlightHeightDiff = attrs.highlightHeightDiff || 20;
 
       // Dummy data fallback for now...
