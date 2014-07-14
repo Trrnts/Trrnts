@@ -1,3 +1,5 @@
+// Heads up! This is magic. Don't care too much about it. It simply works.
+
 var bencode = require('bencode'),
     dgram = require('dgram'),
     hat = require('hat'),
@@ -92,6 +94,8 @@ DHT.prototype.getPeers = function (infoHash, address, callback) {
     this.getPeersCallbacks[transactionID] = callback;
     setTimeout(function () {
       delete this.getPeersCallbacks[transactionID];
+      // Deletes "itself" from the getPeersCallbacks object if we didn't receive
+      // an answer within the next 1000 ms
     }.bind(this), 1000);
   }.bind(this));
 };
