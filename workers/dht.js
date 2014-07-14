@@ -81,6 +81,11 @@ DHT.prototype.getPeers = function (infoHash, address, callback) {
   var transactionID = this.nextTransactionID++;
   var message = bencode.encode({
     t: this._transactionIdToBuffer(transactionID),
+    //BitTorrent protocol assumes this object has these properties. Single letter styling 
+    // is required by the protocol
+    // y set to q means it's a query
+    // q indicates the kind of query
+    // a are the named arguments to the query
     y: 'q',
     q: 'get_peers',
     a: {

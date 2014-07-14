@@ -21,8 +21,9 @@ var Crawler = function () {
 // class, which is a property of the instance of the crawler.
 Crawler.prototype.crawl = function (infoHash) {
   _.each(this.nodes, function (tStamp, node) {
-    console.log('----------------------------------- INSIDE CRAWL');
+    // console.log('----------------------------------- INSIDE CRAWL');
     this.dht.getPeers(infoHash, node, function (err, resp) {
+
       _.each(resp.nodes, function (node) {
 
         this.nodes[node] = _.now();
@@ -57,7 +58,6 @@ Crawler.prototype.crawl = function (infoHash) {
     this.crawl(infoHash);
   }.bind(this), 100);
 
-  console.log('nodes.length');
   console.log(_.keys(this.nodes).length + ' nodes');
   console.log(_.keys(this.peers).length + ' peers');
 };
@@ -72,13 +72,13 @@ Crawler.prototype.pushPeersToGeoQueue = function (peers, infoHash, callback) {
   }
 
   // slice in order to not modify resp.peers
-  var formattedPeers = peers.slice();
+  // var formattedPeers = peers.slice();
   
   // Each peer will have format ipAddress:port. 
   // geo:queue is needs to be first element because of .apply
-  formattedPeers.unshift('geo:queue');
+  // formattedPeers.unshift('geo:queue');
 
-  redis.SADD.apply(null, formattedPeers); 
+  // redis.SADD.apply(null, formattedPeers);
 };
 
 
