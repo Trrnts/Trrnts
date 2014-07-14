@@ -28,5 +28,5 @@ angular.module('trrntsApp.controllers', [])
 })
 
 .controller('WorldMapController', function ($scope) {
-  
+
 });

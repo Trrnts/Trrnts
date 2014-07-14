@@ -119,9 +119,5 @@ article svg[bar-chart] .bar {
 .world-map {
   margin-top:0.5em;
   margin-bottom:0.5em;
-  height:80%;   
-}
-
-.world-map svg {
-  height: 75%;
+  height:35em;
 }

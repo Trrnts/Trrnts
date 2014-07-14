@@ -46,7 +46,7 @@ var mapPeer = function (peer) {
   redis.SADD(geoKey, peerArr[0]);
   // Store all Geo location in Hash Table where each key is geoKey and the value represents the number of peers in that region.
   redis.HINCRBY('geo:map', geoKey, 1);
-}
+};
 
 geoMapWorker();
 
