@@ -62,5 +62,5 @@ module.exports = function(grunt) {
 
   grunt.registerTask('hint', ['jshint']);
   grunt.registerTask('buildClient', ['concat', 'uglify']);
-  grunt.registerTask('default', ['jshint', 'buildClient','concurrent']);
+  grunt.registerTask('default', ['jshint', 'buildClient', 'concurrent']);
 };
