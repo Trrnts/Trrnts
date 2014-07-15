@@ -6,15 +6,15 @@ angular.module('trrntsApp', [
   // Angular prefixes magnet URIs with "unsafe:", which makes them unclickable.
   // Uncomment this line if you prefer clickable magnet links.
   // $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|magnet):/);
-    $stateProvider
-        .state('trrntsApp', {
-          template: '<ui-view></ui-view>'
-        });
-  }])
-  .run(['$state', function ($state) {
-      // This transitions to 'trrntsApp.main' where we have all the logic for nested views
-      $state.transitionTo('trrntsApp.main');
-  }]);
+  $stateProvider
+    .state('trrntsApp', {
+      template: '<ui-view></ui-view>'
+    });
+}])
+.run(['$state', function ($state) {
+    // This transitions to 'trrntsApp.main' where we have all the logic for nested views
+    $state.transitionTo('trrntsApp.main');
+}]);
 
 angular.module('trrntsApp.controllers', [])
 
@@ -191,37 +191,41 @@ angular.module('trrntsApp.filters', [])
 // the views object when can add and remove subviews with ease
 
 angular.module('trrntsApp.main', [
-    'trrntsApp.controllers',
-    'trrntsApp.services',
-    'trrntsApp.directives',
-    'trrntsApp.filters'
-    ])
-  .config(['$stateProvider',function ($stateProvider) {
-    $stateProvider
-      .state('trrntsApp.main', {
-        url: '/',
-        views:{
-          '': { templateUrl: 'views/main.tpl.html' },
+  'trrntsApp.controllers',
+  'trrntsApp.services',
+  'trrntsApp.directives',
+  'trrntsApp.filters'
+])
+.config(['$stateProvider',function ($stateProvider) {
+  $stateProvider
+    .state('trrntsApp.main', {
+      url: '/',
+      views:{
+        '': {
+          templateUrl: 'views/main.tpl.html'
+        },
 
-          'submitMagnet@trrntsApp.main': {
-                templateUrl: 'views/submitMagnet.tpl.html',
-                controller: 'SubmitMagnetLinkController'
-          },
+        'submitMagnet@trrntsApp.main': {
+          templateUrl: 'views/submitMagnet.tpl.html',
+          controller: 'SubmitMagnetLinkController'
+        },
 
-          'topMagnets@trrntsApp.main': {
-                templateUrl: 'views/topMagnets.tpl.html',
-                controller: 'TopMagnetLinksController'
-          },
-          'latestMagnets@trrntsApp.main': {
-                templateUrl: 'views/latestMagnets.tpl.html',
-                controller: 'LatestMagnetLinksController'
-          },
-          'worldMap@trrntsApp.main': {
-                templateUrl: 'views/worldMap.tpl.html',
-                controller: 'WorldMapController'
-          }
+        'topMagnets@trrntsApp.main': {
+          templateUrl: 'views/topMagnets.tpl.html',
+          controller: 'TopMagnetLinksController'
+        },
+
+        'latestMagnets@trrntsApp.main': {
+          templateUrl: 'views/latestMagnets.tpl.html',
+          controller: 'LatestMagnetLinksController'
+        },
+
+        'worldMap@trrntsApp.main': {
+          templateUrl: 'views/worldMap.tpl.html',
+          controller: 'WorldMapController'
         }
-      });
+      }
+    });
 }]);
 
 angular.module('trrntsApp.services', [])
