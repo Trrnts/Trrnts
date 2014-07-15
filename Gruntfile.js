@@ -4,10 +4,11 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     concat: {
       dist: {
-        src: ['bower_components/datamaps/dist/datamaps.world.min.js', 'client/js/**/*.js'],
+        src: ['client/js/**/*.js'],
         dest: 'client/dist/main.js'
       }
     },
+
     concurrent: {
       dev: {
         tasks: ['nodemon', 'watch'],
