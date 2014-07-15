@@ -175,6 +175,7 @@ Style top and latest. Styles are very similar and can be reused.
   padding: 12px;
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
+  font-size: 80%;
   border-radius: 2px;
 }
 
