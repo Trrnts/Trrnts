@@ -167,6 +167,7 @@ Style top and latest. Styles are very similar and can be reused.
 .top article svg[bar-chart] .bar:hover {
   -webkit-animation: highlight-bar 1s; /* Chrome, Safari, Opera */
   animation: highlight-bar 1s;
+  fill: #0066cc;
 }
 
 /* Tooltips for bar chart */
