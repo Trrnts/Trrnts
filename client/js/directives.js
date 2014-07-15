@@ -56,4 +56,41 @@ angular.module('trrntsApp.directives', [])
       });
     }
   };
+})
+
+.directive('worldMap', function () {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      var map = new Datamap({'element': element[0], fills: {defaultFill:'#ABB2AD', torrents: 'black'}});
+      // Generate Fake Stats
+      var fakePositions = generateFakePositions();
+      console.log(fakePositions);
+      map.bubbles(fakePositions);
+
+      function generateFakePositions () {
+        var fakePositions = [];
+        var fakeLatAndLong = [[49.45045869, -65.15636998],
+                        [37.12726948, -17.72583572],
+                        [1.16322135, 127.68441455],
+                        [-25.38805351, 88.82525081],
+                        [-30.31687802, 25.57883445],
+                        [-26.46000555, -134.44309036],
+                        [-33.52151968, -82.46394689],
+                        [-24.96600279, -90.20244849],
+                        [-70.94843404, -146.08284954],
+                        [-27.03729112, 36.61236272]];
+
+        for (var i = 0; i < fakeLatAndLong.length; i++) {
+          var spot = {radius: 10, fillKey:'torrents'};
+          spot.latitude = fakeLatAndLong[i][0];
+          spot.longitude = fakeLatAndLong[i][1];
+          console.log(fakeLatAndLong[i][0], fakeLatAndLong[i][1]);
+          fakePositions.push(spot);
+        }
+
+        return fakePositions;
+      }
+    },
+  };
 });

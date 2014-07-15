@@ -4,7 +4,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     concat: {
       dist: {
-        src: ['client/js/**/*.js'],
+        src: ['bower_components/datamaps/dist/datamaps.world.min.js', 'client/js/**/*.js'],
         dest: 'client/dist/main.js'
       }
     },

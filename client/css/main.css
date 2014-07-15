@@ -219,8 +219,15 @@ leverages an approach called "mobile first" (http://zurb.com/word/mobile-first).
   footer {
     padding: 1em;
   }
+  
   .top article h3,
   .latest article h3 {
     margin: 1em;
   }
+}
+
+.world-map {
+  margin-top:0.5em;
+  margin-bottom:0.5em;
+  height:35em;
 }
