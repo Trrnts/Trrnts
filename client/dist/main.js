@@ -191,6 +191,10 @@ angular.module('trrntsApp.main', [
           'latestMagnets@trrntsApp.main': {
                 templateUrl: 'views/latestMagnets.tpl.html',
                 controller: 'LatestMagnetLinksController'
+          },
+          'worldMap@trrntsApp.main': {
+                templateUrl: 'views/worldMap.tpl.html',
+                controller: 'WorldMapController'
           }
         }
       });
