@@ -1,5 +1,5 @@
 var DHT = require('./dht');
-var redis = require('../redis.js');
+var redis = require('../redis')();
 var _ = require('lodash');
 
 // Uses an DHT instance in order to crawl the network.
@@ -42,11 +42,11 @@ Crawler.prototype.crawl = function (infoHash) {
         redis.ZADD('magnets:' + infoHash + ':peers', _.now(), peer);
         // redis.ZREVRANGE('magnets:' + infoHash + ':peers', 0, 0, 'withscores', function(err, resp) {
         //   console.log('----------------------------------- ' + resp);
-        // });                      
+        // });
       }, this);
 
-      // Store all peers to the geoQueue       
-      this.pushPeersToGeoQueue(resp.peers);    
+      // Store all peers to the geoQueue
+      this.pushPeersToGeoQueue(resp.peers);
     }.bind(this));
   }, this);
 
@@ -67,14 +67,14 @@ Crawler.prototype.start = function (callback) {
 };
 
 Crawler.prototype.pushPeersToGeoQueue = function (peers) {
-  if (!peers.length) {        
+  if (!peers.length) {
     return;
   }
 
   // slice in order to not modify resp.peers
   // var formattedPeers = peers.slice();
-  
-  // Each peer will have format ipAddress:port. 
+
+  // Each peer will have format ipAddress:port.
   // geo:queue is needs to be first element because of .apply
   // formattedPeers.unshift('geo:queue');
 

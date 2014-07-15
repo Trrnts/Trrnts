@@ -1,4 +1,4 @@
-var redis = require('../redis');
+var redis = require('../redis')();
 var geoip = require('geoip-lite');
 var _ = require('lodash');
 
