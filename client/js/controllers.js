@@ -30,4 +30,8 @@ angular.module('trrntsApp.controllers', [])
   }).catch(function () {
     $scope.top = [];
   });
-}]);
+}])
+
+.controller('WorldMapController', function ($scope) {
+
+});

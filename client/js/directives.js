@@ -6,20 +6,47 @@ angular.module('trrntsApp.directives', [])
     link: function (scope, element, attrs) {
       element = element[0];
       var barWidth = attrs.barWidth || 20;
-      var barSpace = attrs.barSpace || 2;
-      var chartHeight = element.offsetHeight;
+      var barSpace = attrs.barSpace || 1;
+
+      // Chart height needs to be specified using attribute AND CSS. Otherwise
+      // Fx will throw crazy errors. Don't try to do something like
+      // element.outerHeight. It won't work.
+      var chartHeight = attrs.barChartHeight || 70;
+      var highlightHeightDiff = attrs.highlightHeightDiff || 20;
+
+      var data = scope.data || [];
+      var chart = d3.select(element);
 
       // Dummy data fallback for now...
-      var data = scope.data || [12, 23, 23, 234, 324, 243, 3, 23];
+      for (var i = 0; i < 20; i++) {
+        data.push({
+          peers: Math.floor(Math.random()*100),
+          t: new Date().getTime()
+        });
+      }
 
       var y = d3.scale.linear()
-                .domain([0, d3.max(data)])
-                .range([0, chartHeight]);
+                .domain([0, d3.max(data, function (d) {
+                  return d.peers;
+                })])
+                .range([0, chartHeight - highlightHeightDiff]);
 
-      d3.select(element)
+      // Initializes a new tooltip.
+      var tip = d3.tip()
+        .attr('class', 'd3-tip')
+        .offset([-highlightHeightDiff-10, 0])
+        .html(function(d) {
+          return '<strong>' + d.peers + '</strong> peers <span>' + moment(parseInt(d.t)).fromNow() + ' ago</span>';
+        });
+
+      // Adds tooltip to chart.
+      chart.call(tip);
+
+      var bar = d3.select(element)
         .selectAll('rect')
-          .data(data)
-        .enter().append('rect')
+          .data(data);
+
+      bar.enter().append('rect')
           .attr('class', 'bar')
           .attr('width', barWidth)
           .attr('x', function (d, i) { return barWidth*i + barSpace*i; })
@@ -27,8 +54,69 @@ angular.module('trrntsApp.directives', [])
           .attr('height', 0)
           .transition()
           .delay(function (d, i) { return i*100; })
-          .attr('y', function (d, i) { return chartHeight-y(d); })
-          .attr('height', function (d) { return y(d); });
+          .attr('y', function (d, i) { return chartHeight-y(d.peers); })
+          .attr('height', function (d) { return y(d.peers); });
+
+      bar.on('mouseover', function (d, i) {
+        var currentBar = bar.filter(function (d, k) {
+          return k === i;
+        })
+        .transition()
+        .attr('y', function () { return chartHeight - y(d.peers) - highlightHeightDiff; })
+        .attr('height', function () { return y(d.peers) + highlightHeightDiff; });
+
+        // Show tooltip.
+        tip.show(d);
+      });
+
+      bar.on('mouseleave', function (d, i) {
+        var currentBar = bar.filter(function (d, k) {
+          return k === i;
+        })
+        .transition()
+        .attr('y', function (d, i) { return chartHeight - y(d.peers); })
+        .attr('height', function (d) { return y(d.peers); });
+
+        // Hide tooltip.
+        tip.hide(d);
+      });
     }
+  };
+})
+
+.directive('worldMap', function () {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      var map = new Datamap({'element': element[0], fills: {defaultFill:'#ABB2AD', torrents: 'black'}});
+      // Generate Fake Stats
+      var fakePositions = generateFakePositions();
+      console.log(fakePositions);
+      map.bubbles(fakePositions);
+
+      function generateFakePositions () {
+        var fakePositions = [];
+        var fakeLatAndLong = [[49.45045869, -65.15636998],
+                        [37.12726948, -17.72583572],
+                        [1.16322135, 127.68441455],
+                        [-25.38805351, 88.82525081],
+                        [-30.31687802, 25.57883445],
+                        [-26.46000555, -134.44309036],
+                        [-33.52151968, -82.46394689],
+                        [-24.96600279, -90.20244849],
+                        [-70.94843404, -146.08284954],
+                        [-27.03729112, 36.61236272]];
+
+        for (var i = 0; i < fakeLatAndLong.length; i++) {
+          var spot = {radius: 10, fillKey:'torrents'};
+          spot.latitude = fakeLatAndLong[i][0];
+          spot.longitude = fakeLatAndLong[i][1];
+          console.log(fakeLatAndLong[i][0], fakeLatAndLong[i][1]);
+          fakePositions.push(spot);
+        }
+
+        return fakePositions;
+      }
+    },
   };
 });

@@ -57,8 +57,8 @@ button,
 input,
 select,
 textarea,
-.pure-g [class*="pure-u"] {
-  font: 400 14px/1.7 "Open Sans", "Helvetica Neue", Helvetica, Arial sans-serif;
+.pure-g [class*='pure-u'] {
+  font: 400 14px/1.7 'Open Sans', 'Helvetica Neue', Helvetica, Arial sans-serif;
   color: #222;
   word-wrap: break-word;
 }
@@ -148,12 +148,63 @@ Style top and latest. Styles are very similar and can be reused.
 }
 
 .top article svg[bar-chart] .bar {
+  cursor: pointer;
   fill: #eee;
+}
+
+/* Chrome, Safari, Opera */
+@-webkit-keyframes highlight-bar {
+  from {fill: #eee;}
+  to {fill: #0066cc;}
+}
+
+/* Standard syntax */
+@keyframes highlight-bar {
+  from {fill: #eee;}
+  to {fill: #0066cc;}
+}
+
+.top article svg[bar-chart] .bar:hover {
+  -webkit-animation: highlight-bar 1s; /* Chrome, Safari, Opera */
+  animation: highlight-bar 1s;
+}
+
+/* Tooltips for bar chart */
+.d3-tip {
+  line-height: 1;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: '\25BC';
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
 }
 
 /*
 Style header and footer. Styles are very similar.
 */
+
+ui-view > header {
+  padding-bottom: 0;
+}
 
 header,
 footer {
@@ -185,8 +236,8 @@ footer {
 }
 
 /*
-Make it responsive! These styles only apply on "large" screens. This stylesheet
-leverages an approach called "mobile first" (http://zurb.com/word/mobile-first).
+Make it responsive! These styles only apply on 'large' screens. This stylesheet
+leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
 */
 
 @media screen and (min-width: 48em) {
@@ -197,8 +248,15 @@ leverages an approach called "mobile first" (http://zurb.com/word/mobile-first).
   footer {
     padding: 1em;
   }
+
   .top article h3,
   .latest article h3 {
     margin: 1em;
   }
+}
+
+.world-map {
+  margin-top:0.5em;
+  margin-bottom:0.5em;
+  height:35em;
 }
