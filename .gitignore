@@ -1,6 +1,8 @@
 node_modules
 bower_components
-dist/*.js
+
+!client/dist/.gitkeep
+client/dist/*
 
 dump.rdb
 .DS_Store
