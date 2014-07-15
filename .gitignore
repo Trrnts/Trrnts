@@ -1,2 +1,5 @@
 dump.rdb
 .DS_Store
+
+# Don't ignore node_modules or bower_components! It is discouraged by npm!
+# https://www.npmjs.org/doc/faq.html#Should-I-check-my-node_modules-folder-into-git
