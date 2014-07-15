@@ -37,7 +37,7 @@ angular.module('trrntsApp.directives', [])
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {
-      var map = new Datamap({'element': element[0], fill: {All: '#ABDDA4'}});
+      var map = new Datamap({'element': element[0], fills: {defaultFill:'#ABB2AD', torrents: 'black'}});
       // Generate Fake Stats
       var fakePositions = generateFakePositions();
       console.log(fakePositions);
@@ -57,7 +57,7 @@ angular.module('trrntsApp.directives', [])
                         [-27.03729112, 36.61236272]];
 
         for (var i = 0; i < fakeLatAndLong.length; i++) {
-          var spot = {radius: 10, fillKey:'All'};
+          var spot = {radius: 10, fillKey:'torrents'};
           spot.latitude = fakeLatAndLong[i][0];
           spot.longitude = fakeLatAndLong[i][1];
           console.log(fakeLatAndLong[i][0], fakeLatAndLong[i][1]);
