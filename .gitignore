@@ -1,8 +1,2 @@
-node_modules
-bower_components
-
-!client/dist/.gitkeep
-client/dist/*
-
 dump.rdb
 .DS_Store
