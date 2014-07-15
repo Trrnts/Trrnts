@@ -15,20 +15,32 @@ angular.module('trrntsApp.directives', [])
       var highlightHeightDiff = attrs.highlightHeightDiff || 20;
 
       var data = scope.data || [];
+      var chart = d3.select(element);
 
       // Dummy data fallback for now...
       for (var i = 0; i < 20; i++) {
         data.push({
-          n: Math.random()*100,
+          peers: Math.floor(Math.random()*100),
           t: new Date().getTime()
         });
       }
 
       var y = d3.scale.linear()
                 .domain([0, d3.max(data, function (d) {
-                  return d.n;
+                  return d.peers;
                 })])
                 .range([0, chartHeight - highlightHeightDiff]);
+
+      // Initializes a new tooltip.
+      var tip = d3.tip()
+        .attr('class', 'd3-tip')
+        .offset([-highlightHeightDiff-10, 0])
+        .html(function(d) {
+          return '<strong>' + d.peers + '</strong> peers <span>' + moment(parseInt(d.t)).fromNow() + ' ago</span>';
+        });
+
+      // Adds tooltip to chart.
+      chart.call(tip);
 
       var bar = d3.select(element)
         .selectAll('rect')
@@ -42,16 +54,19 @@ angular.module('trrntsApp.directives', [])
           .attr('height', 0)
           .transition()
           .delay(function (d, i) { return i*100; })
-          .attr('y', function (d, i) { return chartHeight-y(d.n); })
-          .attr('height', function (d) { return y(d.n); });
+          .attr('y', function (d, i) { return chartHeight-y(d.peers); })
+          .attr('height', function (d) { return y(d.peers); });
 
       bar.on('mouseover', function (d, i) {
         var currentBar = bar.filter(function (d, k) {
           return k === i;
         })
         .transition()
-        .attr('y', function () { return chartHeight - y(d.n) - highlightHeightDiff; })
-        .attr('height', function () { return y(d.n) + highlightHeightDiff; });
+        .attr('y', function () { return chartHeight - y(d.peers) - highlightHeightDiff; })
+        .attr('height', function () { return y(d.peers) + highlightHeightDiff; });
+
+        // Show tooltip.
+        tip.show(d);
       });
 
       bar.on('mouseleave', function (d, i) {
@@ -59,8 +74,11 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
-        .attr('y', function (d, i) { return chartHeight - y(d.n); })
-        .attr('height', function (d) { return y(d.n); });
+        .attr('y', function (d, i) { return chartHeight - y(d.peers); })
+        .attr('height', function (d) { return y(d.peers); });
+
+        // Hide tooltip.
+        tip.hide(d);
       });
     }
   };
