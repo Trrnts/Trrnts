@@ -48,6 +48,7 @@ router.get('/magnets/:list', function (req, res, next) {
         res.send(200, magnets);
       }
     });
+
     // have to return here in order to avoid sending twice error.
     return;
   }

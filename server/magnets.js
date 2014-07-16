@@ -61,6 +61,7 @@ magnets.readMagnet = function (infoHash, callback) {
 };
 
 
+// search('Game of Thrones') #=> get all torrents that have those words, case-sensitive 
 magnets.search = function (search, callback) {    
   // Format : 'search:' + word
   // Convert Each Word into a key Format
