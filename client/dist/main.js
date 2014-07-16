@@ -206,13 +206,7 @@ angular.module('trrntsApp.directives', [])
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {
-      var map = new Datamap({'element': element[0], fills: {defaultFill:'#ABB2AD', torrents: 'black'}});
-      // Generate Fake Stats
-      var fakePositions = generateFakePositions();
-      console.log(fakePositions);
-      map.bubbles(fakePositions);
-
-      function generateFakePositions () {
+      var generateFakePositions = function () {
         var fakePositions = [];
         var fakeLatAndLong = [[49.45045869, -65.15636998],
                         [37.12726948, -17.72583572],
@@ -226,15 +220,31 @@ angular.module('trrntsApp.directives', [])
                         [-27.03729112, 36.61236272]];
 
         for (var i = 0; i < fakeLatAndLong.length; i++) {
-          var spot = {radius: 10, fillKey:'torrents'};
+          var spot = {
+            radius: Math.floor(Math.random()*50),
+            fillKey: 'torrents'
+          };
           spot.latitude = fakeLatAndLong[i][0];
           spot.longitude = fakeLatAndLong[i][1];
-          console.log(fakeLatAndLong[i][0], fakeLatAndLong[i][1]);
+          // console.log(fakeLatAndLong[i][0], fakeLatAndLong[i][1]);
           fakePositions.push(spot);
         }
 
         return fakePositions;
-      }
+      };
+
+      var map = new Datamap({
+        'element': element[0],
+        fills: {
+          defaultFill: '#ccc',
+          torrents: '#222'
+        }
+      });
+
+      // Generate Fake Stats
+      var fakePositions = generateFakePositions();
+      // console.log(fakePositions);
+      map.bubbles(fakePositions);
     },
   };
 });
