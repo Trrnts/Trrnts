@@ -40,7 +40,14 @@ router.get('/magnets/:list', function (req, res, next) {
       stop = parseInt(req.query.stop) || start + 10,
       list = req.params.list;
   if (['top', 'latest'].indexOf(list) === -1) {
-    return next();
+    magnets.search(list, function (err, magnets) {
+      if (err) {
+        return next();
+      } else {
+        console.log("magnets gotten from search:", magnets);
+        res.send(200, magnets);
+      }
+    });
   }
   if (start > stop) {
     return res.send(400, {
