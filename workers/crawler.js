@@ -3,17 +3,21 @@ var redis = require('../redis')();
 var redisSubscribe = require('../redis')();
 var _ = require('lodash');
 
+//In order to have multiple crawlers we need to be able to pass in the same dht
+//instance to each of them
+var dht = new DHT();
+
 // Uses an DHT instance in order to crawl the network.
 var Crawler = function (dht) {
   this.dht = dht;
-  var timestamp = _.now();
+  this.timestamp = _.now();
   // Addresses as keys, since we need constant time insert operations and unique
   // entries (inserts every node only once).
   // We need a few "bootstrap nodes" as entry points for getting started.
   this.nodes = {
-    'router.bittorrent.com:6881': timestamp,
-    'router.utorrent.com:6881': timestamp,
-    'dht.transmissionbt.com:6881': timestamp
+    'router.bittorrent.com:6881': this.timestamp,
+    'router.utorrent.com:6881': this.timestamp,
+    'dht.transmissionbt.com:6881': this.timestamp
   };
   this.peers = {};
 };
@@ -23,7 +27,7 @@ var _onReady = function () {
   // to the magnets:crawl channel.
   redisSubscribe.subscribe('magnets:crawl');
   redisSubscribe.on('message', function (channel, infoHash) {
-    var crawler = new Crawler();
+    var crawler = new Crawler(dht);
     crawler.crawl(infoHash)
     // this.crawl(infoHash);
   }.bind(crawler));
@@ -31,7 +35,7 @@ var _onReady = function () {
   // At startup: Crawls uncrawled magnets in magnets:index set.
   redis.smembers('magnets:crawl', function (err, infoHashes) {
     _.each(infoHashes, function (infoHash) {
-      var crawler = new Crawler();
+      var crawler = new Crawler(dht);
       crawler.crawl.bind(crawler);
     });
   }.bind(this));
@@ -40,6 +44,7 @@ var _onReady = function () {
 Crawler.prototype.logNodesAndPeers = function () {
   console.log(_.keys(this.nodes).length + ' nodes');
   console.log(_.keys(this.peers).length + ' peers');
+  console.log(this.timestamp);
 };
 
 // Recursively crawls the BitTorrent DHT protocol using an instance of the DHT
@@ -107,10 +112,6 @@ Crawler.prototype.pushPeersToGeoQueue = function (peers) {
   // redis.SADD.apply(null, formattedPeers);
 };
 
-
-//In order to have multiple crawlers we need to be able to pass in the same dht
-//instance to each of them
-var dht = new DHT();
 
 var crawler = new Crawler(dht);
 //TODO: set infoHash based on user submitted magnet links
