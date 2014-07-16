@@ -7,4 +7,8 @@
     <svg bar-chart bar-chart-height="70"></svg>
     <small class="ago">{{magnet.createdAt | agoFilter}}</small>
   </article>
+  <nav class="pure-u-1">
+    <button ng-disabled="!hasPrev()" ng-click="prev()">← Previous</button>
+    <button ng-disabled="!hasNext()" ng-click="next()">Next →</button>
+  </nav>
 </section>
