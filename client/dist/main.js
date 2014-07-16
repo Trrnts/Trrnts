@@ -79,9 +79,28 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('WorldMapController', function ($scope) {
+.controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+  $scope.search = '';
+  $scope.searchResults = [];
+  $scope.hasResults = false;
 
-});
+  $scope.submit = function () {
+    $scope.hasResults = false;
+    if ($scope.search) {
+      MagnetLinksFactory.search($scope.search).then(function (result) {
+        $scope.searchResults = result.data;
+        $scope.hasResults = true;
+      }).catch(function () {
+        console.error("Search Failed");
+      });
+    }
+  };
+  $scope.submit();
+}])
+
+.controller('WorldMapController', ['$scope', function ($scope) {
+
+}]);
 
 angular.module('trrntsApp.directives', [])
 
@@ -249,10 +268,16 @@ angular.module('trrntsApp.main', [
           controller: 'LatestMagnetLinksController'
         },
 
+        'searchMagnets@trrntsApp.main': {
+          templateUrl: 'views/searchMagnets.tpl.html',
+          controller: 'SearchMagnetLinksController'
+        },
+
         'worldMap@trrntsApp.main': {
           templateUrl: 'views/worldMap.tpl.html',
           controller: 'WorldMapController'
         }
+
       }
     });
 }]);
@@ -293,9 +318,22 @@ angular.module('trrntsApp.services', [])
     });
   };
 
+  // searches torrents whose titles contains input.
+  var search = function (input) {
+    if (!input) {
+      return;
+    }
+
+    return $http({
+      method: 'GET',
+      url:'api/magnets/'+input
+    });
+  };
+
   return {
     create: create,
     latest: latest,
-    top: top
+    top: top,
+    search:search
   };
 }]);

@@ -42,7 +42,7 @@ router.get('/magnets/:list', function (req, res, next) {
   if (['top', 'latest'].indexOf(list) === -1) {
     // Search Torrents
     magnets.search(list, function (err, magnets) {
-      if (err) {g
+      if (err) {
         return next();
       } else {
         res.send(200, magnets);
