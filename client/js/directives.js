@@ -53,7 +53,9 @@ angular.module('trrntsApp.directives', [])
           .attr('y', chartHeight)
           .attr('height', 0)
           .transition()
-          .delay(function (d, i) { return i*100; })
+          .duration(500)
+          .ease('elastic')
+          .delay(function (d, i) { return (0.7*i)*100; })
           .attr('y', function (d, i) { return chartHeight-y(d.peers); })
           .attr('height', function (d) { return y(d.peers); });
 
@@ -62,6 +64,7 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
+        .ease('elastic')
         .attr('y', function () { return chartHeight - y(d.peers) - highlightHeightDiff; })
         .attr('height', function () { return y(d.peers) + highlightHeightDiff; });
 
@@ -74,6 +77,7 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
+        .ease('elastic')
         .attr('y', function (d, i) { return chartHeight - y(d.peers); })
         .attr('height', function (d) { return y(d.peers); });
 
