@@ -101,7 +101,8 @@ magnets.readMagnet = util.infoHashesToMagnets;
 magnets.search = function (search, callback) {    
   // Format : 'search:' + word
   // Convert Each Word into a key Format  
-  var formattedWords = _.map(search.split(' '), function (word) {
+
+  var formattedWords = _.map(search.toLowerCase().split(' '), function (word) {
     return 'search:'+ word;
   });  
 
