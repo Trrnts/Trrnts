@@ -40,18 +40,8 @@ router.get('/magnets/:list', function (req, res, next) {
       stop = parseInt(req.query.stop) || start + 10,
       list = req.params.list;
   if (['top', 'latest'].indexOf(list) === -1) {
-    // Search Torrents
-    magnets.search(list, function (err, magnets) {
-      if (err) {
-        return next();
-      } else {
-        res.send(200, magnets);
-      }
-    });
-
-    // have to return here in order to avoid sending twice error.
-    return;
-  }
+    return next();    
+  }  
   if (start > stop) {
     return res.send(400, {
       error: 'Start needs to be less than stop'
@@ -65,6 +55,36 @@ router.get('/magnets/:list', function (req, res, next) {
   magnets.readList(list, start, stop, function (err, magnets) {
     res.send(200, magnets);
   });
+});
+
+router.get('/magnets/search/:input', function (req, res, next) {
+  var start = parseInt(req.query.start) || 1,
+      stop = parseInt(req.query.stop) || start + 10,
+      search = req.params.input;
+
+  if (!search) {
+    next();
+  }
+  if (start > stop) {
+    return res.send(400, {
+      error: 'Start needs to be less than stop'
+    });
+  }
+  if (stop - start > 100) {
+    return res.send(400, {
+      error: 'Maximum difference between stop and start is 100'
+    });
+  }
+
+  magnets.search(search, function (err, magnets) {
+    if (err) {
+      return next();
+    } else {
+      var sendMagnets = magnets.slice(start - 1, stop);
+      res.send(200, sendMagnets);
+    }
+  });
+
 });
 
 module.exports = exports = router;

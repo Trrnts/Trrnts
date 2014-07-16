@@ -64,10 +64,10 @@ magnets.readMagnet = function (infoHash, callback) {
 // search('Game of Thrones') #=> get all torrents that have those words, case-sensitive 
 magnets.search = function (search, callback) {    
   // Format : 'search:' + word
-  // Convert Each Word into a key Format
+  // Convert Each Word into a key Format  
   var formattedWords = _.map(search.split(' '), function (word) {
     return 'search:'+ word;
-  });
+  });  
 
   // Get InfoHashes for set of words through intersect
   redis.sinter(formattedWords, function (err, results) {
