@@ -14,16 +14,18 @@ angular.module('trrntsApp.directives', [])
       var chartHeight = attrs.barChartHeight || 70;
       var highlightHeightDiff = attrs.highlightHeightDiff || 20;
 
-      var data = scope.data || [];
+      var data = scope.magnet.peers || {};
       var chart = d3.select(element);
 
-      // Dummy data fallback for now...
-      for (var i = 0; i < 20; i++) {
-        data.push({
-          peers: Math.floor(Math.random()*100),
-          t: new Date().getTime()
+      var formattedData = [];
+      for (var timestamp in data) {
+        formattedData.push({
+          peers: parseInt(data[timestamp]),
+          t: parseInt(timestamp)*1000
         });
       }
+
+      data = formattedData;
 
       var y = d3.scale.linear()
                 .domain([0, d3.max(data, function (d) {
