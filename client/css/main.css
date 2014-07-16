@@ -86,7 +86,8 @@ Style top and latest. Styles are very similar and can be reused.
 }
 
 .top h2,
-.latest h2 {
+.latest h2,
+.search h2 {
   margin: 0;
   font-size: 80%;
   font-weight: 300;
@@ -95,7 +96,8 @@ Style top and latest. Styles are very similar and can be reused.
 }
 
 .top article,
-.latest article {
+.latest article,
+.search article {
   background: #fff;
   border: 1px solid #eee;
 }
@@ -109,7 +111,15 @@ Style top and latest. Styles are very similar and can be reused.
   border-bottom: 0;
 }
 
+.search article {
+
+}
+
 .latest .pagination {
+  border-top: 1px solid #eee;
+}
+
+.search .pagination {
   border-top: 1px solid #eee;
 }
 
@@ -138,20 +148,23 @@ Style top and latest. Styles are very similar and can be reused.
 }
 
 .top article h3,
-.latest article h3 {
+.latest article h3,
+.search article h3 {
   padding: 0;
   margin: 0.5em;
   font-weight: 600;
 }
 
 .top article h3 a,
-.latest article h3 a {
+.latest article h3 a,
+.search article h3 a {
   color: #222;
   text-decoration: none;
 }
 
 .top .ago,
-.latest .ago {
+.latest .ago,
+.search .ago {
   padding: 0.5em;
   font-weight: 300;
   color: #d8d8d8;
@@ -276,7 +289,8 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
   }
 
   .top article h3,
-  .latest article h3 {
+  .latest article h3,
+  .search article h3 {
     margin: 1em;
   }
 }

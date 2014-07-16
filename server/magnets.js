@@ -3,6 +3,48 @@ var _ = require('lodash'),
     parseMagnetURI = require('magnet-uri'),
     magnets = {};
 
+var util = {};
+
+// Converts a single infoHash/ an array of infoHashes into an array of magnet
+// objects.
+util.infoHashesToMagnets = function (infoHashes, callback) {
+  if (!Array.isArray(infoHashes)) {
+    infoHashes = [infoHashes];
+  }
+  var multi = redis.multi();
+  _.each(infoHashes, function (infoHash) {
+    multi.hgetall('magnet:' + infoHash);
+    // TODO Caching
+    multi.zrevrange(['magnet:' + infoHash + ':peers', 0, 10000, 'WITHSCORES']);
+  });
+  multi.exec(function (err, results) {
+    var magnets = [];
+
+    // Every second result is the result of a ZREVRANGE (peer data for charts).
+    _.each(_.range(0, results.length, 2), function (index) {
+      // Every second item in perrsWithScores is a score.
+      var peersWithScores = results[index+1];
+
+      results[index].peers = _.reduce(_.range(0, peersWithScores.length, 2), function (peers, index) {
+        // debugger;
+        var addr = peersWithScores[index];
+        var lastSeenAt = Math.floor((parseInt(peersWithScores[index+1])/1000)/1); // group by 1 second intervalls for testing
+        console.log(peers);
+        peers[lastSeenAt] = peers[lastSeenAt] || 0;
+        peers[lastSeenAt]++;
+        return peers;
+      }, {});
+
+      if (results[index].peers) {
+        console.log(results[index]);
+      }
+      magnets.push(results[index]);
+    });
+
+    callback(null, magnets);
+  });
+};
+
 // create('127.0.0.1', 'magnet:?xt=urn:btih:c066...1337') #=> insert magnet URI
 // into database
 magnets.create = function (ip, magnetURI, callback) {
@@ -46,18 +88,49 @@ magnets.create = function (ip, magnetURI, callback) {
 
 // readList('top', 10) #=> get top 10 magnets
 magnets.readList = function (list, start, stop, callback) {
-  redis.zrevrange('magnets:' + list, -stop, -start, function (err, replies) {
+  redis.zrevrange('magnets:' + list, -stop, -start, function (err, infoHashes) {
+    util.infoHashesToMagnets(infoHashes, callback);
+  });
+};
+
+// readMagnet('chkdewyduewdg') #=> get a single magnet link
+magnets.readMagnet = util.infoHashesToMagnets;
+
+
+// search('Game of Thrones') #=> get all torrents that have those words, case-sensitive 
+magnets.search = function (search, callback) {    
+  // Format : 'search:' + word
+  // Convert Each Word into a key Format  
+  var formattedWords = _.map(search.split(' '), function (word) {
+    return 'search:'+ word;
+  });  
+
+  // Get InfoHashes for set of words through intersect
+  redis.sinter(formattedWords, function (err, results) {
+    if (err) {
+      return callback(err, []);
+    }
+
+    // get magnetLinks for InfoHashes
     var multi = redis.multi();
-    _.map(replies, function (infoHash) {
+    _.map(results, function (infoHash) {
       multi.hgetall('magnet:' + infoHash);
     });
     multi.exec(callback);
   });
 };
 
-// readMagnet('chkdewyduewdg') #=> get a single magnet link
-magnets.readMagnet = function (infoHash, callback) {
-  redis.hgetall('magnet:' + infoHash, callback);
-};
-
 module.exports = exports = magnets;
+
+
+
+
+
+
+
+
+
+
+
+
+
