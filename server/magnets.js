@@ -96,4 +96,41 @@ magnets.readList = function (list, start, stop, callback) {
 // readMagnet('chkdewyduewdg') #=> get a single magnet link
 magnets.readMagnet = util.infoHashesToMagnets;
 
+
+// search('Game of Thrones') #=> get all torrents that have those words, case-sensitive 
+magnets.search = function (search, callback) {    
+  // Format : 'search:' + word
+  // Convert Each Word into a key Format  
+  var formattedWords = _.map(search.split(' '), function (word) {
+    return 'search:'+ word;
+  });  
+
+  // Get InfoHashes for set of words through intersect
+  redis.sinter(formattedWords, function (err, results) {
+    if (err) {
+      return callback(err, []);
+    }
+
+    // get magnetLinks for InfoHashes
+    var multi = redis.multi();
+    _.map(results, function (infoHash) {
+      multi.hgetall('magnet:' + infoHash);
+    });
+    multi.exec(callback);
+  });
+};
+
 module.exports = exports = magnets;
+
+
+
+
+
+
+
+
+
+
+
+
+

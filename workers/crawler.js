@@ -28,7 +28,7 @@ var _onReady = function () {
   redisSubscribe.subscribe('magnets:crawl');
   redisSubscribe.on('message', function (channel, infoHash) {
     var crawler = new Crawler(dht);
-    crawler.crawl(infoHash)
+    crawler.crawl(infoHash);
     // this.crawl(infoHash);
   }.bind(crawler));
 
