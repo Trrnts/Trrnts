@@ -5,6 +5,8 @@ var request = require('request'),
     _ = require('lodash'),
     port = process.env.PORT || 9000;
 
+console.log('Started bootstrapping script. This may take a while.');
+
 // 100: Audio
 // 200: Video
 // 300: Applications
@@ -32,7 +34,12 @@ var extractMagnetURIs = function (body) {
   });
 };
 
+// Total number of open requests.
+var outstanding = 0;
+
 var onResponse = function (err, resp, body) {
+  console.log('Received response.');
+  console.log(--outstanding + ' requests still left.');
   if (err) {
     return console.log('Error scraping ' + resp);
   }
@@ -51,7 +58,17 @@ var onResponse = function (err, resp, body) {
 };
 
 // Scrape the first page of each category. Ordered by leechers (descending).
+var url;
 _.each(categories, function (categoryCode) {
-  var url = createURL(categoryCode, 0, 9);
-  request(url, onResponse);
+  _.each(_.range(0, 5), function (page) {
+    url = createURL(categoryCode, page, 7);
+    console.log('Requesting ' + url + '...');
+    outstanding++;
+    request(url, onResponse);
+
+    url = createURL(categoryCode, page, 9);
+    console.log('Requesting ' + url + '...');
+    outstanding++;
+    request(url, onResponse);
+  });
 });
