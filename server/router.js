@@ -36,8 +36,8 @@ router.get('/peers', function (req, res) {
 // Usage: localhost:9000/api/magnets/top/40      localhost:9000/api/magnets/latest/40
       // to get top/latest 40 magnets
 router.get('/magnets/:list', function (req, res, next) {
-  var start = req.query.start || 1,
-      stop = req.query.stop || start + 10,
+  var start = parseInt(req.query.start) || 1,
+      stop = parseInt(req.query.stop) || start + 10,
       list = req.params.list;
   if (['top', 'latest'].indexOf(list) === -1) {
     return next();
