@@ -9,6 +9,7 @@ var redisPort = process.env.REDIS_PORT || 6379,
 // individually after each Redis command.
 var onError = function (error) {
   console.error('Error in Redis client: ' + error.message);
+  console.error(error.stack);
   console.log('Exiting now because of error in Redis client');
   // Our app doesn't work without DB. Exit.
   process.exit(1);
