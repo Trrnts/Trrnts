@@ -73,11 +73,6 @@ magnets.search = function (search, callback) {
   redis.sinter.apply(null, formattedWords);
 };
 
-
-
-
-
-
 module.exports = exports = magnets;
 
 
