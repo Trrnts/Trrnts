@@ -14,6 +14,8 @@
   "dependencies": {
     "angular-ui-router": "~0.2.10",
     "moment": "~2.7.0",
-    "d3": "~3.4.10"
+    "d3": "~3.4.10",
+    "datamaps": "~0.3.3",
+    "d3-tip": "~0.6.4"
   }
 }

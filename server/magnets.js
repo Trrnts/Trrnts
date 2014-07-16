@@ -1,5 +1,5 @@
 var _ = require('lodash'),
-    redis = require('../redis.js'),
+    redis = require('../redis')(),
     parseMagnetURI = require('magnet-uri'),
     magnets = {};
 
@@ -34,7 +34,10 @@ magnets.create = function (ip, magnetURI, callback) {
       redis.zadd('magnets:top', magnet.score, magnet.infoHash);
       redis.zadd('magnets:latest', magnet.createdAt, magnet.infoHash);
       redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
-      redis.rpush('magnets:crawl', magnet.infoHash);
+      redis.sadd('magnets:crawl', magnet.infoHash);
+      redis.publish('magnets:crawl', magnet.infoHash);
+      redis.sadd('magnets:index', magnet.infoHash);
+      redis.publish('magnets:index', magnet.infoHash);
 
       callback(null, magnet);
     }

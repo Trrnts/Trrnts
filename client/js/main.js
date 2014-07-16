@@ -3,31 +3,39 @@
 // the views object when can add and remove subviews with ease
 
 angular.module('trrntsApp.main', [
-    'trrntsApp.controllers',
-    'trrntsApp.services',
-    'trrntsApp.directives',
-    'trrntsApp.filters'
-    ])
-  .config(['$stateProvider',function ($stateProvider) {
-    $stateProvider
-      .state('trrntsApp.main', {
-        url: '/',
-        views:{
-          '': { templateUrl: 'views/main.tpl.html' },
+  'trrntsApp.controllers',
+  'trrntsApp.services',
+  'trrntsApp.directives',
+  'trrntsApp.filters'
+])
+.config(['$stateProvider',function ($stateProvider) {
+  $stateProvider
+    .state('trrntsApp.main', {
+      url: '/',
+      views:{
+        '': {
+          templateUrl: 'views/main.tpl.html'
+        },
 
-          'submitMagnet@trrntsApp.main': {
-                templateUrl: 'views/submitMagnet.tpl.html',
-                controller: 'SubmitMagnetLinkController'
-          },
+        'submitMagnet@trrntsApp.main': {
+          templateUrl: 'views/submitMagnet.tpl.html',
+          controller: 'SubmitMagnetLinkController'
+        },
 
-          'topMagnets@trrntsApp.main': {
-                templateUrl: 'views/topMagnets.tpl.html',
-                controller: 'TopMagnetLinksController'
-          },
-          'latestMagnets@trrntsApp.main': {
-                templateUrl: 'views/latestMagnets.tpl.html',
-                controller: 'LatestMagnetLinksController'
-          }
+        'topMagnets@trrntsApp.main': {
+          templateUrl: 'views/topMagnets.tpl.html',
+          controller: 'TopMagnetLinksController'
+        },
+
+        'latestMagnets@trrntsApp.main': {
+          templateUrl: 'views/latestMagnets.tpl.html',
+          controller: 'LatestMagnetLinksController'
+        },
+
+        'worldMap@trrntsApp.main': {
+          templateUrl: 'views/worldMap.tpl.html',
+          controller: 'WorldMapController'
         }
-      });
+      }
+    });
 }]);
