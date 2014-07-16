@@ -13,7 +13,7 @@ console.log('Started bootstrapping script. This may take a while.');
 // 400: Games
 // 500: Porn
 // 600: Other
-var categories = [100, 200, 300, 400, 500, 600];
+var categories = [100, 200];
 
 // categoryCode: One of the categories specified above.
 // page: Page, starts with 0
@@ -60,7 +60,7 @@ var onResponse = function (err, resp, body) {
 // Scrape the first page of each category. Ordered by leechers (descending).
 var url;
 _.each(categories, function (categoryCode) {
-  _.each(_.range(0, 5), function (page) {
+  _.each(_.range(0, 1), function (page) {
     url = createURL(categoryCode, page, 7);
     console.log('Requesting ' + url + '...');
     outstanding++;
