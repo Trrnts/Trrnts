@@ -93,20 +93,41 @@ angular.module('trrntsApp.controllers', [])
 .controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
   $scope.search = '';
   $scope.searchResults = [];
-  $scope.hasResults = false;
+  $scope.perPage = 10;
+  $scope.start = 1;
+  $scope.stop = $scope.start + $scope.perPage - 1;
+
+  $scope.hasPrev = function () {
+    return $scope.start > 1;
+  };
+
+  $scope.hasNext = function () {
+    return true;
+  };
+
+  var update = function () {
+    MagnetLinksFactory.search($scope.search, $scope.start, $scope.stop).then(function (result) {
+      $scope.searchResults = result.data;
+    }).catch(function () {
+      $scope.searchResults = [];
+    });
+  };
+
+  $scope.next = function () {
+    $scope.start += $scope.perPage;
+    $scope.stop += $scope.perPage;
+    update();
+  };
+
+  $scope.prev = function () {
+    $scope.start -= $scope.perPage;
+    $scope.stop -= $scope.perPage;
+    update();
+  };
 
   $scope.submit = function () {
-    $scope.hasResults = false;
-    if ($scope.search) {
-      MagnetLinksFactory.search($scope.search).then(function (result) {
-        $scope.searchResults = result.data;
-        $scope.hasResults = true;
-      }).catch(function () {
-        console.error("Search Failed");
-      });
-    }
+    update();
   };
-  $scope.submit();
 }])
 
 .controller('WorldMapController', ['$scope', function ($scope) {
