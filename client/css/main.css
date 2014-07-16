@@ -281,8 +281,9 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
   }
 }
 
+/* Style the world map. */
 .world-map {
-  margin-top:0.5em;
-  margin-bottom:0.5em;
-  height:35em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  height: 35em;
 }
