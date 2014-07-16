@@ -22,7 +22,7 @@ var index = function (infoHash) {
     var words = extractWords(name);
     console.info('Extracted words ' + words.join(', ') + ' (infoHash: ' + infoHash + ')');
     _.each(words, function (word) {
-      redisRegular.sadd('search:' + word, infoHash);
+      redisRegular.sadd('search:' + word.toLowerCase(), infoHash);
       redisRegular.srem('magnets:index', infoHash);
     });
   });
