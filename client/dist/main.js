@@ -386,7 +386,7 @@ angular.module('trrntsApp.services', [])
 
   // Searches torrents whose titles contains input.
   var search = function (input, start, stop) {
-    if (!input) {
+    if (!input && typeof(input) !== 'string') {
       return;
     }
 

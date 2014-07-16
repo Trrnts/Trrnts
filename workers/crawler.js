@@ -1,7 +1,8 @@
 var DHT = require('./dht'),
     redis = require('../redis')(),
     redisSubscribe = require('../redis')(),
-    _ = require('lodash');
+    _ = require('lodash'),
+    crawlJobQueue = require('./crawlJobQueue');
 
 //In order to have multiple crawlers we need to be able to pass in the same dht
 //instance to each of them
