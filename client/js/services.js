@@ -34,9 +34,22 @@ angular.module('trrntsApp.services', [])
     });
   };
 
+  // searches torrents whose titles contains input.
+  var search = function (input) {
+    if (!input) {
+      return;
+    }
+
+    return $http({
+      method: 'GET',
+      url:'api/magnets/'+input
+    });
+  };
+
   return {
     create: create,
     latest: latest,
-    top: top
+    top: top,
+    search:search
   };
 }]);

@@ -62,15 +62,25 @@ magnets.readMagnet = function (infoHash, callback) {
 
 
 magnets.search = function (search, callback) {    
-  // Format : 'search:' + word    
-  // Convert Each Word into a key Format 
+  // Format : 'search:' + word
+  // Convert Each Word into a key Format
   var formattedWords = _.map(search.split(' '), function (word) {
     return 'search:'+ word;
   });
 
-  // Attach callback at end because of apply
-  formattedWords.push(callback);
-  redis.sinter.apply(null, formattedWords);
+  // Get InfoHashes for set of words through intersect
+  redis.sinter(formattedWords, function (err, results) {
+    if (err) {
+      return callback(err, []);
+    }
+
+    // get magnetLinks for InfoHashes
+    var multi = redis.multi();
+    _.map(results, function (infoHash) {
+      multi.hgetall('magnet:' + infoHash);
+    });
+    multi.exec(callback);
+  });
 };
 
 module.exports = exports = magnets;

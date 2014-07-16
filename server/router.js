@@ -40,15 +40,16 @@ router.get('/magnets/:list', function (req, res, next) {
       stop = parseInt(req.query.stop) || start + 10,
       list = req.params.list;
   if (['top', 'latest'].indexOf(list) === -1) {
+    // Search Torrents
     magnets.search(list, function (err, magnets) {
-      if (err) {
+      if (err) {g
         return next();
       } else {
-        console.log("magnets gotten from search:", magnets);
         res.send(200, magnets);
-        return;
       }
     });
+    // have to return here in order to avoid sending twice error.
+    return;
   }
   if (start > stop) {
     return res.send(400, {

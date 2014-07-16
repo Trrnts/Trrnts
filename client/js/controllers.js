@@ -61,6 +61,25 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('WorldMapController', function ($scope) {
+.controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+  $scope.search = '';
+  $scope.searchResults = [];
+  $scope.hasResults = false;
 
-});
+  $scope.submit = function () {
+    $scope.hasResults = false;
+    if ($scope.search) {
+      MagnetLinksFactory.search($scope.search).then(function (result) {
+        $scope.searchResults = result.data;
+        $scope.hasResults = true;
+      }).catch(function () {
+        console.error("Search Failed");
+      });
+    }
+  };
+  $scope.submit();
+}])
+
+.controller('WorldMapController', ['$scope', function ($scope) {
+
+}]);
