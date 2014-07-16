@@ -5,7 +5,7 @@
   </form>  
   <div ngShow="hasResults">
     <header class="pure-u-1">
-      <h2>Search Results for {{ search }}</h2>
+      <h2>Search Results:</h2>
     </header>
     <article class="pure-u-1" ng-repeat="magnet in searchResults">
       <h3><a href="{{magnet.magnetURI}}">{{magnet.name}}</a></h3>
