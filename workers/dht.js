@@ -55,7 +55,6 @@ DHT.prototype._onMessage = function (msg, rinfo) {
         result.nodes.push(compact2string(msg.r.nodes.slice(i + 20, i + 26)));
       }
     }
-    debugger;
     callback(null, result);
   }
 };
