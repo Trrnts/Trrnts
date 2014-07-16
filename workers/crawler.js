@@ -1,5 +1,6 @@
 var DHT = require('./dht');
 var redis = require('../redis')();
+var redisSubscribe = require('../redis')();
 var _ = require('lodash');
 
 // Uses an DHT instance in order to crawl the network.
@@ -15,6 +16,25 @@ var Crawler = function (dht) {
     'dht.transmissionbt.com:6881': timestamp
   };
   this.peers = {};
+};
+
+Crawler.prototype._onReady = function () {
+  // As soon as a new magnet is being submitted, its infoHash will be published
+  // to the magnets:crawl channel.
+  redisSubscribe.subscribe('magnets:crawl');
+  redisSubscribe.on('message', function (channel, infoHash) {
+    this.crawl(infoHash);
+  }.bind(this));
+
+  // At startup: Crawls uncrawled magnets in magnets:index set.
+  redis.smembers('magnets:crawl', function (err, infoHashes) {
+    _.each(infoHashes, this.crawl.bind(this));
+  }.bind(this));
+};
+
+Crawler.prototype.logNodesAndPeers = function () {
+  console.log(_.keys(this.nodes).length + ' nodes');
+  console.log(_.keys(this.peers).length + ' peers');
 };
 
 // Recursively crawls the BitTorrent DHT protocol using an instance of the DHT
@@ -40,9 +60,9 @@ Crawler.prototype.crawl = function (infoHash) {
         //store each peer in a sorted set for its magnet. We will score each magnet by
         //seeing how many peers there are for the magnet in the last X minutes
         redis.ZADD('magnets:' + infoHash + ':peers', _.now(), peer);
-        redis.ZREVRANGE('magnets:' + infoHash + ':peers', 0, 0, 'withscores', function(err, resp) {
-          console.log('----------------------------------- ' + resp);
-        });                      
+        // redis.ZREVRANGE('magnets:' + infoHash + ':peers', 0, 0, 'withscores', function(err, resp) {
+        //   console.log('----------------------------------- ' + resp);
+        // });                      
       }, this);
 
       // Store all peers to the geoQueue
@@ -58,8 +78,9 @@ Crawler.prototype.crawl = function (infoHash) {
     this.crawl(infoHash);
   }.bind(this), 100);
 
-  console.log(_.keys(this.nodes).length + ' nodes');
-  console.log(_.keys(this.peers).length + ' peers');
+
+  this.logNodesAndPeers();
+
 };
 
 Crawler.prototype.start = function (callback) {
@@ -91,6 +112,9 @@ var crawler = new Crawler(dht);
 var infoHash = '7AE9924651F7E6A1E47C918C1256847DCA471BF9';
 
 crawler.start(function () {
+  crawler._onReady();
   crawler.crawl(infoHash, function (err, stats) {
   });
 });
+
+setTimeout(crawler.logNodesAndPeers, 2000);
