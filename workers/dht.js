@@ -101,8 +101,8 @@ DHT.prototype.getPeers = function (infoHash, address, callback) {
   var port = address.split(':')[1];
   var ip = address.split(':')[0];
 
-  if(Number(port) < 1 || Number(port) > 65535) {
-    return;
+  if (parseInt(port) < 1 || parseInt(port) > 65535) {
+    callback(new TypeError('Invalid port'), {});
   }
 
   this.socket.send(message, 0, message.length, port, ip, function (exception) {
