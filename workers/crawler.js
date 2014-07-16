@@ -22,24 +22,22 @@ var Crawler = function (dht) {
 };
 
 var _onReady = function () {
-  // // As soon as a new magnet is being submitted, its infoHash will be published
-  // // to the magnets:crawl channel.
-  // redisSubscribe.subscribe('magnets:crawl');
-  // redisSubscribe.on('message', function (channel, infoHash) {
-  //   console.log('-----------------------------------> resisSubscribe.on');
-  //   var crawler = new Crawler(dht);
-  //   crawler.crawl(infoHash);
-  //   // this.crawl(infoHash);
-  // });
+  // As soon as a new magnet is being submitted, its infoHash will be published
+  // to the magnets:crawl channel.
+  redisSubscribe.subscribe('magnets:crawl');
+  redisSubscribe.on('message', function (channel, infoHash) {
+    var crawler = new Crawler(dht);
+    crawler.crawl(infoHash);
+  });
 
-  // // At startup: Crawls uncrawled magnets in magnets:index set.
-  // redis.smembers('magnets:crawl', function (err, infoHashes) {
-  //   _.each(infoHashes, function (infoHash) {
-  //     console.log('beginning new crawl for -----------------------------------> ' + infoHash);
-  //     var crawler = new Crawler(dht);
-  //     crawler.crawl(infoHash);
-  //   });
-  // });
+  // At startup: Crawls uncrawled magnets in magnets:index set.
+  redis.smembers('magnets:crawl', function (err, infoHashes) {
+    _.each(infoHashes, function (infoHash) {
+      console.log('beginning new crawl for -----------------------------------> ' + infoHash);
+      var crawler = new Crawler(dht);
+      crawler.crawl(infoHash);
+    });
+  });
 };
 
 Crawler.prototype.logNodesAndPeers = function () {
@@ -75,7 +73,7 @@ Crawler.prototype.crawl = function (infoHash) {
         redis.ZADD('magnets:' + infoHash + ':peers', _.now(), peer);
         // redis.ZREVRANGE('magnets:' + infoHash + ':peers', 0, 0, 'withscores', function(err, resp) {
         //   console.log('----------------------------------- ' + resp);
-        // });                      
+        // });
       }, this);
 
       // Store all peers to the geoQueue
@@ -96,10 +94,6 @@ Crawler.prototype.crawl = function (infoHash) {
 
 };
 
-Crawler.prototype.start = function (callback) {
-  dht.start(callback);
-};
-
 Crawler.prototype.pushPeersToGeoQueue = function (peers) {
   if (!peers.length) {
     return;
@@ -115,14 +109,12 @@ Crawler.prototype.pushPeersToGeoQueue = function (peers) {
   // redis.SADD.apply(null, formattedPeers);
 };
 
-
 var crawler = new Crawler(dht);
 //TODO: set infoHash based on user submitted magnet links
 var infoHash = '7AE9924651F7E6A1E47C918C1256847DCA471BF9';
 
-crawler.start(function () {
+dht.start(function () {
   _onReady();
   crawler.crawl(infoHash, function (err, stats) {
   });
 });
-
