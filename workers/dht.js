@@ -80,6 +80,9 @@ DHT.prototype._idToBuffer = function (id) {
 // Sends the get_peers request to a node.
 DHT.prototype.getPeers = function (infoHash, address, callback) {
   callback = callback || function () {  };
+  if(this.nextTransactionID > 50000) {
+    this.nextTransactionID = 1;
+  }
   var transactionID = this.nextTransactionID++;
   var message = bencode.encode({
     t: this._transactionIdToBuffer(transactionID),
@@ -95,7 +98,14 @@ DHT.prototype.getPeers = function (infoHash, address, callback) {
       info_hash: this._idToBuffer(infoHash)
     }
   });
-  this.socket.send(message, 0, message.length, address.split(':')[1], address.split(':')[0], function (exception) {
+  var port = address.split(':')[1];
+  var ip = address.split(':')[0];
+
+  if(Number(port) < 1 || Number(port) > 65535) {
+    return;
+  }
+
+  this.socket.send(message, 0, message.length, port, ip, function (exception) {
     this.getPeersCallbacks[transactionID] = callback;
     setTimeout(function () {
       delete this.getPeersCallbacks[transactionID];
