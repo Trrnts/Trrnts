@@ -3,8 +3,8 @@ var redis = require('../redis.js');
 var _ = require('lodash');
 
 // Uses an DHT instance in order to crawl the network.
-var Crawler = function () {
-  this.dht = new DHT();
+var Crawler = function (dht) {
+  this.dht = dht;
   var timestamp = _.now();
   // Addresses as keys, since we need constant time insert operations and unique
   // entries (inserts every node only once).
@@ -40,9 +40,9 @@ Crawler.prototype.crawl = function (infoHash) {
         //store each peer in a sorted set for its magnet. We will score each magnet by
         //seeing how many peers there are for the magnet in the last X minutes
         redis.ZADD('magnets:' + infoHash + ':peers', _.now(), peer);
-        // redis.ZREVRANGE('magnets:' + infoHash + ':peers', 0, 0, 'withscores', function(err, resp) {
-        //   console.log('----------------------------------- ' + resp);
-        // });                      
+        redis.ZREVRANGE('magnets:' + infoHash + ':peers', 0, 0, 'withscores', function(err, resp) {
+          console.log('----------------------------------- ' + resp);
+        });                      
       }, this);
 
       // Store all peers to the geoQueue       
@@ -82,7 +82,11 @@ Crawler.prototype.pushPeersToGeoQueue = function (peers) {
 };
 
 
-var crawler = new Crawler();
+//In order to have multiple crawlers we need to be able to pass in the same dht
+//instance to each of them
+var dht = new DHT();
+
+var crawler = new Crawler(dht);
 //TODO: set infoHash based on user submitted magnet links
 var infoHash = '7AE9924651F7E6A1E47C918C1256847DCA471BF9';
 
