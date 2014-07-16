@@ -76,7 +76,7 @@ dht.start(function () {
   // As soon as a new magnet is being submitted, its infoHash will be published
   // to the magnets:crawl channel.
 
-  crawlJobQueue.process('crawl', function (job, done) {
+  crawlJobQueue.process('crawl', 10, function (job, done) {
     var infoHash = job.data.infoHash;
     new CrawlJob(infoHash, done);
   });
