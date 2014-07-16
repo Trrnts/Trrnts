@@ -11,4 +11,8 @@
       </div>
     </div>
   </article>
+  <nav class="pure-u-1 pagination">
+    <button ng-disabled="!hasPrev()" ng-click="prev()">← Previous</button>
+    <button ng-disabled="!hasNext()" ng-click="next()">Next →</button>
+  </nav>
 </section>
