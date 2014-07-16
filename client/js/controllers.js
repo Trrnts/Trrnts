@@ -56,6 +56,7 @@ angular.module('trrntsApp.controllers', [])
   $scope.perPage = 10;
   $scope.start = 1;
   $scope.stop = $scope.start + $scope.perPage - 1;
+  $scope.top = [];
 
   $scope.hasPrev = function () {
     return $scope.start > 1;
@@ -65,7 +66,6 @@ angular.module('trrntsApp.controllers', [])
     return $scope.top.length === $scope.perPage;
   };
 
-  $scope.top = [];
 
   var update = function () {
     MagnetLinksFactory.top($scope.start, $scope.stop).then(function (result) {
@@ -103,7 +103,7 @@ angular.module('trrntsApp.controllers', [])
   };
 
   $scope.hasNext = function () {
-    return $scope.top.length === $scope.perPage;
+    return $scope.searchResults.length === $scope.perPage;
   };
 
   var update = function () {

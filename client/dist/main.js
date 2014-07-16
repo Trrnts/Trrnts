@@ -74,8 +74,7 @@ angular.module('trrntsApp.controllers', [])
   $scope.perPage = 10;
   $scope.start = 1;
   $scope.stop = $scope.start + $scope.perPage - 1;
-  // Enables or disables the next button
-  $scope.enabled = true;
+  $scope.top = [];
 
   $scope.hasPrev = function () {
     return $scope.start > 1;
@@ -85,7 +84,6 @@ angular.module('trrntsApp.controllers', [])
     return $scope.top.length === $scope.perPage;
   };
 
-  $scope.top = [];
 
   var update = function () {
     MagnetLinksFactory.top($scope.start, $scope.stop).then(function (result) {
@@ -123,7 +121,7 @@ angular.module('trrntsApp.controllers', [])
   };
 
   $scope.hasNext = function () {
-    return true;
+    return $scope.searchResults.length === $scope.perPage;
   };
 
   var update = function () {
@@ -389,7 +387,7 @@ angular.module('trrntsApp.services', [])
 
   // Searches torrents whose titles contains input.
   var search = function (input, start, stop) {
-    if (!input) {
+    if (!input && typeof(input) !== 'string') {
       return;
     }
 
