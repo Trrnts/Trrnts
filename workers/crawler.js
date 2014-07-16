@@ -9,7 +9,6 @@ var dht = new DHT();
 
 // Uses an DHT instance in order to crawl the network.
 var Crawler = function (dht) {
-  this.dht = dht;
   this.timestamp = _.now();
   // Addresses as keys, since we need constant time insert operations and unique
   // entries (inserts every node only once).
@@ -27,18 +26,20 @@ var _onReady = function () {
   // to the magnets:crawl channel.
   redisSubscribe.subscribe('magnets:crawl');
   redisSubscribe.on('message', function (channel, infoHash) {
+    console.log('-----------------------------------> resisSubscribe.on');
     var crawler = new Crawler(dht);
     crawler.crawl(infoHash);
     // this.crawl(infoHash);
-  }.bind(crawler));
+  });
 
   // At startup: Crawls uncrawled magnets in magnets:index set.
   redis.smembers('magnets:crawl', function (err, infoHashes) {
     _.each(infoHashes, function (infoHash) {
+      console.log('beginning new crawl for -----------------------------------> ' + infoHash);
       var crawler = new Crawler(dht);
-      crawler.crawl.bind(crawler);
+      crawler.crawl(infoHash);
     });
-  }.bind(this));
+  });
 };
 
 Crawler.prototype.logNodesAndPeers = function () {
@@ -52,13 +53,15 @@ Crawler.prototype.logNodesAndPeers = function () {
 Crawler.prototype.crawl = function (infoHash) {
   _.each(this.nodes, function (tStamp, node) {
     // console.log('----------------------------------- INSIDE CRAWL');
-    this.dht.getPeers(infoHash, node, function (err, resp) {
+    dht.getPeers(infoHash, node, function (err, resp) {
 
       _.each(resp.nodes, function (node) {
 
         this.nodes[node] = _.now();
         //add nodes to redis set
         redis.SADD('node', node);
+
+
       }, this);
 
       _.each(resp.peers, function (peer) {
@@ -86,7 +89,7 @@ Crawler.prototype.crawl = function (infoHash) {
   // crawl the the new nodes/ peers. TODO
   setTimeout(function () {
     this.crawl(infoHash);
-  }.bind(this), 100);
+  }.bind(this), 10000);
 
 
   this.logNodesAndPeers();
@@ -94,7 +97,7 @@ Crawler.prototype.crawl = function (infoHash) {
 };
 
 Crawler.prototype.start = function (callback) {
-  this.dht.start(callback);
+  dht.start(callback);
 };
 
 Crawler.prototype.pushPeersToGeoQueue = function (peers) {
@@ -123,4 +126,3 @@ crawler.start(function () {
   });
 });
 
-setTimeout(crawler.logNodesAndPeers, 2000);
