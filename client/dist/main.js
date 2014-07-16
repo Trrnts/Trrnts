@@ -74,8 +74,6 @@ angular.module('trrntsApp.controllers', [])
   $scope.perPage = 10;
   $scope.start = 1;
   $scope.stop = $scope.start + $scope.perPage - 1;
-  // Enables or disables the next button
-  $scope.enabled = true;
 
   $scope.hasPrev = function () {
     return $scope.start > 1;
@@ -123,7 +121,7 @@ angular.module('trrntsApp.controllers', [])
   };
 
   $scope.hasNext = function () {
-    return true;
+    return $scope.searchResults.length === $scope.perPage;
   };
 
   var update = function () {

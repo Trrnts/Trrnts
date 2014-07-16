@@ -103,7 +103,7 @@ angular.module('trrntsApp.controllers', [])
   };
 
   $scope.hasNext = function () {
-    return $scope.top.length === $scope.perPage;
+    return $scope.searchResults.length === $scope.perPage;
   };
 
   var update = function () {
