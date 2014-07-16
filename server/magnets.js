@@ -1,7 +1,8 @@
 var _ = require('lodash'),
     redis = require('../redis')(),
     parseMagnetURI = require('magnet-uri'),
-    magnets = {};
+    magnets = {},
+    crawlJobQueue = require('../workers/crawlJobQueue');
 
 var util = {};
 
@@ -76,8 +77,13 @@ magnets.create = function (ip, magnetURI, callback) {
       redis.zadd('magnets:top', magnet.score, magnet.infoHash);
       redis.zadd('magnets:latest', magnet.createdAt, magnet.infoHash);
       redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
-      redis.sadd('magnets:crawl', magnet.infoHash);
-      redis.publish('magnets:crawl', magnet.infoHash);
+
+      var job = crawlJobQueue.create('crawl', {
+        infoHash: magnet.infoHash
+      }).save(function (err) {
+        if(!err) console.log(job.id);
+      });
+
       redis.sadd('magnets:index', magnet.infoHash);
       redis.publish('magnets:index', magnet.infoHash);
 
@@ -97,14 +103,14 @@ magnets.readList = function (list, start, stop, callback) {
 magnets.readMagnet = util.infoHashesToMagnets;
 
 
-// search('Game of Thrones') #=> get all torrents that have those words, case-sensitive 
-magnets.search = function (search, callback) {    
+// search('Game of Thrones') #=> get all torrents that have those words, case-sensitive
+magnets.search = function (search, callback) {
   // Format : 'search:' + word
-  // Convert Each Word into a key Format  
+  // Convert Each Word into a key Format
 
   var formattedWords = _.map(search.toLowerCase().split(' '), function (word) {
     return 'search:'+ word;
-  });  
+  });
 
   // Get InfoHashes for set of words through intersect
   redis.sinter(formattedWords, function (err, results) {
