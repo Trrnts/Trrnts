@@ -60,4 +60,37 @@ magnets.readMagnet = function (infoHash, callback) {
   redis.hgetall('magnet:' + infoHash, callback);
 };
 
+
+magnets.search = function (search, callback) {    
+  // Format : 'search:' + word    
+  // Convert Each Word into a key Format 
+  var formattedWords = _.map(search.split(' '), function (word) {
+    return 'search:'+ word;
+  });
+
+  // Attatch callback at end because of apply
+  formattedWords.push(callback);
+  
+  // Perform SINTER on each key
+  redis.sinter.apply(null, formattedWords);
+}
+
+
+
+
+
+
 module.exports = exports = magnets;
+
+
+
+
+
+
+
+
+
+
+
+
+
