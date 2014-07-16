@@ -24,12 +24,41 @@ angular.module('trrntsApp.controllers', [])
 }])
 
 .controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+  $scope.perPage = 10;
+  $scope.start = 1;
+  $scope.stop = $scope.start + $scope.perPage - 1;
+
+  $scope.hasPrev = function () {
+    return $scope.start > 1;
+  };
+
+  $scope.hasNext = function () {
+    return true;
+  };
+
   $scope.top = [];
-  MagnetLinksFactory.top().then(function (result) {
-    $scope.top = result.data;
-  }).catch(function () {
-    $scope.top = [];
-  });
+
+  var update = function () {
+    MagnetLinksFactory.top($scope.start, $scope.stop).then(function (result) {
+      $scope.top = result.data;
+    }).catch(function () {
+      $scope.top = [];
+    });
+  };
+
+  update();
+
+  $scope.next = function () {
+    $scope.start += $scope.perPage;
+    $scope.stop += $scope.perPage;
+    update();
+  };
+
+  $scope.prev = function () {
+    $scope.start -= $scope.perPage;
+    $scope.stop -= $scope.perPage;
+    update();
+  };
 }])
 
 .controller('WorldMapController', function ($scope) {
