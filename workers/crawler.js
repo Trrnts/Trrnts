@@ -32,15 +32,18 @@ var CrawlJob = function (infoHash, done) {
       clearInterval(kickOff);
     }
   }.bind(this), 100);
+  setTimeout(function () {
+    // Invoke done after 10 seconds.
+    this.done(null, {
+      infoHash: this.infoHash
+    });
+  }.bind(this), 1000*10);
 };
 
 // Recursively crawls the BitTorrent DHT protocol using an instance of the DHT
 // class, which is a property of the instance of the CrawlJob.
 CrawlJob.prototype.crawl = function (addr) {
-  console.log(_.now() - this.startedAt);
   if (_.now() - this.startedAt > 10000) {
-    console.log('DOOOOOOOOOOONE');
-    this.done(null, {});
     return;
   }
   dht.getPeers(this.infoHash, addr, function (err, resp) {
@@ -76,5 +79,36 @@ dht.start(function () {
   crawlJobQueue.process('crawl', function (job, done) {
     var infoHash = job.data.infoHash;
     new CrawlJob(infoHash, done);
+  });
+
+  crawlJobQueue.on('job complete', function(id, result) {
+    //when a job is completed
+      //add it to the queue again
+        //get the infohash
+
+    console.log(result.infoHash);
+
+    var job = crawlJobQueue.create('crawl', {
+      infoHash: result.infoHash
+    }).save(function (err) {
+      if(!err) {
+        console.log(job.id);
+      }
+    });
+
+
+    // kue.Job.get(id, function(err, job){
+    //   if (err) return;
+      // job.remove(function(err) {
+      //   if (err) throw err;
+      //   console.log('removed completed job #%d', job.id);
+      //   console.log('Add completed job to queue');
+      //   job = crawlJobQueue.create('crawl', {
+      //     infoHash: job.data.infoHash
+      //   }).save(function (err) {
+      //     if(!err) console.log(job.id);
+      //   });
+      // });
+    // });
   });
 });
