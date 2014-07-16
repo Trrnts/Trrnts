@@ -9,3 +9,9 @@ var crawlJobQueue = module.exports = exports = kue.createQueue({
   }
 });
 
+process.once('SIGTERM', function (sig) {
+  queue.shutdown(function (err) {
+    console.log('Kue is shut down.', err || '');
+    process.exit(0);
+  }, 5000);
+});
