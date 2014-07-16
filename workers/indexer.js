@@ -35,7 +35,7 @@ redisSubscribe.on('message', function (channel, infoHash) {
   index(infoHash);
 });
 
-// At startup: Indexes unindexes magnets in magnets:index set.
+// At startup: Indexes unindexed magnets in magnets:index set.
 (function () {
   redisRegular.smembers('magnets:index', function (err, infoHashes) {
     _.each(infoHashes, index);

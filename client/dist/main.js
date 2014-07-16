@@ -33,12 +33,41 @@ angular.module('trrntsApp.controllers', [])
 }])
 
 .controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+  $scope.perPage = 10;
+  $scope.start = 1;
+  $scope.stop = $scope.start + $scope.perPage - 1;
+
+  $scope.hasPrev = function () {
+    return $scope.start > 1;
+  };
+
+  $scope.hasNext = function () {
+    return true;
+  };
+
   $scope.latest = [];
-  MagnetLinksFactory.latest().then(function (result) {
-    $scope.latest = result.data;
-  }).catch(function () {
-    $scope.latest = [];
-  });
+
+  var update = function () {
+    MagnetLinksFactory.latest($scope.start, $scope.stop).then(function (result) {
+      $scope.latest = result.data;
+    }).catch(function () {
+      $scope.latest = [];
+    });
+  };
+
+  update();
+
+  $scope.next = function () {
+    $scope.start += $scope.perPage;
+    $scope.stop += $scope.perPage;
+    update();
+  };
+
+  $scope.prev = function () {
+    $scope.start -= $scope.perPage;
+    $scope.stop -= $scope.perPage;
+    update();
+  };
 }])
 
 .controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
@@ -157,7 +186,9 @@ angular.module('trrntsApp.directives', [])
           .attr('y', chartHeight)
           .attr('height', 0)
           .transition()
-          .delay(function (d, i) { return i*100; })
+          .duration(300)
+          .ease('elastic')
+          .delay(function (d, i) { return (0.7*i)*30; })
           .attr('y', function (d, i) { return chartHeight-y(d.peers); })
           .attr('height', function (d) { return y(d.peers); });
 
@@ -166,6 +197,7 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
+        .ease('elastic')
         .attr('y', function () { return chartHeight - y(d.peers) - highlightHeightDiff; })
         .attr('height', function () { return y(d.peers) + highlightHeightDiff; });
 
@@ -178,6 +210,7 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
+        .ease('elastic')
         .attr('y', function (d, i) { return chartHeight - y(d.peers); })
         .attr('height', function (d) { return y(d.peers); });
 
@@ -192,13 +225,7 @@ angular.module('trrntsApp.directives', [])
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {
-      var map = new Datamap({'element': element[0], fills: {defaultFill:'#ABB2AD', torrents: 'black'}});
-      // Generate Fake Stats
-      var fakePositions = generateFakePositions();
-      console.log(fakePositions);
-      map.bubbles(fakePositions);
-
-      function generateFakePositions () {
+      var generateFakePositions = function () {
         var fakePositions = [];
         var fakeLatAndLong = [[49.45045869, -65.15636998],
                         [37.12726948, -17.72583572],
@@ -212,15 +239,31 @@ angular.module('trrntsApp.directives', [])
                         [-27.03729112, 36.61236272]];
 
         for (var i = 0; i < fakeLatAndLong.length; i++) {
-          var spot = {radius: 10, fillKey:'torrents'};
+          var spot = {
+            radius: Math.floor(Math.random()*50),
+            fillKey: 'torrents'
+          };
           spot.latitude = fakeLatAndLong[i][0];
           spot.longitude = fakeLatAndLong[i][1];
-          console.log(fakeLatAndLong[i][0], fakeLatAndLong[i][1]);
+          // console.log(fakeLatAndLong[i][0], fakeLatAndLong[i][1]);
           fakePositions.push(spot);
         }
 
         return fakePositions;
-      }
+      };
+
+      var map = new Datamap({
+        'element': element[0],
+        fills: {
+          defaultFill: '#ccc',
+          torrents: '#222'
+        }
+      });
+
+      // Generate Fake Stats
+      var fakePositions = generateFakePositions();
+      // console.log(fakePositions);
+      map.bubbles(fakePositions);
     },
   };
 });

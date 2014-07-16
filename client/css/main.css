@@ -109,8 +109,32 @@ Style top and latest. Styles are very similar and can be reused.
   border-bottom: 0;
 }
 
-.latest article:last-child {
-  border-bottom: 1px solid #eee;
+.latest .pagination {
+  border-top: 1px solid #eee;
+}
+
+.pagination {
+  padding: 0.5em 0;
+  text-align: right;
+}
+
+.pagination button {
+  font-weight: 300;
+  background: 0;
+  border: 1px solid #eee;
+  border-radius: 100px;
+  -moz-border-radius: 100px;
+  -webkit-border-radius: 100px;
+  padding: 0.5em 1em;
+  color: #999;
+}
+
+.pagination button:focus {
+  outline: 0;
+}
+
+.pagination button[disabled] {
+  color: #ccc;
 }
 
 .top article h3,
@@ -257,8 +281,9 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
   }
 }
 
+/* Style the world map. */
 .world-map {
-  margin-top:0.5em;
-  margin-bottom:0.5em;
-  height:35em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  height: 35em;
 }
