@@ -68,12 +68,10 @@ magnets.search = function (search, callback) {
     return 'search:'+ word;
   });
 
-  // Attatch callback at end because of apply
+  // Attach callback at end because of apply
   formattedWords.push(callback);
-  
-  // Perform SINTER on each key
   redis.sinter.apply(null, formattedWords);
-}
+};
 
 
 

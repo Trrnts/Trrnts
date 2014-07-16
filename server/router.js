@@ -46,6 +46,7 @@ router.get('/magnets/:list', function (req, res, next) {
       } else {
         console.log("magnets gotten from search:", magnets);
         res.send(200, magnets);
+        return;
       }
     });
   }
