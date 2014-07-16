@@ -80,6 +80,9 @@ DHT.prototype._idToBuffer = function (id) {
 // Sends the get_peers request to a node.
 DHT.prototype.getPeers = function (infoHash, address, callback) {
   callback = callback || function () {  };
+  if(this.nextTransactionID > 50000) {
+    this.nextTransactionID = 1;
+  }
   var transactionID = this.nextTransactionID++;
   var message = bencode.encode({
     t: this._transactionIdToBuffer(transactionID),
