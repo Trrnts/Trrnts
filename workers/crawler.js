@@ -22,24 +22,24 @@ var Crawler = function (dht) {
 };
 
 var _onReady = function () {
-  // As soon as a new magnet is being submitted, its infoHash will be published
-  // to the magnets:crawl channel.
-  redisSubscribe.subscribe('magnets:crawl');
-  redisSubscribe.on('message', function (channel, infoHash) {
-    console.log('-----------------------------------> resisSubscribe.on');
-    var crawler = new Crawler(dht);
-    crawler.crawl(infoHash);
-    // this.crawl(infoHash);
-  });
+  // // As soon as a new magnet is being submitted, its infoHash will be published
+  // // to the magnets:crawl channel.
+  // redisSubscribe.subscribe('magnets:crawl');
+  // redisSubscribe.on('message', function (channel, infoHash) {
+  //   console.log('-----------------------------------> resisSubscribe.on');
+  //   var crawler = new Crawler(dht);
+  //   crawler.crawl(infoHash);
+  //   // this.crawl(infoHash);
+  // });
 
-  // At startup: Crawls uncrawled magnets in magnets:index set.
-  redis.smembers('magnets:crawl', function (err, infoHashes) {
-    _.each(infoHashes, function (infoHash) {
-      console.log('beginning new crawl for -----------------------------------> ' + infoHash);
-      var crawler = new Crawler(dht);
-      crawler.crawl(infoHash);
-    });
-  });
+  // // At startup: Crawls uncrawled magnets in magnets:index set.
+  // redis.smembers('magnets:crawl', function (err, infoHashes) {
+  //   _.each(infoHashes, function (infoHash) {
+  //     console.log('beginning new crawl for -----------------------------------> ' + infoHash);
+  //     var crawler = new Crawler(dht);
+  //     crawler.crawl(infoHash);
+  //   });
+  // });
 };
 
 Crawler.prototype.logNodesAndPeers = function () {
@@ -89,7 +89,7 @@ Crawler.prototype.crawl = function (infoHash) {
   // crawl the the new nodes/ peers. TODO
   setTimeout(function () {
     this.crawl(infoHash);
-  }.bind(this), 10000);
+  }.bind(this), 100);
 
 
   this.logNodesAndPeers();
