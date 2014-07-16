@@ -32,10 +32,16 @@ angular.module('trrntsApp.main', [
           controller: 'LatestMagnetLinksController'
         },
 
+        'searchMagnets@trrntsApp.main': {
+          templateUrl: 'views/searchMagnets.tpl.html',
+          controller: 'SearchMagnetLinksController'
+        },
+
         'worldMap@trrntsApp.main': {
           templateUrl: 'views/worldMap.tpl.html',
           controller: 'WorldMapController'
         }
+
       }
     });
 }]);
