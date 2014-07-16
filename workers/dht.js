@@ -37,7 +37,9 @@ var DHT = function (options) {
 
 // This function will be invoked as soon as a node sends a message.
 DHT.prototype._onMessage = function (msg, rinfo) {
-  msg = bencode.decode(msg);
+  try {
+    msg = bencode.decode(msg);
+  } catch (e) { return; }
   msg.t = Buffer.isBuffer(msg.t) && msg.t.length === 2 && msg.t.readUInt16BE(0);
   var callback = this.getPeersCallbacks[msg.t];
   if (callback) {
@@ -48,11 +50,19 @@ DHT.prototype._onMessage = function (msg, rinfo) {
     // Table to it.
     result.nodes = [];
     if (msg.r && msg.r.values) {
-      result.peers = _.map(msg.r.values, compact2string);
+      _.each(msg.r.values, function (peer) {
+        peer = compact2string(peer);
+        if (peer !== null) {
+          result.peers.push(peer);
+        }
+      });
     }
     if (msg.r && msg.r.nodes && Buffer.isBuffer(msg.r.nodes)) {
       for (var i = 0; i < msg.r.nodes.length; i += 26) {
-        result.nodes.push(compact2string(msg.r.nodes.slice(i + 20, i + 26)));
+        var node = compact2string(msg.r.nodes.slice(i + 20, i + 26));
+        if (node !== null) {
+          result.nodes.push(node);
+        }
       }
     }
     callback(null, result);
@@ -102,7 +112,7 @@ DHT.prototype.getPeers = function (infoHash, address, callback) {
   var ip = address.split(':')[0];
 
   if (parseInt(port) < 1 || parseInt(port) > 65535) {
-    callback(new TypeError('Invalid port'), {});
+    return callback(new TypeError('Invalid port'), {});
   }
 
   this.socket.send(message, 0, message.length, port, ip, function (exception) {
