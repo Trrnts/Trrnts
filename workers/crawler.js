@@ -58,7 +58,7 @@ CrawlJob.prototype.crawl = function (addr) {
 
       //store each peer in a sorted set for its magnet. We will score each magnet by
       //seeing how many peers there are for the magnet in the last X minutes
-      redis.ZADD('magnets:' + this.infoHash + ':peers', _.now(), peer);
+      redis.ZADD('magnet:' + this.infoHash + ':peers', _.now(), peer);
 
       this.crawl(peer);
     }, this);
