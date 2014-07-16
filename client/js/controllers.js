@@ -62,7 +62,7 @@ angular.module('trrntsApp.controllers', [])
   };
 
   $scope.hasNext = function () {
-    return true;
+    return $scope.top.length === $scope.perPage;
   };
 
   $scope.top = [];
@@ -70,6 +70,7 @@ angular.module('trrntsApp.controllers', [])
   var update = function () {
     MagnetLinksFactory.top($scope.start, $scope.stop).then(function (result) {
       $scope.top = result.data;
+
     }).catch(function () {
       $scope.top = [];
     });
@@ -102,7 +103,7 @@ angular.module('trrntsApp.controllers', [])
   };
 
   $scope.hasNext = function () {
-    return true;
+    return $scope.top.length === $scope.perPage;
   };
 
   var update = function () {

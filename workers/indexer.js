@@ -10,6 +10,7 @@ var _ = require('lodash'),
 // whitespaces. This is needed for extracting the words as an array from a
 // string.
 var extractWords = function (string) {
+  string = string.toLowerCase();
   return string.replace(/\W/g, ' ').replace(/ +(?= )/g,'').split(' ');
 };
 
