@@ -100,7 +100,6 @@ DHT.prototype.getPeers = function (infoHash, address, callback) {
   });
   var port = address.split(':')[1];
   var ip = address.split(':')[0];
-  debugger;
 
   if(Number(port) < 1 || Number(port) > 65535) {
     return;

@@ -18,17 +18,22 @@ var Crawler = function (dht) {
   this.peers = {};
 };
 
-Crawler.prototype._onReady = function () {
+var _onReady = function () {
   // As soon as a new magnet is being submitted, its infoHash will be published
   // to the magnets:crawl channel.
   redisSubscribe.subscribe('magnets:crawl');
   redisSubscribe.on('message', function (channel, infoHash) {
-    this.crawl(infoHash);
-  }.bind(this));
+    var crawler = new Crawler();
+    crawler.crawl(infoHash)
+    // this.crawl(infoHash);
+  }.bind(crawler));
 
   // At startup: Crawls uncrawled magnets in magnets:index set.
   redis.smembers('magnets:crawl', function (err, infoHashes) {
-    _.each(infoHashes, this.crawl.bind(this));
+    _.each(infoHashes, function (infoHash) {
+      var crawler = new Crawler();
+      crawler.crawl.bind(crawler);
+    });
   }.bind(this));
 };
 
@@ -112,7 +117,7 @@ var crawler = new Crawler(dht);
 var infoHash = '7AE9924651F7E6A1E47C918C1256847DCA471BF9';
 
 crawler.start(function () {
-  crawler._onReady();
+  _onReady();
   crawler.crawl(infoHash, function (err, stats) {
   });
 });
