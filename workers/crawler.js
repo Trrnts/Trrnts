@@ -117,13 +117,31 @@ CrawlJob.prototype.crawl = function (addr) {
     // peers, which do have the magnet, are located. We do not have a good
     // reason to store them in the database, but we are anyways.
     _.each(resp.nodes, function (node) {
-      redis.SADD('node', node);
+      redis.SADD('node', node, function (err, isNew) {
+        if (isNew) {
+          this.job.log('Discovered new node: ' + node);
+        }
+      }.bind(this));
     }, this);
 
     // Peers have the magnet we are looking for. Storing them by themselves is
     // not yet useful, but we do it anyways.
     _.each(resp.peers, function (peer) {
-      redis.SADD('peer', peer);
+      redis.SADD('peer', peer, function (err, isNew) {
+        if (!isNew) {
+          return;
+        }
+        this.job.log('Discovered new peer: ' + peer);
+        var job = queue.create('mapPeer', {
+          title: 'Geopmap of ' + peer,
+          peer: peer
+        }).save(function (err) {
+          if (err) {
+            console.error('Experienced error while creating new job (id: ' + job.id + '): ' + err.message);
+            console.error(err.stack);
+          }
+        });
+      }.bind(this));
 
       // Store each peer in a sorted set for its magnet. We will score each
       // magnet by seeing how many peers there are for the magnet in the last X
