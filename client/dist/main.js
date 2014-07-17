@@ -175,10 +175,10 @@ angular.module('trrntsApp.directives', [])
       var chart = d3.select(element);
 
       var formattedData = [];
-      for (var timestamp in data) {
+      for (var i = 0; i < data.length; i += 2) {
         formattedData.push({
-          peers: parseInt(data[timestamp]),
-          t: parseInt(timestamp)*1000
+          peers: parseInt(data[i]),
+          t: parseInt(data[i+1])
         });
       }
 
