@@ -123,8 +123,12 @@ var CrawlJob = function (job, done) {
 
   }.bind(this), this.ttl);
 
-  setInterval(function () {
-    this.job.progress(_.now() - this.startedAt, this.ttl);
+  var updateProgress = setInterval(function () {
+    var age = _.now() - this.startedAt;
+    this.job.progress(age, this.ttl);
+    if (age > this.ttl) {
+      clearInterval(updateProgress);
+    }
   }.bind(this), 1000);
 
   this.crawlQueue = [];
