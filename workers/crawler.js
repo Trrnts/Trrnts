@@ -20,6 +20,9 @@ var BOOTSTRAP_NODES = [
 
 //Uses a DHT instance in order to crawl the network. See dht.js.
 var CrawlJob = function (job, done) {
+  // Try to not crawl nodes/ peers twice. Computer freezes at about 40000
+  // packages per second.
+  this.alreadyCrawled = {};
   this.job = job;
   this.infoHash = job.data.infoHash;
   this.startedAt = _.now();
@@ -41,7 +44,8 @@ var CrawlJob = function (job, done) {
     }, this);
     this.job.log('Finished invoking crawl function on bootstrap nodes.');
 
-    // Stop kicking off the bootstrap nodes after 10 iterations.
+    // Stop kicking off the bootstrap nodes after a certain number of
+    // iterations.
     if (kickOffCounter === 10) {
       clearInterval(kickOff);
       this.job.log('Finished kicking of crawl job.');
@@ -74,6 +78,14 @@ var CrawlJob = function (job, done) {
 // Recursively crawls the BitTorrent DHT protocol using an instance of the DHT
 // class.
 CrawlJob.prototype.crawl = function (addr) {
+  if (this.alreadyCrawled[addr]) {
+    // Don't crawl addresses twice.
+    return;
+  }
+
+  // Mark that this addr has been crawled now.
+  this.alreadyCrawled[addr] = true;
+
   this.job.progress(_.now() - this.startedAt, this.ttl);
   // Crawls need to stop after 10 seconds, or some time, or else they would
   // crawl 'forever'.
