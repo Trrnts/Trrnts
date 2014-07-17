@@ -1,4 +1,4 @@
-// See https://github.com/learnboost/kue for futher reference.
+// See https://github.com/learnboost/kue for further reference.
 var kue = require('kue'),
     redis = require('../redis');
 
