@@ -15,30 +15,15 @@ util.infoHashesToMagnets = function (infoHashes, callback) {
   var multi = redis.multi();
   _.each(infoHashes, function (infoHash) {
     multi.hgetall('magnet:' + infoHash);
-    // TODO Caching
-    multi.zrevrange(['magnet:' + infoHash + ':peers', 0, 10000, 'WITHSCORES']);
+    multi.zrevrange(['magnet:' + infoHash + ':peers', 0, 50, 'WITHSCORES']);
+    console.log(['magnet:' + infoHash + ':peers', 0, 50, 'WITHSCORES'].join(' '));
   });
   multi.exec(function (err, results) {
     var magnets = [];
 
     // Every second result is the result of a ZREVRANGE (peer data for charts).
     _.each(_.range(0, results.length, 2), function (index) {
-      // Every second item in perrsWithScores is a score.
-      var peersWithScores = results[index+1];
-
-      results[index].peers = _.reduce(_.range(0, peersWithScores.length, 2), function (peers, index) {
-        // debugger;
-        var addr = peersWithScores[index];
-        var lastSeenAt = Math.floor((parseInt(peersWithScores[index+1])/1000)/1); // group by 1 second intervalls for testing
-        console.log(peers);
-        peers[lastSeenAt] = peers[lastSeenAt] || 0;
-        peers[lastSeenAt]++;
-        return peers;
-      }, {});
-
-      if (results[index].peers) {
-        console.log(results[index]);
-      }
+      results[index].peers = results[index+1];
       magnets.push(results[index]);
     });
 
