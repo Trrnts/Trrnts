@@ -55,9 +55,19 @@ var CrawlJob = function (job, done) {
     // error, we set to null.
     this.job.log('Stop crawling after timeout.');
     this.job.log('Clone job and add to job queue.');
-    this.done(null, {
+    // This instantiates a job instance for the kue library called "crawl".
+    // We can now create proccesses by this same name (see above) and use kue's
+    // functionality on it.
+    var job = queue.create('crawl', {
+      title: 'Recursive crawl of ' + this.infoHash,
       infoHash: this.infoHash
+    }).save(function (err) {
+      if (err) {
+        console.error('Experienced error while creating new job (id: ' + job.id + '): ' + err.message);
+        console.error(err.stack);
+      }
     });
+    this.done(null);
   }.bind(this), this.ttl);
 };
 
@@ -118,20 +128,5 @@ dht.start(function () {
   queue.process('crawl', 2, function (job, done) {
     // See below for instantiation of job variable.
     new CrawlJob(job, done);
-  });
-
-  queue.on('job complete', function (id, result) {
-    // This instantiates a job instance for the kue library called "crawl".
-    // We can now create proccesses by this same name (see above) and use kue's
-    // functionality on it.
-    var job = queue.create('crawl', {
-      title: 'Recursive crawl of ' + result.infoHash,
-      infoHash: result.infoHash
-    }).save(function (err) {
-      if (err) {
-        console.error('Experienced error while creating new job (id: ' + job.id + '): ' + err.message);
-        console.error(err.stack);
-      }
-    });
   });
 });
