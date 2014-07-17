@@ -74,20 +74,21 @@ angular.module('trrntsApp.controllers', [])
   $scope.perPage = 10;
   $scope.start = 1;
   $scope.stop = $scope.start + $scope.perPage - 1;
+  $scope.top = [];
 
   $scope.hasPrev = function () {
     return $scope.start > 1;
   };
 
   $scope.hasNext = function () {
-    return true;
+    return $scope.top.length === $scope.perPage;
   };
 
-  $scope.top = [];
 
   var update = function () {
     MagnetLinksFactory.top($scope.start, $scope.stop).then(function (result) {
       $scope.top = result.data;
+
     }).catch(function () {
       $scope.top = [];
     });
@@ -108,9 +109,49 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('WorldMapController', function ($scope) {
+.controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+  $scope.search = '';
+  $scope.searchResults = [];
+  $scope.perPage = 10;
+  $scope.start = 1;
+  $scope.stop = $scope.start + $scope.perPage - 1;
 
-});
+  $scope.hasPrev = function () {
+    return $scope.start > 1;
+  };
+
+  $scope.hasNext = function () {
+    return $scope.searchResults.length === $scope.perPage;
+  };
+
+  var update = function () {
+    MagnetLinksFactory.search($scope.search, $scope.start, $scope.stop).then(function (result) {
+      $scope.searchResults = result.data;
+    }).catch(function () {
+      $scope.searchResults = [];
+    });
+  };
+
+  $scope.next = function () {
+    $scope.start += $scope.perPage;
+    $scope.stop += $scope.perPage;
+    update();
+  };
+
+  $scope.prev = function () {
+    $scope.start -= $scope.perPage;
+    $scope.stop -= $scope.perPage;
+    update();
+  };
+
+  $scope.submit = function () {
+    update();
+  };
+}])
+
+.controller('WorldMapController', ['$scope', function ($scope) {
+
+}]);
 
 angular.module('trrntsApp.directives', [])
 
@@ -128,16 +169,18 @@ angular.module('trrntsApp.directives', [])
       var chartHeight = attrs.barChartHeight || 70;
       var highlightHeightDiff = attrs.highlightHeightDiff || 20;
 
-      var data = scope.data || [];
+      var data = scope.magnet.peers || {};
       var chart = d3.select(element);
 
-      // Dummy data fallback for now...
-      for (var i = 0; i < 20; i++) {
-        data.push({
-          peers: Math.floor(Math.random()*100),
-          t: new Date().getTime()
+      var formattedData = [];
+      for (var timestamp in data) {
+        formattedData.push({
+          peers: parseInt(data[timestamp]),
+          t: parseInt(timestamp)*1000
         });
       }
+
+      data = formattedData;
 
       var y = d3.scale.linear()
                 .domain([0, d3.max(data, function (d) {
@@ -292,10 +335,16 @@ angular.module('trrntsApp.main', [
           controller: 'LatestMagnetLinksController'
         },
 
+        'searchMagnets@trrntsApp.main': {
+          templateUrl: 'views/searchMagnets.tpl.html',
+          controller: 'SearchMagnetLinksController'
+        },
+
         'worldMap@trrntsApp.main': {
           templateUrl: 'views/worldMap.tpl.html',
           controller: 'WorldMapController'
         }
+
       }
     });
 }]);
@@ -336,9 +385,26 @@ angular.module('trrntsApp.services', [])
     });
   };
 
+  // Searches torrents whose titles contains input.
+  var search = function (input, start, stop) {
+    if (!input && typeof(input) !== 'string') {
+      return;
+    }
+
+    return $http({
+      method: 'GET',
+      url:'api/magnets/search/' + input,
+      params: {
+        start: start || 1,
+        stop: stop || 30
+      }
+    });
+  };
+
   return {
     create: create,
     latest: latest,
-    top: top
+    top: top,
+    search:search
   };
 }]);

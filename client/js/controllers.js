@@ -56,20 +56,21 @@ angular.module('trrntsApp.controllers', [])
   $scope.perPage = 10;
   $scope.start = 1;
   $scope.stop = $scope.start + $scope.perPage - 1;
+  $scope.top = [];
 
   $scope.hasPrev = function () {
     return $scope.start > 1;
   };
 
   $scope.hasNext = function () {
-    return true;
+    return $scope.top.length === $scope.perPage;
   };
 
-  $scope.top = [];
 
   var update = function () {
     MagnetLinksFactory.top($scope.start, $scope.stop).then(function (result) {
       $scope.top = result.data;
+
     }).catch(function () {
       $scope.top = [];
     });
@@ -90,6 +91,46 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('WorldMapController', function ($scope) {
+.controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+  $scope.search = '';
+  $scope.searchResults = [];
+  $scope.perPage = 10;
+  $scope.start = 1;
+  $scope.stop = $scope.start + $scope.perPage - 1;
 
-});
+  $scope.hasPrev = function () {
+    return $scope.start > 1;
+  };
+
+  $scope.hasNext = function () {
+    return $scope.searchResults.length === $scope.perPage;
+  };
+
+  var update = function () {
+    MagnetLinksFactory.search($scope.search, $scope.start, $scope.stop).then(function (result) {
+      $scope.searchResults = result.data;
+    }).catch(function () {
+      $scope.searchResults = [];
+    });
+  };
+
+  $scope.next = function () {
+    $scope.start += $scope.perPage;
+    $scope.stop += $scope.perPage;
+    update();
+  };
+
+  $scope.prev = function () {
+    $scope.start -= $scope.perPage;
+    $scope.stop -= $scope.perPage;
+    update();
+  };
+
+  $scope.submit = function () {
+    update();
+  };
+}])
+
+.controller('WorldMapController', ['$scope', function ($scope) {
+
+}]);
