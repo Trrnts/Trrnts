@@ -301,3 +301,7 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
   margin-bottom: 0.5em;
   height: 35em;
 }
+
+.search-results {
+  width:100%;
+}
