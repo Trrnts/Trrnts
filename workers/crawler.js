@@ -29,7 +29,7 @@ var CrawlJob = function (job, done) {
   this.done = done;
   // TTL = Time to live. This is the amount of time in milliseconds we want this
   // crawl job to work.
-  this.ttl = 10*1000;
+  this.ttl = 60*2*1000;
   var kickOffCounter = 0;
 
   this.job.log('Kicking off crawl job...');
@@ -47,15 +47,24 @@ var CrawlJob = function (job, done) {
 
     // Stop kicking off the bootstrap nodes after a certain number of
     // iterations.
-    if (kickOffCounter === 10) {
+    if (kickOffCounter === 5) {
       clearInterval(kickOff);
       this.job.log('Finished kicking of crawl job.');
     }
   }.bind(this), 10);
 
+  // Send 1000 packages per seond at max.
+  var crawling = setInterval(function () {
+    var nextAddrToCrawl = this._queue.shift();
+    if (nextAddrToCrawl) {
+      this.crawl(nextAddrToCrawl);
+    }
+  }.bind(this), 1);
+
   // Invoke crawlJobQueue's done callback function after 10 seconds. Passing in
   // infoHash so that we can queue the same infoHash to be crawled again later.
   setTimeout(function () {
+    clearInterval(crawling);
     // First argument to this.done is for if there is an error. Since there's no
     // error, we set to null.
     this.job.log('Stop crawling after timeout.');
@@ -74,6 +83,12 @@ var CrawlJob = function (job, done) {
     });
     this.done(null);
   }.bind(this), this.ttl);
+
+  this._queue = [];
+};
+
+CrawlJob.prototype.enqueue = function (addr) {
+  this._queue.push(addr);
 };
 
 // Recursively crawls the BitTorrent DHT protocol using an instance of the DHT
@@ -116,7 +131,7 @@ CrawlJob.prototype.crawl = function (addr) {
       redis.ZADD('magnets:' + this.infoHash + ':peers', _.now(), peer);
 
       // Here is the recursive call.
-      this.crawl(peer);
+      this.enqueue(peer);
     }, this);
 
     // If there were no peers to crawl, then we crawl the nodes in order to find
@@ -124,7 +139,7 @@ CrawlJob.prototype.crawl = function (addr) {
     if (resp.peers.length === 0) {
       this.job.log('No peers to crawl. Crawl nodes instead.');
       _.each(resp.nodes, function (node) {
-        this.crawl(node);
+        this.enqueue(node);
       }, this);
     }
     this.job.log('Finished crawling ' + addr + '.');
@@ -136,9 +151,9 @@ dht.start(function () {
   // As soon as a new magnet is being submitted to the database from the client
   // side, its infoHash will be published to a certain channel. Kue takes care
   // of that and creates a new job etc.
-  // 2 refers to the number of concurrent crawl jobs we want to run. Increment
+  // 4 refers to the number of concurrent crawl jobs we want to run.
   // at your own risk. It might break your computer/ server.
-  queue.process('crawl', 2, function (job, done) {
+  queue.process('crawl', 4, function (job, done) {
     // See below for instantiation of job variable.
     new CrawlJob(job, done);
   });
