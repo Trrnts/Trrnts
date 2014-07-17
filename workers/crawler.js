@@ -20,13 +20,16 @@ var BOOTSTRAP_NODES = [
 
 //Uses a DHT instance in order to crawl the network. See dht.js.
 var CrawlJob = function (job, done) {
+  // Try to not crawl nodes/ peers twice. Computer freezes at about 40000
+  // packages per second.
+  this.alreadyCrawled = {};
   this.job = job;
   this.infoHash = job.data.infoHash;
   this.startedAt = _.now();
   this.done = done;
   // TTL = Time to live. This is the amount of time in milliseconds we want this
   // crawl job to work.
-  this.ttl = 10*1000;
+  this.ttl = 60*2*1000;
   var kickOffCounter = 0;
 
   this.job.log('Kicking off crawl job...');
@@ -37,33 +40,68 @@ var CrawlJob = function (job, done) {
     kickOffCounter++;
     this.job.log('Crawling bootstrap nodes (' + kickOffCounter + '. kick)...');
     _.each(BOOTSTRAP_NODES, function (addr) {
+      this.alreadyCrawled[addr] = false;
       this.crawl(addr);
     }, this);
     this.job.log('Finished invoking crawl function on bootstrap nodes.');
 
-    // Stop kicking off the bootstrap nodes after 10 iterations.
-    if (kickOffCounter === 10) {
+    // Stop kicking off the bootstrap nodes after a certain number of
+    // iterations.
+    if (kickOffCounter === 5) {
       clearInterval(kickOff);
       this.job.log('Finished kicking of crawl job.');
     }
   }.bind(this), 10);
 
+  // Send 1000 packages per seond at max.
+  var crawling = setInterval(function () {
+    var nextAddrToCrawl = this._queue.shift();
+    if (nextAddrToCrawl) {
+      this.crawl(nextAddrToCrawl);
+    }
+  }.bind(this), 1);
+
   // Invoke crawlJobQueue's done callback function after 10 seconds. Passing in
   // infoHash so that we can queue the same infoHash to be crawled again later.
   setTimeout(function () {
+    clearInterval(crawling);
     // First argument to this.done is for if there is an error. Since there's no
     // error, we set to null.
     this.job.log('Stop crawling after timeout.');
     this.job.log('Clone job and add to job queue.');
-    this.done(null, {
+    // This instantiates a job instance for the kue library called "crawl".
+    // We can now create proccesses by this same name (see above) and use kue's
+    // functionality on it.
+    var job = queue.create('crawl', {
+      title: 'Recursive crawl of ' + this.infoHash,
       infoHash: this.infoHash
+    }).save(function (err) {
+      if (err) {
+        console.error('Experienced error while creating new job (id: ' + job.id + '): ' + err.message);
+        console.error(err.stack);
+      }
     });
+    this.done(null);
   }.bind(this), this.ttl);
+
+  this._queue = [];
+};
+
+CrawlJob.prototype.enqueue = function (addr) {
+  this._queue.push(addr);
 };
 
 // Recursively crawls the BitTorrent DHT protocol using an instance of the DHT
 // class.
 CrawlJob.prototype.crawl = function (addr) {
+  if (this.alreadyCrawled[addr]) {
+    // Don't crawl addresses twice.
+    return;
+  }
+
+  // Mark that this addr has been crawled now.
+  this.alreadyCrawled[addr] = true;
+
   this.job.progress(_.now() - this.startedAt, this.ttl);
   // Crawls need to stop after 10 seconds, or some time, or else they would
   // crawl 'forever'.
@@ -93,7 +131,7 @@ CrawlJob.prototype.crawl = function (addr) {
       redis.ZADD('magnets:' + this.infoHash + ':peers', _.now(), peer);
 
       // Here is the recursive call.
-      this.crawl(peer);
+      this.enqueue(peer);
     }, this);
 
     // If there were no peers to crawl, then we crawl the nodes in order to find
@@ -101,7 +139,7 @@ CrawlJob.prototype.crawl = function (addr) {
     if (resp.peers.length === 0) {
       this.job.log('No peers to crawl. Crawl nodes instead.');
       _.each(resp.nodes, function (node) {
-        this.crawl(node);
+        this.enqueue(node);
       }, this);
     }
     this.job.log('Finished crawling ' + addr + '.');
@@ -113,25 +151,10 @@ dht.start(function () {
   // As soon as a new magnet is being submitted to the database from the client
   // side, its infoHash will be published to a certain channel. Kue takes care
   // of that and creates a new job etc.
-  // 2 refers to the number of concurrent crawl jobs we want to run. Increment
+  // 4 refers to the number of concurrent crawl jobs we want to run.
   // at your own risk. It might break your computer/ server.
-  queue.process('crawl', 2, function (job, done) {
+  queue.process('crawl', 4, function (job, done) {
     // See below for instantiation of job variable.
     new CrawlJob(job, done);
-  });
-
-  queue.on('job complete', function (id, result) {
-    // This instantiates a job instance for the kue library called "crawl".
-    // We can now create proccesses by this same name (see above) and use kue's
-    // functionality on it.
-    var job = queue.create('crawl', {
-      title: 'Recursive crawl of ' + result.infoHash,
-      infoHash: result.infoHash
-    }).save(function (err) {
-      if (err) {
-        console.error('Experienced error while creating new job (id: ' + job.id + '): ' + err.message);
-        console.error(err.stack);
-      }
-    });
   });
 });
