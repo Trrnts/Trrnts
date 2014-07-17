@@ -18,7 +18,7 @@ process.once('SIGTERM', function (sig) {
       console.error('Error:' + err.message);
       console.error(err.stack);
     }
-    console.log('Exiting now. Shutting queue down.');
+    console.log('Exiting now. Shutting down queue.');
     process.exit(0);
   }, 5000);
 });

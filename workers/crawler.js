@@ -125,6 +125,7 @@ dht.start(function () {
     // We can now create proccesses by this same name (see above) and use kue's
     // functionality on it.
     var job = queue.create('crawl', {
+      title: 'Recursive crawl of ' + result.infoHash,
       infoHash: result.infoHash
     }).save(function (err) {
       if (err) {

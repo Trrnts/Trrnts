@@ -79,6 +79,7 @@ magnets.create = function (ip, magnetURI, callback) {
       redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
 
       var job = queue.create('crawl', {
+        title: 'First time crawl of ' + magnet.infoHash,
         infoHash: magnet.infoHash
       }).save(function (err) {
         if (err) {
