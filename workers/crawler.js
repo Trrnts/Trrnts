@@ -40,6 +40,7 @@ var CrawlJob = function (job, done) {
     kickOffCounter++;
     this.job.log('Crawling bootstrap nodes (' + kickOffCounter + '. kick)...');
     _.each(BOOTSTRAP_NODES, function (addr) {
+      this.alreadyCrawled[addr] = false;
       this.crawl(addr);
     }, this);
     this.job.log('Finished invoking crawl function on bootstrap nodes.');
