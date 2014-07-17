@@ -115,6 +115,7 @@ angular.module('trrntsApp.controllers', [])
   $scope.perPage = 10;
   $scope.start = 1;
   $scope.stop = $scope.start + $scope.perPage - 1;
+  $scope.hasBeenSubmitted = false;
 
   $scope.hasPrev = function () {
     return $scope.start > 1;
@@ -146,6 +147,7 @@ angular.module('trrntsApp.controllers', [])
 
   $scope.submit = function () {
     update();
+    $scope.hasBeenSubmitted = true;
   };
 }])
 
@@ -173,10 +175,10 @@ angular.module('trrntsApp.directives', [])
       var chart = d3.select(element);
 
       var formattedData = [];
-      for (var timestamp in data) {
+      for (var i = 0; i < data.length; i += 2) {
         formattedData.push({
-          peers: parseInt(data[timestamp]),
-          t: parseInt(timestamp)*1000
+          peers: parseInt(data[i]),
+          t: parseInt(data[i+1])
         });
       }
 

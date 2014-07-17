@@ -97,6 +97,7 @@ angular.module('trrntsApp.controllers', [])
   $scope.perPage = 10;
   $scope.start = 1;
   $scope.stop = $scope.start + $scope.perPage - 1;
+  $scope.hasBeenSubmitted = false;
 
   $scope.hasPrev = function () {
     return $scope.start > 1;
@@ -128,6 +129,7 @@ angular.module('trrntsApp.controllers', [])
 
   $scope.submit = function () {
     update();
+    $scope.hasBeenSubmitted = true;
   };
 }])
 

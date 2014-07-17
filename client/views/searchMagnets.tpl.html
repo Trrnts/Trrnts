@@ -1,9 +1,9 @@
 <section class="search pure-g" ng-controller="SearchMagnetLinksController">
   <form class="submit" ng-submit="submit()">
-    <input type="text" ng-model="search" placeholder="Search For A Torrent">
-    <button>Submit!</button><br>
-  </form>  
-  <div class="search-results">
+    <input type="text" ng-model="search" placeholder="Search For A Torrent" required>
+    <button>Search</button><br>
+  </form>
+  <div class="search-results" ng-show="hasBeenSubmitted" ng-model="hasBeenSubmitted">
     <header class="pure-u-1">
       <h2>Search Results:</h2>
     </header>

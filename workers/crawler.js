@@ -92,10 +92,10 @@ var CrawlJob = function (job, done) {
 
     var multi = redis.multi();
 
-    multi.zadd('magnets:' + this.infoHash + ':peers', this.startedAt, numPeers);
-    multi.zadd('magnets:' + this.infoHash + ':nodes', this.startedAt, numNodes);
+    multi.zadd('magnet:' + this.infoHash + ':peers', this.startedAt, numPeers);
+    multi.zadd('magnet:' + this.infoHash + ':nodes', this.startedAt, numNodes);
 
-    multi.zadd('magnets:' + this.infoHash + ':peers:locations', this.startedAt, JSON.stringify(peerLocations));
+    multi.zadd('magnet:' + this.infoHash + ':peers:locations', this.startedAt, JSON.stringify(peerLocations));
 
     multi.exec(function () {
       this.job.log('Inserted data into DB.');
