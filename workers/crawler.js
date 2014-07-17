@@ -81,20 +81,20 @@ var CrawlJob = function (job, done) {
     }, this);
 
     _.each(this.peers, function (t, peer) {
-      multi.SADD('peer', peer, function (err, isNew) {
-        if (!isNew) {
-          return;
-        }
-        var job = queue.create('mapPeer', {
-          title: 'Geopmapping ' + peer,
-          peer: peer
-        }).save(function (err) {
-          if (err) {
-            console.error('Experienced error while creating new job (id: ' + job.id + '): ' + err.message);
-            console.error(err.stack);
-          }
-        });
-      }.bind(this));
+      // multi.SADD('peer', peer);
+      //   if (!isNew) {
+      //     return;
+      //   }
+      //   var job = queue.create('mapPeer', {
+      //     title: 'Geopmapping ' + peer,
+      //     peer: peer
+      //   }).save(function (err) {
+      //     if (err) {
+      //       console.error('Experienced error while creating new job (id: ' + job.id + '): ' + err.message);
+      //       console.error(err.stack);
+      //     }
+      //   });
+      // }.bind(this));
 
       // Store each peer in a sorted set for its magnet. We will score each
       // magnet by seeing how many peers there are for the magnet in the last X
@@ -192,7 +192,7 @@ dht.start(function () {
   // of that and creates a new job etc.
   // 4 refers to the number of concurrent crawl jobs we want to run.
   // at your own risk. It might break your computer/ server.
-  queue.process('crawl', 4, function (job, done) {
+  queue.process('crawl', 20, function (job, done) {
     // See below for instantiation of job variable.
     new CrawlJob(job, done);
   });
