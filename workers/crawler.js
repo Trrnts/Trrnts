@@ -3,7 +3,9 @@ var DHT = require('./dht'),
     redis = require('../redis')(),
     _ = require('lodash'),
     // See queue.js, which uses the kue library.
-    queue = require('./queue');
+    queue = require('./queue'),
+    cleaner = require('./cleaner'),
+    geoip = require('geoip-lite');
 
 // In order to have multiple crawlers, we need to be able to pass in the same
 // dht instance to each of them. Otherwise we would need to start listening on a
@@ -56,7 +58,7 @@ var CrawlJob = function (job, done) {
     }
   }.bind(this), 10);
 
-  // Send 1000 packages per seond at max.
+  // Send 1000 packages per seond at peak.
   var crawling = setInterval(function () {
     var nextAddrToCrawl = this.crawlQueue.shift();
     if (nextAddrToCrawl) {
@@ -71,40 +73,32 @@ var CrawlJob = function (job, done) {
     // First argument to this.done is for if there is an error. Since there's no
     // error, we set to null.
     this.job.log('Stop crawling after timeout.');
-
     this.job.log('Writing results to database...');
+
+    var numPeers = _.keys(this.peers).length;
+    var numNodes = _.keys(this.nodes).length;
+
+    var peerLocations = _.reduce(this.peers, function (peerLocations, t, addr) {
+      var location = geoip.lookup(addr.split(':')[0]) || {};
+      location.ll = location.ll || [];
+      location = location.ll.join('|');
+      peerLocations[location] = peerLocations[location] || 0;
+      peerLocations[location]++;
+      return peerLocations;
+    }, {});
+
+    this.job.log('Found ' + numPeers + ' peers');
+    this.job.log('Found ' + numNodes + ' nodes');
 
     var multi = redis.multi();
 
-    _.each(this.nodes, function (node) {
-      multi.sadd('node', node);
-    }, this);
+    multi.zadd('magnets:' + this.infoHash + ':peers', this.startedAt, numPeers);
+    multi.zadd('magnets:' + this.infoHash + ':nodes', this.startedAt, numNodes);
 
-    _.each(this.peers, function (t, peer) {
-      // multi.SADD('peer', peer);
-      //   if (!isNew) {
-      //     return;
-      //   }
-      //   var job = queue.create('mapPeer', {
-      //     title: 'Geopmapping ' + peer,
-      //     peer: peer
-      //   }).save(function (err) {
-      //     if (err) {
-      //       console.error('Experienced error while creating new job (id: ' + job.id + '): ' + err.message);
-      //       console.error(err.stack);
-      //     }
-      //   });
-      // }.bind(this));
-
-      // Store each peer in a sorted set for its magnet. We will score each
-      // magnet by seeing how many peers there are for the magnet in the last X
-      // minutes.
-      multi.zadd('magnets:' + this.infoHash + ':peers', _.now(), peer);
-    }, this);
+    multi.zadd('magnets:' + this.infoHash + ':peers:locations', this.startedAt, JSON.stringify(peerLocations));
 
     multi.exec(function () {
       this.job.log('Inserted data into DB.');
-
       this.job.log('Clone job and add to job queue.');
       // This instantiates a job instance for the kue library called "crawl".
       // We can now create proccesses by this same name (see above) and use kue's
@@ -122,14 +116,6 @@ var CrawlJob = function (job, done) {
     }.bind(this));
 
   }.bind(this), this.ttl);
-
-  var updateProgress = setInterval(function () {
-    var age = _.now() - this.startedAt;
-    this.job.progress(age, this.ttl);
-    if (age > this.ttl) {
-      clearInterval(updateProgress);
-    }
-  }.bind(this), 1000);
 
   this.crawlQueue = [];
 };
@@ -176,7 +162,6 @@ CrawlJob.prototype.crawl = function (addr) {
     // If there were no peers to crawl, then we crawl the nodes in order to find
     // more peers.
     if (resp.peers.length === 0) {
-      // this.job.log('No peers to crawl. Crawl nodes instead.');
       _.each(resp.nodes, function (node) {
         this.enqueue(node);
       }, this);
@@ -192,7 +177,7 @@ dht.start(function () {
   // of that and creates a new job etc.
   // 4 refers to the number of concurrent crawl jobs we want to run.
   // at your own risk. It might break your computer/ server.
-  queue.process('crawl', 20, function (job, done) {
+  queue.process('crawl', 50, function (job, done) {
     // See below for instantiation of job variable.
     new CrawlJob(job, done);
   });
