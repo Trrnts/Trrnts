@@ -192,7 +192,7 @@ dht.start(function () {
   // of that and creates a new job etc.
   // 4 refers to the number of concurrent crawl jobs we want to run.
   // at your own risk. It might break your computer/ server.
-  queue.process('crawl', 20, function (job, done) {
+  queue.process('crawl', 5, function (job, done) {
     // See below for instantiation of job variable.
     new CrawlJob(job, done);
   });
