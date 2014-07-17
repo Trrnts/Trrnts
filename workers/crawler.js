@@ -23,13 +23,17 @@ var CrawlJob = function (job, done) {
   // Try to not crawl nodes/ peers twice. Computer freezes at about 40000
   // packages per second.
   this.alreadyCrawled = {};
+
+  this.nodes = {};
+  this.peers = {};
+
   this.job = job;
   this.infoHash = job.data.infoHash;
   this.startedAt = _.now();
   this.done = done;
   // TTL = Time to live. This is the amount of time in milliseconds we want this
   // crawl job to work.
-  this.ttl = 60*2*1000;
+  this.ttl = 60*1*1000;
   var kickOffCounter = 0;
 
   this.job.log('Kicking off crawl job...');
@@ -40,7 +44,6 @@ var CrawlJob = function (job, done) {
     kickOffCounter++;
     this.job.log('Crawling bootstrap nodes (' + kickOffCounter + '. kick)...');
     _.each(BOOTSTRAP_NODES, function (addr) {
-      this.alreadyCrawled[addr] = false;
       this.crawl(addr);
     }, this);
     this.job.log('Finished invoking crawl function on bootstrap nodes.');
@@ -55,7 +58,7 @@ var CrawlJob = function (job, done) {
 
   // Send 1000 packages per seond at max.
   var crawling = setInterval(function () {
-    var nextAddrToCrawl = this._queue.shift();
+    var nextAddrToCrawl = this.crawlQueue.shift();
     if (nextAddrToCrawl) {
       this.crawl(nextAddrToCrawl);
     }
@@ -68,72 +71,22 @@ var CrawlJob = function (job, done) {
     // First argument to this.done is for if there is an error. Since there's no
     // error, we set to null.
     this.job.log('Stop crawling after timeout.');
-    this.job.log('Clone job and add to job queue.');
-    // This instantiates a job instance for the kue library called "crawl".
-    // We can now create proccesses by this same name (see above) and use kue's
-    // functionality on it.
-    var job = queue.create('crawl', {
-      title: 'Recursive crawl of ' + this.infoHash,
-      infoHash: this.infoHash
-    }).save(function (err) {
-      if (err) {
-        console.error('Experienced error while creating new job (id: ' + job.id + '): ' + err.message);
-        console.error(err.stack);
-      }
-    });
-    this.done(null);
-  }.bind(this), this.ttl);
 
-  this._queue = [];
-};
+    this.job.log('Writing results to database...');
 
-CrawlJob.prototype.enqueue = function (addr) {
-  this._queue.push(addr);
-};
+    var multi = redis.multi();
 
-// Recursively crawls the BitTorrent DHT protocol using an instance of the DHT
-// class.
-CrawlJob.prototype.crawl = function (addr) {
-  if (this.alreadyCrawled[addr]) {
-    // Don't crawl addresses twice.
-    return;
-  }
-
-  // Mark that this addr has been crawled now.
-  this.alreadyCrawled[addr] = true;
-
-  this.job.progress(_.now() - this.startedAt, this.ttl);
-  // Crawls need to stop after 10 seconds, or some time, or else they would
-  // crawl 'forever'.
-  if (_.now() - this.startedAt > this.ttl) {
-    this.job.log('Abort execution of crawl-function (timeout).');
-    return;
-  }
-
-  this.job.log('Crawling ' + addr + '...');
-  // See dht.js for description of getPeers-method.
-  dht.getPeers(this.infoHash, addr, function (err, resp) {
-    // Nodes do not contain the magnet, but they have information about where
-    // peers, which do have the magnet, are located. We do not have a good
-    // reason to store them in the database, but we are anyways.
-    _.each(resp.nodes, function (node) {
-      redis.SADD('node', node, function (err, isNew) {
-        if (isNew) {
-          this.job.log('Discovered new node: ' + node);
-        }
-      }.bind(this));
+    _.each(this.nodes, function (node) {
+      multi.sadd('node', node);
     }, this);
 
-    // Peers have the magnet we are looking for. Storing them by themselves is
-    // not yet useful, but we do it anyways.
-    _.each(resp.peers, function (peer) {
-      redis.SADD('peer', peer, function (err, isNew) {
+    _.each(this.peers, function (t, peer) {
+      multi.SADD('peer', peer, function (err, isNew) {
         if (!isNew) {
           return;
         }
-        this.job.log('Discovered new peer: ' + peer);
         var job = queue.create('mapPeer', {
-          title: 'Geopmap of ' + peer,
+          title: 'Geopmapping ' + peer,
           peer: peer
         }).save(function (err) {
           if (err) {
@@ -146,7 +99,71 @@ CrawlJob.prototype.crawl = function (addr) {
       // Store each peer in a sorted set for its magnet. We will score each
       // magnet by seeing how many peers there are for the magnet in the last X
       // minutes.
-      redis.ZADD('magnets:' + this.infoHash + ':peers', _.now(), peer);
+      multi.zadd('magnets:' + this.infoHash + ':peers', _.now(), peer);
+    }, this);
+
+    multi.exec(function () {
+      this.job.log('Inserted data into DB.');
+
+      this.job.log('Clone job and add to job queue.');
+      // This instantiates a job instance for the kue library called "crawl".
+      // We can now create proccesses by this same name (see above) and use kue's
+      // functionality on it.
+      var job = queue.create('crawl', {
+        title: 'Recursive crawl of ' + this.infoHash,
+        infoHash: this.infoHash
+      }).save(function (err) {
+        if (err) {
+          console.error('Experienced error while creating new job (id: ' + job.id + '): ' + err.message);
+          console.error(err.stack);
+        }
+      });
+      this.done(null);
+    }.bind(this));
+
+  }.bind(this), this.ttl);
+
+  setInterval(function () {
+    this.job.progress(_.now() - this.startedAt, this.ttl);
+  }.bind(this), 1000);
+
+  this.crawlQueue = [];
+};
+
+CrawlJob.prototype.enqueue = function (addr) {
+  if (!this.alreadyCrawled[addr]) {
+    this.crawlQueue.push(addr);
+  }
+};
+
+// Recursively crawls the BitTorrent DHT protocol using an instance of the DHT
+// class.
+CrawlJob.prototype.crawl = function (addr) {
+  // Mark that this addr has been crawled now.
+  this.alreadyCrawled[addr] = true;
+
+  // Crawls need to stop after 10 seconds, or some time, or else they would
+  // crawl 'forever'.
+  if (_.now() - this.startedAt > this.ttl) {
+    this.job.log('Abort execution of crawl-function (timeout).');
+    return;
+  }
+
+  // Don't log this for performance reasons.
+  // this.job.log('Crawling ' + addr + '...');
+  // See dht.js for description of getPeers-method.
+  dht.getPeers(this.infoHash, addr, function (err, resp) {
+    // Nodes do not contain the magnet, but they have information about where
+    // peers, which do have the magnet, are located. We do not have a good
+    // reason to store them in the database, but we are anyways.
+    _.each(resp.nodes, function (node) {
+      this.nodes[node] = true;
+    }, this);
+
+    // Peers have the magnet we are looking for. Storing them by themselves is
+    // not yet useful, but we do it anyways.
+    _.each(resp.peers, function (peer) {
+      this.peers[peer] = true;
 
       // Here is the recursive call.
       this.enqueue(peer);
@@ -155,12 +172,12 @@ CrawlJob.prototype.crawl = function (addr) {
     // If there were no peers to crawl, then we crawl the nodes in order to find
     // more peers.
     if (resp.peers.length === 0) {
-      this.job.log('No peers to crawl. Crawl nodes instead.');
+      // this.job.log('No peers to crawl. Crawl nodes instead.');
       _.each(resp.nodes, function (node) {
         this.enqueue(node);
       }, this);
     }
-    this.job.log('Finished crawling ' + addr + '.');
+    // this.job.log('Finished crawling ' + addr + '.');
   }.bind(this));
 };
 

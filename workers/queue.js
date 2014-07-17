@@ -4,7 +4,7 @@ var kue = require('kue'),
 
 // Instantiate a job queue using Kue which will help us handle multiple crawler
 // jobs. Running more than a few at a time tends to explode the computers.
-var queue = module.exports = exports = kue.createQueue({
+var queue = kue.createQueue({
   redis: {
     createClientFactory: function () {
       return redis();
@@ -22,3 +22,5 @@ process.once('SIGTERM', function (sig) {
     process.exit(0);
   }, 5000);
 });
+
+module.exports = exports = queue;
