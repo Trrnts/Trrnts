@@ -2,7 +2,7 @@ var _ = require('lodash'),
     redis = require('../redis')(),
     parseMagnetURI = require('magnet-uri'),
     magnets = {},
-    crawlJobQueue = require('../workers/crawlJobQueue');
+    queue = require('../workers/queue');
 
 var util = {};
 
@@ -78,10 +78,13 @@ magnets.create = function (ip, magnetURI, callback) {
       redis.zadd('magnets:latest', magnet.createdAt, magnet.infoHash);
       redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
 
-      var job = crawlJobQueue.create('crawl', {
+      var job = queue.create('crawl', {
         infoHash: magnet.infoHash
       }).save(function (err) {
-        if(!err) console.log(job.id);
+        if (err) {
+          console.error('Experienced error while creating new job (id: ' + job.id + '): ' + err.message);
+          console.error(err.stack);
+        }
       });
 
       redis.sadd('magnets:index', magnet.infoHash);
@@ -128,16 +131,3 @@ magnets.search = function (search, callback) {
 };
 
 module.exports = exports = magnets;
-
-
-
-
-
-
-
-
-
-
-
-
-

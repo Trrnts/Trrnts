@@ -16,7 +16,7 @@ var compact2string = function(compact) {
 };
 
 // Implements parts of BEP 5. Please read http://www.bittorrent.org/beps/bep_0005.html for
-// an overview of what this whole program is about, and especially to learn about DHT, nodes, 
+// an overview of what this whole program is about, and especially to learn about DHT, nodes,
 // peers, and the bitTorrent network
 // We currenly only need the get_peers functionality (requesting peers).
 var DHT = function (options) {
@@ -40,7 +40,7 @@ var DHT = function (options) {
 };
 
 // This function will be invoked as soon as a node/peer sends a message. It does a lot of
-// formatting for the protocols we are working with. You don't need to worry too much about 
+// formatting for the protocols we are working with. You don't need to worry too much about
 // this function, just know that it proccesses the message from the node/peer we connected to
 // above and then passes the 'result' object created here as the 'resp' parameter in the
 // dht.getPeers callback function that is located inside the body of Crawler.prototype.crawl
@@ -113,8 +113,8 @@ DHT.prototype.getPeers = function (infoHash, address, callback) {
   // Here we do the formatting for bitTorrent protocol, don't worry about it too much.
   var message = bencode.encode({
     t: this._transactionIdToBuffer(transactionID),
-    //BitTorrent protocol assumes this object has these properties. Single letter styling
-    // is required by the protocol
+    // BitTorrent protocol assumes this object has these properties. Single
+    // letter styling is required by the protocol.
     // 'y' set to q means it's a query
     // 'q' indicates the kind of query
     // 'a' are the named arguments to the query
@@ -128,8 +128,9 @@ DHT.prototype.getPeers = function (infoHash, address, callback) {
   var port = address.split(':')[1];
   var ip = address.split(':')[0];
 
-  // If port is greater than ~65000 we get an error. We need to send arrays no matter what
-  // so we send empty arrays if there is an error in the port size, which does happen.
+  // If port is greater than 65535, we would get an error. We need to send
+  // arrays no matter what so we send empty arrays if there is an error in the
+  // port size, which does happen.
   if (parseInt(port) < 1 || parseInt(port) > 65535) {
     return callback(new TypeError('Invalid port'), {
       peers: [],
