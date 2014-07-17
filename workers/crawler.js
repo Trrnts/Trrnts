@@ -120,7 +120,7 @@ dht.start(function () {
     new CrawlJob(job, done);
   });
 
-  queue.on('job complete', function(id, result) {
+  queue.on('job complete', function (id, result) {
     // This instantiates a job instance for the kue library called "crawl".
     // We can now create proccesses by this same name (see above) and use kue's
     // functionality on it.
