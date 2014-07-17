@@ -88,8 +88,15 @@ magnets.create = function (ip, magnetURI, callback) {
         }
       });
 
-      redis.sadd('magnets:index', magnet.infoHash);
-      redis.publish('magnets:index', magnet.infoHash);
+      var job2 = queue.create('index', {
+        title: 'Indexing of ' + magnet.infoHash,
+        infoHash: magnet.infoHash
+      }).save(function (err) {
+        if (err) {
+          console.error('Experienced error while creating new job (id: ' + job2.id + '): ' + err.message);
+          console.error(err.stack);
+        }
+      });
 
       callback(null, magnet);
     }
