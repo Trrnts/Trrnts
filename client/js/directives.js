@@ -17,9 +17,11 @@ angular.module('trrntsApp.directives', [])
       var data = scope.magnet.peers || {};
       var chart = d3.select(element);
 
+      console.log(data);
+
       var formattedData = [];
       for (var i = 0; i < data.length; i += 2) {
-        formattedData.push({
+        formattedData.unshift({
           peers: parseInt(data[i]),
           t: parseInt(data[i+1])
         });
