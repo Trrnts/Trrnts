@@ -162,7 +162,7 @@ var crawl = function (infoHash) {
 socket.bind(port, function () {
   // Start the magic.
   var next = function () {
-    redis.srandmember('magnets:all', 5, function (err, infoHashes) {
+    redis.srandmember('magnets:all', 20, function (err, infoHashes) {
       _.each(infoHashes, crawl);
     });
   };
