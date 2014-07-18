@@ -145,8 +145,8 @@ DHT.prototype.getPeers = function (infoHash, address, callback) {
     setTimeout(function () {
       delete this.getPeersCallbacks[transactionID];
       // Deletes "itself" from the getPeersCallbacks object if we didn't receive
-      // an answer within the next 1000 ms
-    }.bind(this), 1000);
+      // an answer within the next 2000 ms
+    }.bind(this), 2000);
   }.bind(this));
 };
 
