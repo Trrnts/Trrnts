@@ -1,8 +1,7 @@
 var _ = require('lodash'),
     redis = require('../redis')(),
     parseMagnetURI = require('magnet-uri'),
-    magnets = {},
-    queue = require('../workers/queue');
+    magnets = {};
 
 var util = {};
 
@@ -16,7 +15,6 @@ util.infoHashesToMagnets = function (infoHashes, callback) {
   _.each(infoHashes, function (infoHash) {
     multi.hgetall('magnet:' + infoHash);
     multi.zrevrange(['magnet:' + infoHash + ':peers', 0, 50, 'WITHSCORES']);
-    console.log(['magnet:' + infoHash + ':peers', 0, 50, 'WITHSCORES'].join(' '));
   });
   multi.exec(function (err, results) {
     var magnets = [];
@@ -62,11 +60,7 @@ magnets.create = function (ip, magnetURI, callback) {
       redis.zadd('magnets:top', magnet.score, magnet.infoHash);
       redis.zadd('magnets:latest', magnet.createdAt, magnet.infoHash);
       redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
-
-      var job = queue.create('crawl', {
-        title: 'First time crawl of ' + magnet.infoHash,
-        infoHash: magnet.infoHash
-      }).save();
+      redis.sadd('magnets:all', magnet.infoHash);
 
       magnets.index(magnet);
       callback(null, magnet);
