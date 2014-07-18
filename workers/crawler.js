@@ -3,7 +3,8 @@ var bencode = require('bencode'),
     hat = require('hat'),
     _ = require('lodash'),
     redis = require('../redis')(),
-    queue = require('./queue');
+    queue = require('./queue'),
+    geoip = require('geoip-lite');
 
 // Put in a function. The returned function won't ever throw an error. This is
 // quite useful for malformed messages.
@@ -62,13 +63,23 @@ socket.on('message', function (msg, rinfo) {
   var infoHash = transactions[transactionId];
   var job = crawlJobs[infoHash];
   if (!job) {
-    console.log(msg);
     return;
   }
   if (msg.r && msg.r.values) {
     _.each(msg.r.values, function (peer) {
       peer = compact2string(peer);
       if (peer) {
+        redis.pfadd('peers', function (err, added) {
+          if (added) {
+            var ip = rinfo.address;
+            var geo = geoip.lookup(ip) || {};
+            // TODO Cron job that cleans up these keys.
+            redis.zincrby('geo:countries', 1, geo.country || '?');
+            redis.zincrby('geo:regions', 1, geo.region || '?');
+            redis.zincrby('geo:cities', 1, geo.city || '?');
+            redis.zincrby('geo:ll', 1, geo.ll.join('|') || '?|?');
+          }
+        });
         redis.pfadd(job + ':peers', peer, function (err, added) {
           if (added > 0) {
             getPeers(infoHash, peer);
@@ -152,19 +163,14 @@ var crawl = function (infoHash, done) {
 // Starts the DHT client by listening on the specified port.
 socket.bind(port, function () {
   // Start the magic.
-  queue.process('crawl', 5, function (job, done) {
+  queue.process('crawl', 3, function (job, done) {
     var infoHash = job.data.infoHash;
-    crawl(infoHash, function () {
+    crawl(infoHash, done);
+    job.on('complete', function () {
       queue.create('crawl', {
         title: 'Recursive crawl of ' + infoHash,
         infoHash: infoHash
-      }).save(function (err) {
-        if (err) {
-          console.error('Experienced error while creating new recursive job: ' + err.message);
-          console.error(err.stack);
-        }
-        done(null);
-      });
+      }).save();
     });
   });
 });

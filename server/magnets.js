@@ -66,23 +66,9 @@ magnets.create = function (ip, magnetURI, callback) {
       var job = queue.create('crawl', {
         title: 'First time crawl of ' + magnet.infoHash,
         infoHash: magnet.infoHash
-      }).save(function (err) {
-        if (err) {
-          console.error('Experienced error while creating new job (id: ' + job.id + '): ' + err.message);
-          console.error(err.stack);
-        }
-      });
+      }).save();
 
-      var job2 = queue.create('index', {
-        title: 'Indexing of ' + magnet.infoHash,
-        infoHash: magnet.infoHash
-      }).save(function (err) {
-        if (err) {
-          console.error('Experienced error while creating new job (id: ' + job2.id + '): ' + err.message);
-          console.error(err.stack);
-        }
-      });
-
+      magnets.index(magnet);
       callback(null, magnet);
     }
   });
@@ -121,6 +107,27 @@ magnets.search = function (search, callback) {
     });
     multi.exec(callback);
   });
+};
+
+// Removes all non-alphanumeric charters from a string and removes multiple
+// whitespaces. This is needed for extracting the words as an array from a
+// string.
+var extractWords = function (string) {
+  string = string.toLowerCase();
+  return string.replace(/\W/g, ' ').replace(/ +(?= )/g,'').split(' ');
+};
+
+// index(m1) #=> creates an inverted search index for a magnet object created by
+// magnets.create(...).
+magnets.index = function (magnet) {
+  // This script indexes recently submitted magnets using an
+  // [inverted index](http://en.wikipedia.org/wiki/Inverted_index).
+  var words = extractWords(magnet.name);
+  var multi = redis.multi();
+  _.each(words, function (word) {
+    multi.sadd('search:' + word.toLowerCase(), magnet.infoHash);
+  });
+  multi.exec();
 };
 
 module.exports = exports = magnets;
