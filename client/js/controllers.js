@@ -100,8 +100,7 @@ angular.module('trrntsApp.controllers', [])
   $scope.hasBeenSubmitted = false;
 
   var reset = function () {
-    $scope.start = 0;
-    $scope.showResults = [];
+      $scope.start = 0;
   };
 
   $scope.hasPrev = function () {
@@ -114,6 +113,7 @@ angular.module('trrntsApp.controllers', [])
 
   var update = function () {
     var toShow = 0;
+    $scope.showResults = [];
     if ($scope.hasNext()) {
       toShow = $scope.perPage;
     } else {
@@ -138,10 +138,11 @@ angular.module('trrntsApp.controllers', [])
   $scope.submit = function () {
     MagnetLinksFactory.search($scope.search).then(function (result) {
       $scope.searchResults = result.data;
+      console.log($scope.searchResults.length, "length");
       reset();
       update();
     }).catch(function () {
-      reset();
+      $scope.showResults = [];
     });
     $scope.hasBeenSubmitted = true;
   };

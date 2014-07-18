@@ -68,7 +68,7 @@ router.get('/magnets/search/:input', function (req, res, next) {
     if (err) {
       return next();
     } else {
-      res.send(200, magnets);
+      res.send(200, magnets || []);
     }
   });
 
