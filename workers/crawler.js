@@ -95,6 +95,9 @@ var CrawlJob = function (job, done) {
     multi.zadd('magnet:' + this.infoHash + ':peers', this.startedAt, numPeers);
     multi.zadd('magnet:' + this.infoHash + ':nodes', this.startedAt, numNodes);
 
+    multi.zadd('magnet:' + this.infoHash, 'score', numPeers);
+    multi.zadd('magnets:top', numPeers, this.infoHash);
+
     multi.zadd('magnet:' + this.infoHash + ':peers:locations', this.startedAt, JSON.stringify(peerLocations));
 
     multi.exec(function () {
