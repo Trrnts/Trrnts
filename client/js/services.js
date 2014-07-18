@@ -35,18 +35,14 @@ angular.module('trrntsApp.services', [])
   };
 
   // Searches torrents whose titles contains input.
-  var search = function (input, start, stop) {
+  var search = function (input) {
     if (!input && typeof(input) !== 'string') {
       return;
     }
 
     return $http({
       method: 'GET',
-      url:'api/magnets/search/' + input,
-      params: {
-        start: start || 1,
-        stop: stop || 30
-      }
+      url:'api/magnets/search/' + input
     });
   };
 
