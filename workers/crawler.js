@@ -1,187 +1,150 @@
-var DHT = require('./dht'),
-    // See http://redis.io/commands for excellent documention on Redis commands.
-    redis = require('../redis')(),
+var bencode = require('bencode'),
+    dgram = require('dgram'),
+    hat = require('hat'),
     _ = require('lodash'),
-    // See queue.js, which uses the kue library.
-    queue = require('./queue'),
-    cleaner = require('./cleaner'),
-    geoip = require('geoip-lite');
+    redis = require('../redis')();
 
-// In order to have multiple crawlers, we need to be able to pass in the same
-// dht instance to each of them. Otherwise we would need to start listening on a
-// new port each time we create a new dht/ crawlJob instance, which would be
-// quite inefficient.
-var dht = new DHT();
+// Put in a function. The returned function won't ever throw an error. This is
+// quite useful for malformed messages.
+var makeSafe = function (fn, onFuckedUp) {
+  return function () {
+    try {
+      return fn.apply(null, arguments);
+    } catch (e) {
+      return onFuckedUp;
+    }
+  };
+};
 
-// We need a few "bootstrap nodes" as entry points for getting started.
+// See https://github.com/bencevans/node-compact2string.
+var compact2string = makeSafe(require('compact2string'));
+
+// Necessary formatting for the protocols we are using.
+var transactionIdToBuffer = makeSafe(function (transactionId) {
+  var buf = new Buffer(2);
+  buf.writeUInt16BE(transactionId, 0);
+  return buf;
+});
+
+// Necessary formatting for the protocols we are using.
+var idToBuffer = makeSafe(function (id) {
+  return new Buffer(id, 'hex');
+});
+
+// Time in ms for a crawlJob to live.
+var ttl = 60*1000;
+
+var decode = makeSafe(bencode.decode, {});
+var encode = makeSafe(bencode.encode, {});
+
 var BOOTSTRAP_NODES = [
   'router.bittorrent.com:6881',
   'router.utorrent.com:6881',
   'dht.transmissionbt.com:6881'
 ];
 
-//Uses a DHT instance in order to crawl the network. See dht.js.
-var CrawlJob = function (job, done) {
-  // Try to not crawl nodes/ peers twice. Computer freezes at about 40000
-  // packages per second.
-  this.alreadyCrawled = {};
+var nodeID = hat(160),
+    port = 6881,
+    socket = dgram.createSocket('udp4');
 
-  this.nodes = {};
-  this.peers = {};
+// Key: transactionId; Value: infoHash
+var transactions = {};
+// Key: infoHash; Value: Temporary key in database
+var crawlJobs = {};
 
-  this.job = job;
-  this.infoHash = job.data.infoHash;
-  this.startedAt = _.now();
-  this.done = done;
-  // TTL = Time to live. This is the amount of time in milliseconds we want this
-  // crawl job to work.
-  this.ttl = 60*1*1000;
-  var kickOffCounter = 0;
-
-  this.job.log('Kicking off crawl job...');
-
-  // Kick off crawler by crawling the bootstrap nodes 10 times. This is
-  // necessary, since UDP packages might get lost.
-  var kickOff = setInterval(function () {
-    kickOffCounter++;
-    this.job.log('Crawling bootstrap nodes (' + kickOffCounter + '. kick)...');
-    _.each(BOOTSTRAP_NODES, function (addr) {
-      this.crawl(addr);
-    }, this);
-    this.job.log('Finished invoking crawl function on bootstrap nodes.');
-
-    // Stop kicking off the bootstrap nodes after a certain number of
-    // iterations.
-    if (kickOffCounter === 5) {
-      clearInterval(kickOff);
-      this.job.log('Finished kicking of crawl job.');
-    }
-  }.bind(this), 10);
-
-  // Send 1000 packages per seond at peak.
-  var crawling = setInterval(function () {
-    var nextAddrToCrawl = this.crawlQueue.shift();
-    if (nextAddrToCrawl) {
-      this.crawl(nextAddrToCrawl);
-    }
-  }.bind(this), 1);
-
-  // Invoke crawlJobQueue's done callback function after 10 seconds. Passing in
-  // infoHash so that we can queue the same infoHash to be crawled again later.
-  setTimeout(function () {
-    clearInterval(crawling);
-    // First argument to this.done is for if there is an error. Since there's no
-    // error, we set to null.
-    this.job.log('Stop crawling after timeout.');
-    this.job.log('Writing results to database...');
-
-    var numPeers = _.keys(this.peers).length;
-    var numNodes = _.keys(this.nodes).length;
-
-    var peerLocations = _.reduce(this.peers, function (peerLocations, t, addr) {
-      var location = geoip.lookup(addr.split(':')[0]) || {};
-      location.ll = location.ll || [];
-      location = location.ll.join('|');
-      peerLocations[location] = peerLocations[location] || 0;
-      peerLocations[location]++;
-      return peerLocations;
-    }, {});
-
-    this.job.log('Found ' + numPeers + ' peers');
-    this.job.log('Found ' + numNodes + ' nodes');
-
-    var multi = redis.multi();
-
-    multi.zadd('magnet:' + this.infoHash + ':peers', this.startedAt, numPeers);
-    multi.zadd('magnet:' + this.infoHash + ':nodes', this.startedAt, numNodes);
-
-    multi.zadd('magnet:' + this.infoHash, 'score', numPeers);
-    multi.zadd('magnets:top', numPeers, this.infoHash);
-
-    multi.zadd('magnet:' + this.infoHash + ':peers:locations', this.startedAt, JSON.stringify(peerLocations));
-
-    multi.exec(function () {
-      this.job.log('Inserted data into DB.');
-      this.job.log('Clone job and add to job queue.');
-      // This instantiates a job instance for the kue library called "crawl".
-      // We can now create proccesses by this same name (see above) and use kue's
-      // functionality on it.
-      var job = queue.create('crawl', {
-        title: 'Recursive crawl of ' + this.infoHash,
-        infoHash: this.infoHash
-      }).save(function (err) {
-        if (err) {
-          console.error('Experienced error while creating new job (id: ' + job.id + '): ' + err.message);
-          console.error(err.stack);
-        }
-      });
-      this.done(null);
-    }.bind(this));
-
-  }.bind(this), this.ttl);
-
-  this.crawlQueue = [];
-};
-
-CrawlJob.prototype.enqueue = function (addr) {
-  if (!this.alreadyCrawled[addr]) {
-    this.crawlQueue.push(addr);
-  }
-};
-
-// Recursively crawls the BitTorrent DHT protocol using an instance of the DHT
-// class.
-CrawlJob.prototype.crawl = function (addr) {
-  // Mark that this addr has been crawled now.
-  this.alreadyCrawled[addr] = true;
-
-  // Crawls need to stop after 10 seconds, or some time, or else they would
-  // crawl 'forever'.
-  if (_.now() - this.startedAt > this.ttl) {
-    this.job.log('Abort execution of crawl-function (timeout).');
+// This function will be invoked as soon as a node/peer sends a message. It does
+// a lot of formatting for the protocols.
+socket.on('message', function (msg, rinfo) {
+  // console.log('Received message from ' + rinfo.address);
+  msg = decode(msg);
+  var transactionId = Buffer.isBuffer(msg.t) && msg.t.length === 2 && msg.t.readUInt16BE(0);
+  var infoHash = transactions[transactionId];
+  var job = crawlJobs[infoHash];
+  if (!job) {
+    console.log(msg);
     return;
   }
-
-  // Don't log this for performance reasons.
-  // this.job.log('Crawling ' + addr + '...');
-  // See dht.js for description of getPeers-method.
-  dht.getPeers(this.infoHash, addr, function (err, resp) {
-    // Nodes do not contain the magnet, but they have information about where
-    // peers, which do have the magnet, are located. We do not have a good
-    // reason to store them in the database, but we are anyways.
-    _.each(resp.nodes, function (node) {
-      this.nodes[node] = true;
-    }, this);
-
-    // Peers have the magnet we are looking for. Storing them by themselves is
-    // not yet useful, but we do it anyways.
-    _.each(resp.peers, function (peer) {
-      this.peers[peer] = true;
-
-      // Here is the recursive call.
-      this.enqueue(peer);
-    }, this);
-
-    // If there were no peers to crawl, then we crawl the nodes in order to find
-    // more peers.
-    if (resp.peers.length === 0) {
-      _.each(resp.nodes, function (node) {
-        this.enqueue(node);
-      }, this);
+  if (msg.r && msg.r.values) {
+    _.each(msg.r.values, function (peer) {
+      peer = compact2string(peer);
+      if (peer) {
+        redis.pfadd(job + ':peers', peer, function (err, added) {
+          if (added > 0) {
+            getPeers(infoHash, peer);
+          }
+        });
+      }
+    });
+  }
+  if (msg.r && msg.r.nodes && Buffer.isBuffer(msg.r.nodes)) {
+    for (var i = 0; i < msg.r.nodes.length; i += 26) {
+      var node = compact2string(msg.r.nodes.slice(i + 20, i + 26));
+      if (node) {
+        redis.pfadd(job + ':nodes', node, function (err, added) {
+          if (added > 0) {
+            getPeers(infoHash, node);
+          }
+        });
+      }
     }
-    // this.job.log('Finished crawling ' + addr + '.');
-  }.bind(this));
+  }
+});
+
+// Sends the get_peers request to a node.
+var getPeers = function (infoHash, addr) {
+  addr = addr.split(':');
+  var ip = addr[0],
+      port = parseInt(addr[1]);
+  if (port <= 0 || port >= 65536) {
+    return;
+  }
+  var transactionId = _.random(Math.pow(2, 16));
+  transactions[transactionId] = infoHash;
+  var message = encode({
+    t: transactionIdToBuffer(transactionId),
+    y: 'q',
+    q: 'get_peers',
+    a: {
+      id: idToBuffer(nodeID),
+      info_hash: idToBuffer(infoHash)
+    }
+  });
+  socket.send(message, 0, message.length, port, ip);
 };
 
-// See dht.js.
-dht.start(function () {
-  // As soon as a new magnet is being submitted to the database from the client
-  // side, its infoHash will be published to a certain channel. Kue takes care
-  // of that and creates a new job etc.
-  // 4 refers to the number of concurrent crawl jobs we want to run.
-  // at your own risk. It might break your computer/ server.
-  queue.process('crawl', 50, function (job, done) {
-    // See below for instantiation of job variable.
-    new CrawlJob(job, done);
-  });
+var crawl = function (infoHash) {
+  crawlJobs[infoHash] = _.random(Math.pow(10, 10));
+
+  var job = crawlJobs[infoHash];
+  redis.pexpire(job + ':peers', ttl*1.1);
+  redis.pexpire(job + ':nodes', ttl*1.1);
+
+  setTimeout(function () {
+    console.log('Deleting crawlJob ' + infoHash + '...');
+    redis.pfcount(job + ':peers', function (err, peers) {
+      console.log(peers + ' peers');
+      redis.del(job + ':peers');
+    });
+    redis.pfcount(job + ':nodes', function (err, nodes) {
+      console.log(nodes + ' nodes');
+      redis.del(job + ':nodes');
+    });
+    delete crawlJobs[infoHash];
+  }, ttl);
+
+  var kickedOff = 0;
+  var kickOff = setInterval(function () {
+    _.each(BOOTSTRAP_NODES, function (addr) {
+      getPeers(infoHash, addr);
+    });
+    if (kickedOff++ === 10) {
+      clearInterval(kickOff);
+    }
+  }, 10);
+};
+
+// Starts the DHT client by listening on the specified port.
+socket.bind(port, function () {
+  // Start the magic.
+  crawl('7B390B9E1FC2631E21398317524CAE4985DCCEEE');
 });
