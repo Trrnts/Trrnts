@@ -2,7 +2,8 @@ var bencode = require('bencode'),
     dgram = require('dgram'),
     hat = require('hat'),
     _ = require('lodash'),
-    redis = require('../redis')();
+    redis = require('../redis')(),
+    queue = require('./queue');
 
 // Put in a function. The returned function won't ever throw an error. This is
 // quite useful for malformed messages.
@@ -112,7 +113,7 @@ var getPeers = function (infoHash, addr) {
   socket.send(message, 0, message.length, port, ip);
 };
 
-var crawl = function (infoHash) {
+var crawl = function (infoHash, done) {
   crawlJobs[infoHash] = _.random(Math.pow(10, 10));
 
   var job = crawlJobs[infoHash];
@@ -123,13 +124,18 @@ var crawl = function (infoHash) {
     console.log('Deleting crawlJob ' + infoHash + '...');
     redis.pfcount(job + ':peers', function (err, peers) {
       console.log(peers + ' peers');
+      redis.zadd('magnet:' + infoHash + ':peers', _.now(), peers);
+      redis.hset('magnet:' + infoHash, 'score', peers);
+      redis.zadd('magnets:top', peers, infoHash);
       redis.del(job + ':peers');
     });
     redis.pfcount(job + ':nodes', function (err, nodes) {
       console.log(nodes + ' nodes');
+      redis.zadd('magnet:' + infoHash + ':nodes', _.now(), nodes);
       redis.del(job + ':nodes');
     });
     delete crawlJobs[infoHash];
+    done();
   }, ttl);
 
   var kickedOff = 0;
@@ -146,5 +152,19 @@ var crawl = function (infoHash) {
 // Starts the DHT client by listening on the specified port.
 socket.bind(port, function () {
   // Start the magic.
-  crawl('7B390B9E1FC2631E21398317524CAE4985DCCEEE');
+  queue.process('crawl', 5, function (job, done) {
+    var infoHash = job.data.infoHash;
+    crawl(infoHash, function () {
+      queue.create('crawl', {
+        title: 'Recursive crawl of ' + infoHash,
+        infoHash: infoHash
+      }).save(function (err) {
+        if (err) {
+          console.error('Experienced error while creating new recursive job: ' + err.message);
+          console.error(err.stack);
+        }
+        done(null);
+      });
+    });
+  });
 });
