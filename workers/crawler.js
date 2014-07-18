@@ -171,6 +171,6 @@ socket.bind(port, function () {
         title: 'Recursive crawl of ' + infoHash,
         infoHash: infoHash
       }).save();
-    })
+    });
   });
 });
