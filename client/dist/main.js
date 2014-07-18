@@ -189,6 +189,8 @@ angular.module('trrntsApp.directives', [])
       var data = scope.magnet.peers || {};
       var chart = d3.select(element);
 
+      console.log(scope.magnet.score);
+
       console.log(data);
 
       var formattedData = [];
