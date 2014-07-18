@@ -1,6 +1,6 @@
 angular.module('trrntsApp.services', [])
-
-.factory('MagnetLinksFactory', ['$http', function ($http) {
+// need promise library to pass back a blank promise if validation fails
+.factory('MagnetLinksFactory', ['$http', '$q', function ($http, $q) {
   // Submit Magnet URI
   var create = function (magnetURI) {
     return $http({
@@ -35,18 +35,14 @@ angular.module('trrntsApp.services', [])
   };
 
   // Searches torrents whose titles contains input.
-  var search = function (input, start, stop) {
-    if (!input && typeof(input) !== 'string') {
-      return;
+  var search = function (input) {
+    if (typeof(input) !== 'string') {
+      return $q.defer().promise;
     }
 
     return $http({
       method: 'GET',
-      url:'api/magnets/search/' + input,
-      params: {
-        start: start || 1,
-        stop: stop || 30
-      }
+      url:'api/magnets/search/' + input
     });
   };
 
