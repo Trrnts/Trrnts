@@ -189,8 +189,6 @@ angular.module('trrntsApp.directives', [])
       var data = scope.magnet.peers || {};
       var chart = d3.select(element);
 
-      console.log(data);
-
       var formattedData = [];
       for (var i = 0; i < data.length; i += 2) {
         formattedData.unshift({
@@ -240,7 +238,7 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
-        .ease('elastic')
+        .ease('bounce')
         .attr('y', function () { return chartHeight - y(d.peers) - highlightHeightDiff; })
         .attr('height', function () { return y(d.peers) + highlightHeightDiff; });
 
@@ -253,7 +251,7 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
-        .ease('elastic')
+        .ease('bounce')
         .attr('y', function (d, i) { return chartHeight - y(d.peers); })
         .attr('height', function (d) { return y(d.peers); });
 
