@@ -167,11 +167,11 @@ angular.module('trrntsApp.controllers', [])
 }])
 
 .controller('WorldMapController', ['$scope', 'GeoFactory', function ($scope, GeoFactory) {
-  $scope.location = {};
+  $scope.locations = [];
 
   $scope.getLatAndLong = function () {
     GeoFactory.getLatAndLong().then(function (results) {
-      $scope.location = results;
+      $scope.locations.push(results.data);
     });
   };
 
@@ -286,7 +286,9 @@ angular.module('trrntsApp.directives', [])
           var llArr = ll.split(',');
           bubble.latitude = llArr[0];
           bubble.longitude = llArr[1];
-          formatedLLs.puhs(bubble);
+          if (llArr.length > 1) {
+            formatedLLs.push(bubble);
+          }
         }
 
         return formatedLLs;
@@ -301,8 +303,8 @@ angular.module('trrntsApp.directives', [])
       });
 
       // Generate Stats
-      var llStats = update(scope.locations);
-      console.log(llStats);
+      var llStats = update(scope.location);
+      console.log(llStats, "location");
       map.bubbles(llStats);
     },
   };

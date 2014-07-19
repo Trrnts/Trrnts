@@ -30,9 +30,8 @@ var getData = function(type, callback) {
     _.each(_.range(0, results.length, 2), function(index) {
       data[results[index]] = results[index + 1];
     });
-
-    console.log("locations " + type + ":", data, results);
-    callback(data);
+    
+    callback(err, data);
   });
 };
 
