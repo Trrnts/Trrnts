@@ -10,7 +10,7 @@ var makeSafe = function (fn, onFuckedUp) {
     try {
       return fn.apply(null, arguments);
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       return onFuckedUp;
     }
   };
@@ -69,19 +69,19 @@ socket.on('message', function (msg, rinfo) {
   var transactionId = Buffer.isBuffer(msg.t) && msg.t.length === 2 && msg.t.readUInt16BE(0);
   var infoHash = transactions[transactionId];
   if (transactionId === false) {
-    console.log('Malformed message from ' + rinfo.address + ':' + rinfo.port + '.');
-    console.log(msg);
+    // console.log('Malformed message from ' + rinfo.address + ':' + rinfo.port + '.');
+    // console.log(msg);
     return;
   }
   if (infoHash === undefined) {
-    console.log('Unknown transaction for ' + transactionId + ' from ' + rinfo.address + ':' + rinfo.port + '.');
-    console.log(msg);
+    // console.log('Unknown transaction for ' + transactionId + ' from ' + rinfo.address + ':' + rinfo.port + '.');
+    // console.log(msg);
     return;
   }
   if (msg.r && msg.r.values) {
     _.each(msg.r.values, function (peer) {
       peer = compact2string(peer);
-      if (peer && jobs[infoHash]) {
+      if (peer && jobs[infoHash] && !jobs[infoHash].peers[peer]) {
         // console.log('Found new peer ' + node + ' for ' + infoHash);
         jobs[infoHash].peers[peer] = true;
         getPeers(infoHash, peer);
@@ -91,7 +91,7 @@ socket.on('message', function (msg, rinfo) {
   if (msg.r && msg.r.nodes && Buffer.isBuffer(msg.r.nodes)) {
     for (var i = 0; i < msg.r.nodes.length; i += 26) {
       var node = compact2string(msg.r.nodes.slice(i + 20, i + 26));
-      if (node && jobs[infoHash]) {
+      if (node && jobs[infoHash] && !jobs[infoHash].nodes[node]) {
         // console.log('Found new node ' + node + ' for ' + infoHash);
         jobs[infoHash].nodes[node] = true;
         getPeers(infoHash, node);
