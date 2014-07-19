@@ -19,7 +19,7 @@ angular.module('trrntsApp.directives', [])
 
       var formattedData = [];
       for (var i = 0; i < data.length; i += 2) {
-        formattedData.push({
+        formattedData.unshift({
           peers: parseInt(data[i]),
           t: parseInt(data[i+1])
         });
@@ -38,7 +38,7 @@ angular.module('trrntsApp.directives', [])
         .attr('class', 'd3-tip')
         .offset([-highlightHeightDiff-10, 0])
         .html(function(d) {
-          return '<strong>' + d.peers + '</strong> peers <span>' + moment(parseInt(d.t)).fromNow() + ' ago</span>';
+          return '<strong>' + d.peers + '</strong> peers <span>' + moment(parseInt(d.t)).fromNow() + '</span>';
         });
 
       // Adds tooltip to chart.
@@ -66,7 +66,7 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
-        .ease('elastic')
+        .ease('bounce')
         .attr('y', function () { return chartHeight - y(d.peers) - highlightHeightDiff; })
         .attr('height', function () { return y(d.peers) + highlightHeightDiff; });
 
@@ -79,7 +79,7 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
-        .ease('elastic')
+        .ease('bounce')
         .attr('y', function (d, i) { return chartHeight - y(d.peers); })
         .attr('height', function (d) { return y(d.peers); });
 

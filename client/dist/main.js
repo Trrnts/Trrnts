@@ -112,41 +112,56 @@ angular.module('trrntsApp.controllers', [])
 .controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
   $scope.search = '';
   $scope.searchResults = [];
+  $scope.showResults = [];
   $scope.perPage = 10;
-  $scope.start = 1;
-  $scope.stop = $scope.start + $scope.perPage - 1;
+  $scope.start = 0;
   $scope.hasBeenSubmitted = false;
+
+  var reset = function () {
+      $scope.start = 0;
+  };
 
   $scope.hasPrev = function () {
     return $scope.start > 1;
   };
 
   $scope.hasNext = function () {
-    return $scope.searchResults.length === $scope.perPage;
+    return $scope.searchResults.length > $scope.start + $scope.perPage;
   };
 
   var update = function () {
-    MagnetLinksFactory.search($scope.search, $scope.start, $scope.stop).then(function (result) {
-      $scope.searchResults = result.data;
-    }).catch(function () {
-      $scope.searchResults = [];
-    });
+    var toShow = 0;
+    $scope.showResults = [];
+    if ($scope.hasNext()) {
+      toShow = $scope.perPage;
+    } else {
+      toShow = $scope.searchResults.length - $scope.start;
+    }
+
+    for (var i = 0 ; i < toShow; i++) {
+      $scope.showResults[i] = $scope.searchResults[$scope.start + i];
+    }
   };
 
   $scope.next = function () {
     $scope.start += $scope.perPage;
-    $scope.stop += $scope.perPage;
     update();
   };
 
   $scope.prev = function () {
     $scope.start -= $scope.perPage;
-    $scope.stop -= $scope.perPage;
     update();
   };
 
   $scope.submit = function () {
-    update();
+    MagnetLinksFactory.search($scope.search).then(function (result) {
+      $scope.searchResults = result.data;
+      console.log($scope.searchResults.length, "length");
+      reset();
+      update();
+    }).catch(function () {
+      $scope.showResults = [];
+    });
     $scope.hasBeenSubmitted = true;
   };
 }])
@@ -176,7 +191,7 @@ angular.module('trrntsApp.directives', [])
 
       var formattedData = [];
       for (var i = 0; i < data.length; i += 2) {
-        formattedData.push({
+        formattedData.unshift({
           peers: parseInt(data[i]),
           t: parseInt(data[i+1])
         });
@@ -195,7 +210,7 @@ angular.module('trrntsApp.directives', [])
         .attr('class', 'd3-tip')
         .offset([-highlightHeightDiff-10, 0])
         .html(function(d) {
-          return '<strong>' + d.peers + '</strong> peers <span>' + moment(parseInt(d.t)).fromNow() + ' ago</span>';
+          return '<strong>' + d.peers + '</strong> peers <span>' + moment(parseInt(d.t)).fromNow() + '</span>';
         });
 
       // Adds tooltip to chart.
@@ -223,7 +238,7 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
-        .ease('elastic')
+        .ease('bounce')
         .attr('y', function () { return chartHeight - y(d.peers) - highlightHeightDiff; })
         .attr('height', function () { return y(d.peers) + highlightHeightDiff; });
 
@@ -236,7 +251,7 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
-        .ease('elastic')
+        .ease('bounce')
         .attr('y', function (d, i) { return chartHeight - y(d.peers); })
         .attr('height', function (d) { return y(d.peers); });
 
@@ -352,8 +367,8 @@ angular.module('trrntsApp.main', [
 }]);
 
 angular.module('trrntsApp.services', [])
-
-.factory('MagnetLinksFactory', ['$http', function ($http) {
+// need promise library to pass back a blank promise if validation fails
+.factory('MagnetLinksFactory', ['$http', '$q', function ($http, $q) {
   // Submit Magnet URI
   var create = function (magnetURI) {
     return $http({
@@ -388,18 +403,14 @@ angular.module('trrntsApp.services', [])
   };
 
   // Searches torrents whose titles contains input.
-  var search = function (input, start, stop) {
-    if (!input && typeof(input) !== 'string') {
-      return;
+  var search = function (input) {
+    if (typeof(input) !== 'string') {
+      return $q.defer().promise;
     }
 
     return $http({
       method: 'GET',
-      url:'api/magnets/search/' + input,
-      params: {
-        start: start || 1,
-        stop: stop || 30
-      }
+      url:'api/magnets/search/' + input
     });
   };
 

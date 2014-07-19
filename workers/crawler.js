@@ -90,14 +90,15 @@ socket.on('message', function (msg, rinfo) {
     });
   }
   if (msg.r && msg.r.nodes && Buffer.isBuffer(msg.r.nodes)) {
+    var addNode = function (err, added) {
+      if (added > 0) {
+        getPeers(infoHash, node);
+      }
+    };
     for (var i = 0; i < msg.r.nodes.length; i += 26) {
       var node = compact2string(msg.r.nodes.slice(i + 20, i + 26));
       if (node) {
-        redis.pfadd('job:' + infoHash + ':nodes', node, function (err, added) {
-          if (added > 0) {
-            getPeers(infoHash, node);
-          }
-        });
+        redis.pfadd('job:' + infoHash + ':nodes', node, addNode);
       }
     }
   }
@@ -161,7 +162,7 @@ var crawl = function (infoHash) {
 socket.bind(port, function () {
   // Start the magic.
   var next = function () {
-    redis.srandmember('magnets:all', 5, function (err, infoHashes) {
+    redis.srandmember('magnets:all', 20, function (err, infoHashes) {
       _.each(infoHashes, crawl);
     });
   };

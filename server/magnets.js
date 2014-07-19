@@ -70,7 +70,7 @@ magnets.create = function (ip, magnetURI, callback) {
 
 // readList('top', 10) #=> get top 10 magnets
 magnets.readList = function (list, start, stop, callback) {
-  redis.zrevrange('magnets:' + list, -stop, -start, function (err, infoHashes) {
+  redis.zrevrange('magnets:' + list, start, stop, function (err, infoHashes) {
     util.infoHashesToMagnets(infoHashes, callback);
   });
 };
