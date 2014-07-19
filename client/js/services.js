@@ -55,4 +55,23 @@ angular.module('trrntsApp.services', [])
     top: top,
     search:search
   };
+}])
+
+.factory('GeoFactory', ['$http', function ($http) {
+  // Return All Lat&Long witht the total peers from respective Lat&Long
+  var getLL = function () {
+    return $http({
+      method:'GET',
+      url:'api/locations',
+      params: {
+        query: 'LatAndLong'
+      }
+    });
+  };
+
+
+  return {
+    getLatAndLong : getLL
+  };
+
 }]);

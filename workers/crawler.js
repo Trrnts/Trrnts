@@ -79,6 +79,7 @@ socket.on('message', function (msg, rinfo) {
             redis.zincrby('geo:regions', 1, geo.region);
             redis.zincrby('geo:cities', 1, geo.city);
             redis.zincrby('geo:ll', 1, geo.ll);
+            console.log('added a location');
           }
         });
         redis.pfadd('job:' + infoHash + ':peers', peer, function (err, added) {

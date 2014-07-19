@@ -148,6 +148,14 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('WorldMapController', ['$scope', function ($scope) {
+.controller('WorldMapController', ['$scope', 'GeoFactory', function ($scope, GeoFactory) {
+  $scope.location = {};
 
+  $scope.getLatAndLong = function () {
+    GeoFactory.getLatAndLong().then(function (results) {
+      $scope.location = results;
+    });
+  };
+
+  $scope.getLatAndLong();
 }]);

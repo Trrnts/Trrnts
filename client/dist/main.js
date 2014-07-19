@@ -166,8 +166,16 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('WorldMapController', ['$scope', function ($scope) {
+.controller('WorldMapController', ['$scope', 'GeoFactory', function ($scope, GeoFactory) {
+  $scope.location = {};
 
+  $scope.getLatAndLong = function () {
+    GeoFactory.getLatAndLong().then(function (results) {
+      $scope.location = results;
+    });
+  };
+
+  $scope.getLatAndLong();
 }]);
 
 angular.module('trrntsApp.directives', [])
@@ -266,31 +274,22 @@ angular.module('trrntsApp.directives', [])
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {
-      var generateFakePositions = function () {
-        var fakePositions = [];
-        var fakeLatAndLong = [[49.45045869, -65.15636998],
-                        [37.12726948, -17.72583572],
-                        [1.16322135, 127.68441455],
-                        [-25.38805351, 88.82525081],
-                        [-30.31687802, 25.57883445],
-                        [-26.46000555, -134.44309036],
-                        [-33.52151968, -82.46394689],
-                        [-24.96600279, -90.20244849],
-                        [-70.94843404, -146.08284954],
-                        [-27.03729112, 36.61236272]];
-
-        for (var i = 0; i < fakeLatAndLong.length; i++) {
-          var spot = {
-            radius: Math.floor(Math.random()*50),
-            fillKey: 'torrents'
+      console.log(scope);
+      var update = function (lls) {
+        var formatedLLs = [];
+        for (var ll in lls) {
+          var bubble = {
+            fillKey : 'torrents',
+            radius :  lls[ll]
           };
-          spot.latitude = fakeLatAndLong[i][0];
-          spot.longitude = fakeLatAndLong[i][1];
-          // console.log(fakeLatAndLong[i][0], fakeLatAndLong[i][1]);
-          fakePositions.push(spot);
+
+          var llArr = ll.split(',');
+          bubble.latitude = llArr[0];
+          bubble.longitude = llArr[1];
+          formatedLLs.puhs(bubble);
         }
 
-        return fakePositions;
+        return formatedLLs;
       };
 
       var map = new Datamap({
@@ -301,10 +300,10 @@ angular.module('trrntsApp.directives', [])
         }
       });
 
-      // Generate Fake Stats
-      var fakePositions = generateFakePositions();
-      // console.log(fakePositions);
-      map.bubbles(fakePositions);
+      // Generate Stats
+      var llStats = update(scope.locations);
+      console.log(llStats);
+      map.bubbles(llStats);
     },
   };
 });
@@ -423,4 +422,23 @@ angular.module('trrntsApp.services', [])
     top: top,
     search:search
   };
+}])
+
+.factory('GeoFactory', ['$http', function ($http) {
+  // Return All Lat&Long witht the total peers from respective Lat&Long
+  var getLL = function () {
+    return $http({
+      method:'GET',
+      url:'api/locations',
+      params: {
+        query: 'LatAndLong'
+      }
+    });
+  };
+
+
+  return {
+    getLatAndLong : getLL
+  };
+
 }]);

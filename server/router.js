@@ -1,5 +1,6 @@
 var express = require('express'),
-    magnets = require('./magnets');
+    magnets = require('./magnets'),
+    locations = require('./locations');
 
 var router = express.Router();
 
@@ -63,6 +64,22 @@ router.get('/magnets', function (req, res, next) {
   }
   magnets.search(query, start, stop, function (err, magnets) {
     res.send(200, magnets);
+  });
+});
+
+router.get('/locations', function (req, res, next) {
+  var type = req.query.query;
+  if (['LatAndLong', 'Country', 'Region', 'City'].indexOf(type) === -1) {
+    return next();
+  }
+
+  locations['getBy' + type](function (err, results) {
+    if (err) {
+      return next();
+    }
+
+    results = results || {};
+    res.send(200, results);
   });
 });
 
