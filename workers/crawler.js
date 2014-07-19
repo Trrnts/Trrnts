@@ -212,8 +212,11 @@ socket.bind(port, function () {
   // Start the magic.
   // crawl('8CA378DBC8F62E04DF4A4A0114B66018666C17CD');
   var next = function () {
-    redis.srandmember('magnets:all', 2, function (err, infoHashes) {
-      _.each(infoHashes, crawl);
+    redis.lpop('magnets:crawl', function (err, infoHash) {
+      redis.rpush('magnets:crawl', infoHash);
+      if (infoHash) {
+        crawl(infoHash);
+      }
     });
   };
   next();

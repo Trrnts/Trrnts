@@ -70,6 +70,8 @@ magnets.create = function (ip, magnetURI, callback) {
       redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
       redis.sadd('magnets:all', magnet.infoHash);
 
+      redis.rpush('magnets:crawl', magnet.infoHash);
+
       magnets.index(magnet);
       callback(null, magnet);
     }
