@@ -3,7 +3,9 @@ var express = require('express'),
 
 var router = express.Router();
 
-// http://localhost:9000/api/magnets
+// Creates a new magnet. Accepts JSON-object having one attribute `magnetURI.`
+// Usage:
+// localhost:9000/api/magnets
 router.post('/magnets', function (req, res) {
   var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
   magnets.create(ip, req.body.magnetURI, function (err, magnet) {
@@ -16,25 +18,10 @@ router.post('/magnets', function (req, res) {
   });
 });
 
-// http://localhost:9000/api/nodes
-// This get request will return all of the nodes in the 'node' set of the database
-// it returns an array of strings in the format of "ipadress:port"
-router.get('/nodes', function (req, res) {
-  redis.SMEMBERS('node', function(error, result) {
-    res.send(result);
-  });
-});
-
-router.get('/peers', function (req, res) {
-  redis.SMEMBERS('peer', function(error, result) {
-    res.send(result);
-  });
-});
-
-// http://localhost:9000/api/magnets/top or /latest
-// By default the api returns the last or top 10 magnets
-// Usage: localhost:9000/api/magnets/top/40      localhost:9000/api/magnets/latest/40
-      // to get top/latest 40 magnets
+// By default the API returns the last or top 10 magnets.
+// Usage:
+// localhost:9000/api/magnets/top?start=0&stop=3
+// localhost:9000/api/magnets/latest
 router.get('/magnets/:list', function (req, res, next) {
   var start = parseInt(req.query.start) || 0,
       stop = parseInt(req.query.stop) || start + 10,
@@ -57,6 +44,9 @@ router.get('/magnets/:list', function (req, res, next) {
   });
 });
 
+// Implements search for a specific torrent.
+// Usage:
+// localhost:9000/api/magnets?query=movie
 router.get('/magnets', function (req, res, next) {
   var query = req.query.query,
       start = parseInt(req.query.start) || 0,
