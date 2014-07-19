@@ -5,6 +5,14 @@ var _ = require('lodash'),
 
 var util = {};
 
+// Removes all non-alphanumeric charters from a string and removes multiple
+// whitespaces. This is needed for extracting the words as an array from a
+// string.
+util.extractWords = function (string) {
+  string = string.toLowerCase();
+  return string.replace(/\W/g, ' ').replace(/ +(?= )/g,'').split(' ');
+};
+
 // Converts a single infoHash/ an array of infoHashes into an array of magnet
 // objects.
 util.infoHashesToMagnets = function (infoHashes, callback) {
@@ -95,18 +103,9 @@ magnets.search = function (query, start, stop, callback) {
 
   redis.zinterstore(zinterstoreQuery, function (err) {
     redis.zrevrange(resultKeyName, start, stop, function (err, infoHashes) {
-      console.log(infoHashes);
       util.infoHashesToMagnets(infoHashes, callback);
     });
   });
-};
-
-// Removes all non-alphanumeric charters from a string and removes multiple
-// whitespaces. This is needed for extracting the words as an array from a
-// string.
-var extractWords = function (string) {
-  string = string.toLowerCase();
-  return string.replace(/\W/g, ' ').replace(/ +(?= )/g,'').split(' ');
 };
 
 // index(m1) #=> creates an inverted search index for a magnet object created by
@@ -114,7 +113,7 @@ var extractWords = function (string) {
 magnets.index = function (magnet) {
   // This script indexes recently submitted magnets using an
   // [inverted index](http://en.wikipedia.org/wiki/Inverted_index).
-  var words = extractWords(magnet.name);
+  var words = util.extractWords(magnet.name);
   var multi = redis.multi();
   _.each(words, function (word) {
     multi.sadd('search:' + word.toLowerCase(), magnet.infoHash);
