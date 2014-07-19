@@ -38,7 +38,7 @@ angular.module('trrntsApp.directives', [])
         .attr('class', 'd3-tip')
         .offset([-highlightHeightDiff-10, 0])
         .html(function(d) {
-          return '<strong>' + d.peers + '</strong> peers <span>' + moment(parseInt(d.t)).fromNow() + ' ago</span>';
+          return '<strong>' + d.peers + '</strong> peers <span>' + moment(parseInt(d.t)).fromNow() + '</span>';
         });
 
       // Adds tooltip to chart.
