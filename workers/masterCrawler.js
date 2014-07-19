@@ -54,12 +54,20 @@ crawl.init(function () {
   };
   next();
   setInterval(next, 60*1000*1.1);
+  // next();
+  // setInterval(next, 60*1000*1.1);
+  // next();
+  // setInterval(next, 60*1000*1.1);
+  // next();
+  // setInterval(next, 60*1000*1.1);
+  // next();
+  // setInterval(next, 60*1000*1.1);
 
+
+  // Example usage:
   // crawl('8CA378DBC8F62E04DF4A4A0114B66018666C17CD', function (err, results) {
   //   console.log(results);
   //
   //   process.exit(1);
   // });
-
-
 });
