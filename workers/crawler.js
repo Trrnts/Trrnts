@@ -62,10 +62,10 @@ var active = {};
 // lookup will succeed.
 setInterval(function () {
   console.log('Updating bootstrap nodes...');
-  redis.lrange('nodes', 0, 200, function (err, nodes) {
+  redis.lrange('nodes', 0, 50, function (err, nodes) {
     BOOTSTRAP_NODES = ROUTERS.concat(nodes);
     console.log('Finished updating bootstrap nodes.');
-    redis.ltrim('nodes', 0, 200);
+    redis.ltrim('nodes', 0, 50);
     _.each(active, function (bool, infoHash) {
       _.each(nodes, function (node) {
         getPeers(infoHash, node);
@@ -200,7 +200,7 @@ var crawl = function (infoHash) {
     _.each(BOOTSTRAP_NODES, function (addr) {
       getPeers(infoHash, addr);
     });
-    if (!active[infoHash] || ++kickedOff === 10) {
+    if (!active[infoHash] || ++kickedOff === 5) {
       clearInterval(kickOff);
     }
   }, 100);
