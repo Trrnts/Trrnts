@@ -1,9 +1,7 @@
 var bencode = require('bencode'),
     dgram = require('dgram'),
     hat = require('hat'),
-    _ = require('lodash'),
-    // redis = require('../redis')(),
-    geoip = require('geoip-lite');
+    _ = require('lodash');
 
 // Put in a function. The returned function won't ever throw an error. This is
 // quite useful for malformed messages.
@@ -84,56 +82,19 @@ socket.on('message', function (msg, rinfo) {
     _.each(msg.r.values, function (peer) {
       peer = compact2string(peer);
       if (peer && jobs[infoHash]) {
+        // console.log('Found new peer ' + node + ' for ' + infoHash);
         jobs[infoHash].peers[peer] = true;
         getPeers(infoHash, peer);
-        // var ip = peer.split(':')[0];
-        // var geo = geoip.lookup(ip) || {};
-        // geo.country = geo.country || '?';
-        // geo.region = geo.region || '?';
-        // geo.city = geo.city || '?';
-        // geo.ll = geo.ll || ['?', '?'];
-        // geo.ll = geo.ll.join(',');
-        //
-        // redis.pfadd('peers', peer, function (err, added) {
-        //   if (added > 0) {
-        //     redis.zincrby('geo:countries', 1, geo.country);
-        //     redis.zincrby('geo:regions', 1, geo.region);
-        //     redis.zincrby('geo:cities', 1, geo.city);
-        //     redis.zincrby('geo:ll', 1, geo.ll);
-        //
-        //     redis.lpush('nodes', peer);
-        //   }
-        // });
-        //
-        // redis.pfadd('job:' + infoHash + ':peers', peer, function (err, added) {
-        //   if (added > 0) {
-        //     console.log('Found new peer ' + peer + ' for ' + infoHash);
-        //     if (active[infoHash]) {
-        //       getPeers(infoHash, peer);
-        //     }
-        //   }
-        // });
       }
     });
   }
   if (msg.r && msg.r.nodes && Buffer.isBuffer(msg.r.nodes)) {
-    // var addNode = function (node) {
-    //   return function (err, added) {
-    //     if (added > 0) {
-    //       console.log('Found new node ' + node + ' for ' + infoHash);
-    //       if (active[infoHash]) {
-    //         getPeers(infoHash, node);
-    //       }
-    //     }
-    //   };
-    // };
     for (var i = 0; i < msg.r.nodes.length; i += 26) {
       var node = compact2string(msg.r.nodes.slice(i + 20, i + 26));
       if (node && jobs[infoHash]) {
+        // console.log('Found new node ' + node + ' for ' + infoHash);
         jobs[infoHash].nodes[node] = true;
         getPeers(infoHash, node);
-        // redis.lpush('nodes', node);
-        // redis.pfadd('job:' + infoHash + ':nodes', node, addNode(node));
       }
     }
   }
@@ -181,8 +142,8 @@ var crawl = function (infoHash, callback) {
     var peers = _.keys(jobs[infoHash].peers);
     var nodes = _.keys(jobs[infoHash].nodes);
 
-    console.log('Found ' + peers + ' peers for ' + infoHash + '.');
-    console.log('Found ' + nodes + ' nodes for ' + infoHash + '.');
+    console.log('Found ' + peers.length + ' peers for ' + infoHash + '.');
+    console.log('Found ' + nodes.length + ' nodes for ' + infoHash + '.');
 
     delete jobs[infoHash];
     console.log('Successfully deleted crawl job for ' + infoHash + '.');
@@ -191,24 +152,6 @@ var crawl = function (infoHash, callback) {
       peers: peers,
       nodes: nodes
     });
-
-    // redis.zadd('magnet:' + infoHash + ':peers', _.now(), peers);
-    // redis.hset('magnet:' + infoHash, 'score', peers);
-    // redis.zadd('magnets:top', peers, infoHash);
-
-
-    // redis.pfcount('job:' + infoHash + ':peers', function (err, peers) {
-    //   console.log('Found ' + peers + ' peers for ' + infoHash);
-    //   redis.zadd('magnet:' + infoHash + ':peers', _.now(), peers);
-    //   redis.hset('magnet:' + infoHash, 'score', peers);
-    //   redis.zadd('magnets:top', peers, infoHash);
-    //   redis.del('job:' + infoHash + ':peers');
-    // });
-    // redis.pfcount('job:' + infoHash + ':nodes', function (err, nodes) {
-    //   console.log('Found ' + nodes + ' nodes for ' + infoHash);
-    //   redis.zadd('magnet:' + infoHash + ':nodes', _.now(), nodes);
-    //   redis.del('job:' + infoHash + ':nodes');
-    // });
   }, ttl);
 
   // Packages might get lost. This sends each get_peers request multiple times.
@@ -220,23 +163,16 @@ var crawl = function (infoHash, callback) {
   });
 };
 
-// Starts the DHT client by listening on the specified port.
-// socket.bind(port, function () {
-  // Start the magic.
-
-  // var next = function () {
-  //   redis.lpop('magnets:crawl', function (err, infoHash) {
-  //     redis.rpush('magnets:crawl', infoHash);
-  //     if (infoHash) {
-  //       crawl(infoHash);
-  //     }
-  //   });
-  // };
-  // next();
-  // setInterval(next, ttl*1.2);
-// });
-
 module.exports = exports = crawl;
 module.exports.init = function (callback) {
   socket.bind(port, callback);
 };
+
+// Example usage:
+// var crawl = require('./crawl');
+// crawl.init(function () {
+//   crawl('8CA378DBC8F62E04DF4A4A0114B66018666C17CD', function (err, results) {
+//     console.log(results);
+//     process.exit(1);
+//   });
+// });
