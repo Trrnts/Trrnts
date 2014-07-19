@@ -57,17 +57,23 @@ router.get('/magnets/:list', function (req, res, next) {
   });
 });
 
-router.get('/magnets/search/:query', function (req, res, next) {
-  var query = req.params.query;
-
-  magnets.search(query, 0, 10, function (err, magnets) {
-    if (err) {
-      return next();
-    } else {
-      res.send(200, magnets || []);
-    }
+router.get('/magnets', function (req, res, next) {
+  var query = req.query.query,
+      start = parseInt(req.query.start) || 1,
+      stop = parseInt(req.query.stop) || start + 10;
+  if (start > stop) {
+    return res.send(400, {
+      error: 'Start needs to be less than stop'
+    });
+  }
+  if (stop - start > 100) {
+    return res.send(400, {
+      error: 'Maximum difference between stop and start is 100'
+    });
+  }
+  magnets.search(query, start, stop, function (err, magnets) {
+    res.send(200, magnets);
   });
-
 });
 
 module.exports = exports = router;
