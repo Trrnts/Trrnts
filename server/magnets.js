@@ -62,10 +62,10 @@ magnets.create = function (ip, magnetURI, callback) {
       magnet.infoHash = parsedMagnetURI.infoHash;
       magnet.createdAt = _.now();
       magnet.magnetURI = magnetURI;
-      magnet.score = -1;
+      magnet.peers = -1;
 
       redis.hmset('magnet:' + magnet.infoHash, magnet);
-      redis.zadd('magnets:top', magnet.score, magnet.infoHash);
+      redis.zadd('magnets:top', magnet.peers, magnet.infoHash);
       redis.zadd('magnets:latest', magnet.createdAt, magnet.infoHash);
       redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
       redis.sadd('magnets:all', magnet.infoHash);
