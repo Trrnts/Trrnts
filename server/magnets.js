@@ -95,7 +95,6 @@ magnets.search = function (query, start, stop, callback) {
 
   redis.zinterstore(zinterstoreQuery, function (err) {
     redis.zrevrange(resultKeyName, start, stop, function (err, infoHashes) {
-      console.log(infoHashes);
       util.infoHashesToMagnets(infoHashes, callback);
     });
   });
