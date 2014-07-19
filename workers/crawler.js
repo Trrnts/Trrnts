@@ -54,7 +54,7 @@ var transactions = {};
 // This function will be invoked as soon as a node/peer sends a message. It does
 // a lot of formatting for the protocols.
 socket.on('message', function (msg, rinfo) {
-  // console.log('Received message from ' + rinfo.address);
+  console.log('Received message from ' + rinfo.address);
   msg = decode(msg);
   var transactionId = Buffer.isBuffer(msg.t) && msg.t.length === 2 && msg.t.readUInt16BE(0);
   var infoHash = transactions[transactionId];
