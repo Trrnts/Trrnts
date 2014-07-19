@@ -410,7 +410,10 @@ angular.module('trrntsApp.services', [])
 
     return $http({
       method: 'GET',
-      url:'api/magnets/search/' + input
+      url:'api/magnets',
+      params: {
+        query: input
+      }
     });
   };
 
