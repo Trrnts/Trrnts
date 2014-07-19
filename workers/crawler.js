@@ -60,14 +60,19 @@ var active = {};
 
 // Update BOOTSTRAP_NODES on a regular basis. This way is it more likely that a
 // lookup will succeed.
-// setInterval(function () {
-//   console.log('Updating bootstrap nodes...');
-//   redis.lrange('nodes', 0, 200, function (err, nodes) {
-//     BOOTSTRAP_NODES = ROUTERS.concat(nodes);
-//     console.log('Finished updating bootstrap nodes.');
-//     redis.ltrim('nodes', 0, 200);
-//   });
-// }, 2000);
+setInterval(function () {
+  console.log('Updating bootstrap nodes...');
+  redis.lrange('nodes', 0, 200, function (err, nodes) {
+    BOOTSTRAP_NODES = ROUTERS.concat(nodes);
+    console.log('Finished updating bootstrap nodes.');
+    redis.ltrim('nodes', 0, 200);
+    _.each(active, function (bool, infoHash) {
+      _.each(nodes, function (node) {
+        getPeers(infoHash, node);
+      });
+    });
+  });
+}, 2000);
 
 // Key: transactionId; Value: infoHash
 var transactions = {};
@@ -117,18 +122,21 @@ socket.on('message', function (msg, rinfo) {
     });
   }
   if (msg.r && msg.r.nodes && Buffer.isBuffer(msg.r.nodes)) {
+    var addNode = function (node) {
+      return function (err, added) {
+        if (added > 0) {
+          console.log('Found new node ' + node + ' for ' + infoHash);
+          if (active[infoHash]) {
+            getPeers(infoHash, node);
+          }
+        }
+      };
+    };
     for (var i = 0; i < msg.r.nodes.length; i += 26) {
       var node = compact2string(msg.r.nodes.slice(i + 20, i + 26));
       if (node) {
         redis.lpush('nodes', node);
-        redis.pfadd('job:' + infoHash + ':nodes', node, function (err, added) {
-          if (added > 0) {
-            console.log('Found new node ' + node + ' for ' + infoHash);
-            if (active[infoHash]) {
-              getPeers(infoHash, node);
-            }
-          }
-        });
+        redis.pfadd('job:' + infoHash + ':nodes', node, addNode(node));
       }
     }
   }
@@ -201,12 +209,12 @@ var crawl = function (infoHash) {
 // Starts the DHT client by listening on the specified port.
 socket.bind(port, function () {
   // Start the magic.
-  crawl('8CA378DBC8F62E04DF4A4A0114B66018666C17CD');
-  // var next = function () {
-  //   redis.srandmember('magnets:all', 2, function (err, infoHashes) {
-  //     _.each(infoHashes, crawl);
-  //   });
-  // };
-  // next();
-  // setInterval(next, ttl*1.2);
+  // crawl('8CA378DBC8F62E04DF4A4A0114B66018666C17CD');
+  var next = function () {
+    redis.srandmember('magnets:all', 2, function (err, infoHashes) {
+      _.each(infoHashes, crawl);
+    });
+  };
+  next();
+  setInterval(next, ttl*1.2);
 });
