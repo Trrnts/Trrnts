@@ -83,10 +83,6 @@ socket.on('message', function (msg, rinfo) {
     console.log('Unknown transaction for ' + transactionId + ' from ' + rinfo.address + ':' + rinfo.port);
     return;
   }
-  if (!active[infoHash]) {
-    console.log('Transaction for ' + transactionId + ' from ' + rinfo.address + ':' + rinfo.port + ' timed out');
-    return;
-  }
   if (msg.r && msg.r.values) {
     _.each(msg.r.values, function (peer) {
       peer = compact2string(peer);
@@ -112,7 +108,9 @@ socket.on('message', function (msg, rinfo) {
         redis.pfadd('job:' + infoHash + ':peers', peer, function (err, added) {
           if (added > 0) {
             console.log('Found new peer ' + peer + ' for ' + infoHash);
-            getPeers(infoHash, peer);
+            if (active[infoHash]) {
+              getPeers(infoHash, peer);
+            }
           }
         });
       }
@@ -126,7 +124,9 @@ socket.on('message', function (msg, rinfo) {
         redis.pfadd('job:' + infoHash + ':nodes', node, function (err, added) {
           if (added > 0) {
             console.log('Found new node ' + node + ' for ' + infoHash);
-            getPeers(infoHash, node);
+            if (active[infoHash]) {
+              getPeers(infoHash, node);
+            }
           }
         });
       }
@@ -187,14 +187,15 @@ var crawl = function (infoHash) {
   // Routers provided by BitTorrent, Inc. are sometimes down. This way we
   // ensure that we corrently enter the DHT network. Otherwise, we might not get
   // a single peer/ node.
+  var kickedOff = 0;
   var kickOff = setInterval(function () {
     _.each(BOOTSTRAP_NODES, function (addr) {
       getPeers(infoHash, addr);
     });
-    if (!active[infoHash]) {
+    if (!active[infoHash] || ++kickedOff === 10) {
       clearInterval(kickOff);
     }
-  }, 10);
+  }, 100);
 };
 
 // Starts the DHT client by listening on the specified port.
