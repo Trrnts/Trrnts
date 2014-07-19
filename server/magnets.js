@@ -78,28 +78,26 @@ magnets.readList = function (list, start, stop, callback) {
 // readMagnet('chkdewyduewdg') #=> get a single magnet link
 magnets.readMagnet = util.infoHashesToMagnets;
 
-
 // search('Game of Thrones') #=> get all torrents that have those words, case-sensitive
-magnets.search = function (search, callback) {
-  // Format : 'search:' + word
-  // Convert Each Word into a key Format
-
-  var formattedWords = _.map(search.toLowerCase().split(' '), function (word) {
-    return 'search:'+ word;
+magnets.search = function (query, start, stop, callback) {
+  var keyNames = _.map(query.toLowerCase().split(' '), function (word) {
+    return 'search:' + word;
   });
 
-  // Get InfoHashes for set of words through intersect
-  redis.sinter(formattedWords, function (err, results) {
-    if (err) {
-      return callback(err, []);
-    }
+  var resultKeyName = 'search:query:' + query;
+  var zinterstoreQuery = [resultKeyName, keyNames.length + 1];
+  _.each(keyNames, function (keyName) {
+    zinterstoreQuery.push(keyName);
+  });
+  zinterstoreQuery.push('magnets:top');
+  zinterstoreQuery.push('AGGREGATE');
+  zinterstoreQuery.push('MAX');
 
-    // get magnetLinks for InfoHashes
-    var multi = redis.multi();
-    _.map(results, function (infoHash) {
-      multi.hgetall('magnet:' + infoHash);
+  redis.zinterstore(zinterstoreQuery, function (err) {
+    redis.zrevrange(resultKeyName, start, stop, function (err, infoHashes) {
+      console.log(infoHashes);
+      util.infoHashesToMagnets(infoHashes, callback);
     });
-    multi.exec(callback);
   });
 };
 

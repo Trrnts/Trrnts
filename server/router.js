@@ -40,8 +40,8 @@ router.get('/magnets/:list', function (req, res, next) {
       stop = parseInt(req.query.stop) || start + 10,
       list = req.params.list;
   if (['top', 'latest'].indexOf(list) === -1) {
-    return next();    
-  }  
+    return next();
+  }
   if (start > stop) {
     return res.send(400, {
       error: 'Start needs to be less than stop'
@@ -57,14 +57,10 @@ router.get('/magnets/:list', function (req, res, next) {
   });
 });
 
-router.get('/magnets/search/:input', function (req, res, next) {
-  var search = req.params.input;
+router.get('/magnets/search/:query', function (req, res, next) {
+  var query = req.params.query;
 
-  if (!search) {
-    next();
-  }
-
-  magnets.search(search, function (err, magnets) {
+  magnets.search(query, 0, 10, function (err, magnets) {
     if (err) {
       return next();
     } else {
