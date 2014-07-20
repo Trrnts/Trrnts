@@ -3,7 +3,6 @@ var locations = {},
     redis = require('../redis')();
 
 locations.getByLatAndLong = function (number, callback) {
-  // get all lls 
   getData('ll', number, callback);
 };
 
