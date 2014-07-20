@@ -21,33 +21,29 @@ angular.module('trrntsApp.controllers', [])
 
   $scope.latest = [];
 
-  var update = function () {
-    MagnetLinksFactory.latest($scope.start, $scope.stop).then(function (result) {
-      $scope.latest = result.data;
-    }).catch(function () {
-      $scope.latest = [];
+  $scope.loadMore = function () {
+    MagnetLinksFactory.latest($scope.start, $scope.stop).then(function (results) {
+      $scope.latest = $scope.latest.concat(results.data);
+      $scope.start += $scope.perPage;
+      $scope.stop += $scope.perPage;
     });
   };
-
-  update();
 }])
 
 .controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
   $scope.perPage = 10;
   $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
+
   $scope.top = [];
 
-  var update = function () {
-    MagnetLinksFactory.top($scope.start, $scope.stop).then(function (result) {
-      $scope.top = result.data;
-
-    }).catch(function () {
-      $scope.top = [];
+  $scope.loadMore = function () {
+    MagnetLinksFactory.top($scope.start, $scope.stop).then(function (results) {
+      $scope.top = $scope.top.concat(results.data);
+      $scope.start += $scope.perPage;
+      $scope.stop += $scope.perPage;
     });
   };
-
-  update();
 }])
 
 .controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {

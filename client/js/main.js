@@ -6,7 +6,8 @@ angular.module('trrntsApp.main', [
   'trrntsApp.controllers',
   'trrntsApp.services',
   'trrntsApp.directives',
-  'trrntsApp.filters'
+  'trrntsApp.filters',
+  'infinite-scroll'
 ])
 .config(['$stateProvider',function ($stateProvider) {
 
@@ -27,11 +28,6 @@ angular.module('trrntsApp.main', [
         'searchMagnets@trrntsApp.main': {
           templateUrl: 'views/searchMagnets.tpl.html',
           controller: 'SearchMagnetLinksController'
-        },
-
-        'submitMagnet@trrntsApp.main': {
-          templateUrl: 'views/submitMagnet.tpl.html',
-          controller: 'SubmitMagnetLinkController'
         }
       }
     })
@@ -52,5 +48,10 @@ angular.module('trrntsApp.main', [
     url:'/map',
     templateUrl: 'views/worldMap.tpl.html',
     controller: 'WorldMapController'
+  })
+  .state('trrntsApp.main.submit', {
+    url:'/submit',
+    templateUrl: 'views/submitMagnet.tpl.html',
+    controller: 'SubmitMagnetLinkController'
   });
 }]);
