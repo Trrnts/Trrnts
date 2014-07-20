@@ -1,32 +1,39 @@
-<header class="pure-g">
+<!-- <header class="pure-g">
   <div class="pure-u-1-3">
-    <!-- <small><a href="#latest" class="latest-link">Latest submissions</a></small>
-    <small><a href="#stats" class="stats-link">Stats</a></small> -->
+    <small><a href="#latest" class="latest-link">Latest submissions</a></small>
+    <small><a href="#stats" class="stats-link">Stats</a></small>
   </div>
   <div class="pure-u-1-3">
     <a href="/" class="logo">Trrnts</a>
   </div>
-  <div class="pure-u-1-3">
-    <!-- <small><a href="#submit" class="submit">Submit a magnet</a></small> -->
+  <dsiv class="pure-u-1-3">
+    <small><a href="#submit" class="submit">Submit a magnet</a></small>
   </div>
-</header>
+</header> -->
 
-<nav class="navbar navbar-inverse" role="navigation">
-    <ul class="nav navbar-nav">
-        <li><a ui-sref=".top">Home</a></li>
-        <li><a ui-sref=".latest">Latest Magnets</a></li>
-        <li><a ui-sref=".map">Map</a></li>
-    </ul>
-</nav>
+<header class="pure-g">
+  <div class="pure-u-1 pure-u-md-1-5">
+    <a ui-sref=".top" class="logo">Trrnts</a>
+  </div>
+  <nav class="pure-u-1 pure-u-md-4-5">
+    <a ui-sref=".top">Top</a>
+    <span>·</span>
+    <a ui-sref=".latest">Latest</a>
+    <span>·</span>
+    <a ui-sref=".stats">Stats</a>
+    <span>·</span>
+    <a ui-sref=".submit">Submit a magnet</a>
+    <span>·</span>
+    <a ui-sref=".about">About this site</a>
+  </nav>
+</header>
 
 
 
 <!-- Add all the subviews you need  -->
 
-<div ui-view="searchMagnets"></div>
+<!-- <div ui-view="searchMagnets"></div> -->
 
 <div ui-view></div>
 
-<div ui-view="submitMagnet"></div>
-
-<footer>The front page for the BitTorrent network, providing insights through interactive analytics and data visualizations that leverage the DHT protocol.</footer>
+<!-- <div ui-view="submitMagnet"></div> -->
