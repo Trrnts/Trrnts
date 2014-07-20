@@ -86,7 +86,32 @@ magnets.readList = function (list, start, stop, callback) {
 };
 
 // readMagnet('chkdewyduewdg') #=> get a single magnet link
-magnets.readMagnet = util.infoHashesToMagnets;
+magnets.readMagnet = function (infoHash, callback) {
+  util.infoHashesToMagnets(infoHash, function (err, magnets) {
+    var magnet = magnets[0];
+    if (magnet === undefined) {
+      return callback(new Error('Unknown magnet'));
+    }
+    redis.lrange('magnet:' + magnet.infoHash + ':comments', 0, -1, function (err, comments) {
+      magnet.comments = _.map(comments, JSON.parse);
+      callback(null, magnet);
+    });
+  });
+};
+
+// commentMagnet('erfienrfeor', '123.456.789.012', 'Great movie') #=> comment a magnet link
+magnets.commentMagnet = function (infoHash, ip, text, callback) {
+  redis.exists('magnet:' + infoHash, function (err, exists) {
+    if (!exists) {
+      return callback(new Error('Unknown magnet'));
+    }
+    redis.lpush('magnet:' + infoHash + ':comments', JSON.stringify({
+      ip: ip,
+      text: text,
+      createdAt: _.now()
+    }), callback);
+  });
+};
 
 // search('Game of Thrones') #=> get all torrents that have those words, case-sensitive
 magnets.search = function (query, start, stop, callback) {
