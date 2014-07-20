@@ -82,7 +82,7 @@ socket.on('message', function (msg, rinfo) {
     _.each(msg.r.values, function (peer) {
       peer = compact2string(peer);
       if (peer && jobs[infoHash]) {
-        console.log('Found new peer ' + node + ' for ' + infoHash);
+        console.log('Found new peer ' + peer + ' for ' + infoHash);
         jobs[infoHash].peers[peer] = true;
         setImmediate(function () {
           getPeers(infoHash, peer);
