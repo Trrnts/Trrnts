@@ -87,8 +87,7 @@ socket.on('message', function (msg, rinfo) {
   if (!infoHash) {
     console.log('Unknown transaction for ' + transactionId + ' from ' + rinfo.address + ':' + rinfo.port);
     return;
-  }
-  console.log('msg.r.values', msg.r.values);
+  }  
   if (msg.r && msg.r.values) {
     _.each(msg.r.values, function (peer) {
       peer = compact2string(peer);
@@ -99,15 +98,13 @@ socket.on('message', function (msg, rinfo) {
         geo.region = geo.region || '?';
         geo.city = geo.city || '?';
         geo.ll = geo.ll || ['?', '?'];
-        geo.ll = geo.ll.join(',');
-        console.log("how far before you drop >>>>>>>>>>>>>>>>>>>");
+        geo.ll = geo.ll.join(',');        
         redis.pfadd('peers', peer, function (err, added) {
           if (added > 0) {
             redis.zincrby('geo:countries', 1, geo.country);
             redis.zincrby('geo:regions', 1, geo.region);
             redis.zincrby('geo:cities', 1, geo.city);
-            redis.zincrby('geo:ll', 1, geo.ll);
-            console.log('added a location <<<<<<<<<<<<<<<<<<<<<<<');
+            redis.zincrby('geo:ll', 1, geo.ll);            
           }
         });
 

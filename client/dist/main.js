@@ -280,16 +280,17 @@ angular.module('trrntsApp.directives', [])
 
       var generateStats = function (lls) {
         var formatedLLs = [];
-        for (var ll in lls) {
+        for (var ll in lls) {          
           var bubble = {
             fillKey : 'torrents',
-            radius :  lls[ll]
+            radius :  lls[ll] * 0.2,
+            torrentsTotal: lls[ll]
           };
 
           var latAndLong = ll.split(',');
           bubble.latitude = latAndLong[0];
           bubble.longitude = latAndLong[1];
-          if (latAndLong.length > 1) {
+          if (latAndLong.length > 1 && latAndLong[0] !== '?') {
             formatedLLs.push(bubble);
           }
         }
@@ -306,7 +307,8 @@ angular.module('trrntsApp.directives', [])
       });
 
       // Generate Stats
-      var llStats = generateStats(scope.location);
+      console.log(scope.latAndLong);
+      var llStats = generateStats(scope.latAndLong);
       map.bubbles(llStats, {
         popupTemplate: function (geo, data) {
           return '<div class="hoverinfo"> Total Number of Torrents: <strong>' + 
