@@ -292,7 +292,7 @@ angular.module('trrntsApp.main', [
   $stateProvider
     .state('trrntsApp.main', {
       url: '',
-      views:{
+      views: {
         '': {
           // We need this line in order to set the default child view that
           // will be inserted into <div ui-view></div> inside the main template
