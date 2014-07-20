@@ -81,20 +81,22 @@ socket.on('message', function (msg, rinfo) {
   if (msg.r && msg.r.values) {
     _.each(msg.r.values, function (peer) {
       peer = compact2string(peer);
-      if (peer && jobs[infoHash] && !jobs[infoHash].peers[peer]) {
-        // console.log('Found new peer ' + node + ' for ' + infoHash);
+      if (peer && jobs[infoHash]) {
+        console.log('Found new peer ' + node + ' for ' + infoHash);
         jobs[infoHash].peers[peer] = true;
-        getPeers(infoHash, peer);
+        jobs[infoHash].queue.push(peer);
+        // getPeers(infoHash, peer);
       }
     });
   }
   if (msg.r && msg.r.nodes && Buffer.isBuffer(msg.r.nodes)) {
     for (var i = 0; i < msg.r.nodes.length; i += 26) {
       var node = compact2string(msg.r.nodes.slice(i + 20, i + 26));
-      if (node && jobs[infoHash] && !jobs[infoHash].nodes[node]) {
-        // console.log('Found new node ' + node + ' for ' + infoHash);
+      if (node && jobs[infoHash]) {
+        console.log('Found new node ' + node + ' for ' + infoHash);
         jobs[infoHash].nodes[node] = true;
-        getPeers(infoHash, node);
+        jobs[infoHash].queue.push(node);
+        // getPeers(infoHash, node);
       }
     }
   }
@@ -133,11 +135,21 @@ var crawl = function (infoHash, callback) {
 
   jobs[infoHash] = {
     peers: {},
-    nodes: {}
+    nodes: {},
+    queue: []
   };
+
+  var crawling = setInterval(function () {
+    var next = jobs[infoHash].queue.shift();
+    if (next) {
+      getPeers(infoHash, next);
+    }
+  }, 1);
 
   setTimeout(function () {
     console.log('Done crawling ' + infoHash + '.');
+
+    clearInterval(crawling);
 
     var peers = _.keys(jobs[infoHash].peers);
     var nodes = _.keys(jobs[infoHash].nodes);
@@ -158,8 +170,10 @@ var crawl = function (infoHash, callback) {
   // Routers provided by BitTorrent, Inc. are sometimes down. This way we
   // ensure that we corrently enter the DHT network. Otherwise, we might not get
   // a single peer/ node.
-  _.each(BOOTSTRAP_NODES, function (addr) {
-    getPeers(infoHash, addr);
+  _.times(5, function () {
+    _.each(BOOTSTRAP_NODES, function (addr) {
+      jobs[infoHash].queue.push(addr);
+    });
   });
 };
 
