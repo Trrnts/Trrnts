@@ -91,14 +91,17 @@ socket.on('message', function (msg, rinfo) {
     });
   }
   if (msg.r && msg.r.nodes && Buffer.isBuffer(msg.r.nodes)) {
+    var createGetPeers = function (node) {
+      return function () {
+        getPeers(infoHash, node);
+      };
+    };
     for (var i = 0; i < msg.r.nodes.length; i += 26) {
       var node = compact2string(msg.r.nodes.slice(i + 20, i + 26));
       if (node && jobs[infoHash]) {
         console.log('Found new node ' + node + ' for ' + infoHash);
         jobs[infoHash].nodes[node] = true;
-        setImmediate(function () {
-          getPeers(infoHash, node);
-        });
+        setImmediate(createGetPeers(node));
       }
     }
   }
