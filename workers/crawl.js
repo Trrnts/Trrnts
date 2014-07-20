@@ -82,10 +82,11 @@ socket.on('message', function (msg, rinfo) {
     _.each(msg.r.values, function (peer) {
       peer = compact2string(peer);
       if (peer && jobs[infoHash]) {
-        console.log('Found new peer ' + node + ' for ' + infoHash);
+        console.log('Found new peer ' + peer + ' for ' + infoHash);
         jobs[infoHash].peers[peer] = true;
-        jobs[infoHash].queue.push(peer);
-        // getPeers(infoHash, peer);
+        setImmediate(function () {
+          getPeers(infoHash, peer);
+        });
       }
     });
   }
@@ -95,8 +96,9 @@ socket.on('message', function (msg, rinfo) {
       if (node && jobs[infoHash]) {
         console.log('Found new node ' + node + ' for ' + infoHash);
         jobs[infoHash].nodes[node] = true;
-        jobs[infoHash].queue.push(node);
-        // getPeers(infoHash, node);
+        setImmediate(function () {
+          getPeers(infoHash, node);
+        });
       }
     }
   }
@@ -135,21 +137,11 @@ var crawl = function (infoHash, callback) {
 
   jobs[infoHash] = {
     peers: {},
-    nodes: {},
-    queue: []
+    nodes: {}
   };
-
-  var crawling = setInterval(function () {
-    var next = jobs[infoHash].queue.shift();
-    if (next) {
-      getPeers(infoHash, next);
-    }
-  }, 1);
 
   setTimeout(function () {
     console.log('Done crawling ' + infoHash + '.');
-
-    clearInterval(crawling);
 
     var peers = _.keys(jobs[infoHash].peers);
     var nodes = _.keys(jobs[infoHash].nodes);
@@ -170,11 +162,15 @@ var crawl = function (infoHash, callback) {
   // Routers provided by BitTorrent, Inc. are sometimes down. This way we
   // ensure that we corrently enter the DHT network. Otherwise, we might not get
   // a single peer/ node.
-  _.times(5, function () {
+  var kickedOff = 0;
+  var kickOff = setInterval(function () {
     _.each(BOOTSTRAP_NODES, function (addr) {
-      jobs[infoHash].queue.push(addr);
+        getPeers(infoHash, addr);
     });
-  });
+    if (kickedOff++ === 5) {
+      clearInterval(kickOff);
+    }
+  }, 1);
 };
 
 module.exports = exports = crawl;
