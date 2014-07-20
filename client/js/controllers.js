@@ -149,11 +149,14 @@ angular.module('trrntsApp.controllers', [])
 }])
 
 .controller('WorldMapController', ['$scope', 'GeoFactory', function ($scope, GeoFactory) {
-  $scope.locations = [];
-
+  $scope.latAndLong = {};
+  $scope.gotLL = false;
   $scope.getLatAndLong = function () {
     GeoFactory.getLatAndLong().then(function (results) {
-      $scope.locations.push(results.data);
+      $scope.latAndLong = results.data;
+      $scope.gotLL = true;
+    }).catch(function (err) {
+      console.log(err);
     });
   };
 

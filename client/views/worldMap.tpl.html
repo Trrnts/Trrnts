@@ -1,6 +1,6 @@
 <section ng-controller="WorldMapController">
-  <div ng-repeat="location in locations">
-    <div world-map ></div>
+  <div ng-if="gotLL" >
+    <div world-map ng-model='latAndLong'></div>
   </div>
   <svg donut-chart></svg>
 </section>
