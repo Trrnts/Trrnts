@@ -20,7 +20,7 @@ locations.getByCity = function (number, callback) {
 };
 
 var getData = function(type, number, callback) {
-  redis.ZRANGE(['geo:' + type, 0, number, 'WITHSCORES'], function (err, results) {
+  redis.ZREVRANGE(['geo:' + type, 0, number, 'WITHSCORES'], function (err, results) {
     if (err || results === null) {
       return callback(err, {});
     }

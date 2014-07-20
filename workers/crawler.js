@@ -80,7 +80,7 @@ var transactions = {};
 // This function will be invoked as soon as a node/peer sends a message. It does
 // a lot of formatting for the protocols.
 socket.on('message', function (msg, rinfo) {
-  console.log('Received message from ' + rinfo.address);
+  //console.log('Received message from ' + rinfo.address);
   msg = decode(msg);
   var transactionId = Buffer.isBuffer(msg.t) && msg.t.length === 2 && msg.t.readUInt16BE(0);
   var infoHash = transactions[transactionId];
@@ -88,6 +88,7 @@ socket.on('message', function (msg, rinfo) {
     console.log('Unknown transaction for ' + transactionId + ' from ' + rinfo.address + ':' + rinfo.port);
     return;
   }
+  console.log('msg.r.values', msg.r.values);
   if (msg.r && msg.r.values) {
     _.each(msg.r.values, function (peer) {
       peer = compact2string(peer);
@@ -99,14 +100,14 @@ socket.on('message', function (msg, rinfo) {
         geo.city = geo.city || '?';
         geo.ll = geo.ll || ['?', '?'];
         geo.ll = geo.ll.join(',');
-
+        console.log("how far before you drop >>>>>>>>>>>>>>>>>>>");
         redis.pfadd('peers', peer, function (err, added) {
           if (added > 0) {
             redis.zincrby('geo:countries', 1, geo.country);
             redis.zincrby('geo:regions', 1, geo.region);
             redis.zincrby('geo:cities', 1, geo.city);
             redis.zincrby('geo:ll', 1, geo.ll);
-            console.log('added a location');
+            console.log('added a location <<<<<<<<<<<<<<<<<<<<<<<');
           }
         });
 

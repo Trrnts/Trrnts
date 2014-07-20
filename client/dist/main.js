@@ -308,6 +308,58 @@ angular.module('trrntsApp.directives', [])
       map.bubbles(llStats);
     },
   };
+})
+
+.directive('donutChart', function () {
+  return {
+    restrict : 'A',
+    link : function (scope, element, attrs) {    
+      element = element[0];
+      var dataset = scope[attrs.dataType] || [10,20,30,40,50];
+      var radius = 100,
+          width = radius * 2,
+          height = radius * 2;
+          outerRadius = width / 2;
+          innerRadius = width / 3;
+      var pie = d3.layout.pie()
+                  .sort(null)
+                  .value(function (d) { return d; });
+
+      var arc = d3.svg.arc()
+                  .outerRadius(outerRadius)
+                  .innerRadius(innerRadius);
+    
+      var svg = d3.select(element)
+                  .attr('width', width)
+                  .attr('height', height);
+      
+      var color = d3.scale.category10();
+
+      var arcs = svg.selectAll('g.arc')
+         .data(pie(dataset))
+         .enter()
+         .append('g')
+         .attr('class', 'arc')
+         .attr('transform', 'translate(' + outerRadius + ',' +
+                                           innerRadius + ')');
+
+      arcs.append("path")
+          .attr("fill", function(d, i) {
+            return color(i);
+          })
+          .attr("d", arc);   
+      
+      arcs.append('text')
+          .attr('transform', function (d) {
+            return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr('text-anchor', 'middle')
+          .text(function (d) {
+            return d.value;
+          });
+    }
+
+  };  
 });
 
 angular.module('trrntsApp.filters', [])
@@ -428,12 +480,13 @@ angular.module('trrntsApp.services', [])
 
 .factory('GeoFactory', ['$http', function ($http) {
   // Return All Lat&Long witht the total peers from respective Lat&Long
-  var getLL = function () {
+  var getLL = function (amount) {
     return $http({
       method:'GET',
       url:'api/locations',
       params: {
-        query: 'LatAndLong'
+        query: 'LatAndLong',
+        number: amount
       }
     });
   };
