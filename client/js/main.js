@@ -6,7 +6,8 @@ angular.module('trrntsApp.main', [
   'trrntsApp.controllers',
   'trrntsApp.services',
   'trrntsApp.directives',
-  'trrntsApp.filters'
+  'trrntsApp.filters',
+  'infinite-scroll'
 ])
 .config(['$stateProvider',function ($stateProvider) {
 
