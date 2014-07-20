@@ -184,7 +184,7 @@ angular.module('trrntsApp.controllers', [])
     });
   };
 
-  $scope.getLatAndLong(20);
+  $scope.getLatAndLong(100);
   $scope.getCountries(20);
   $scope.getCities(10);
 }]);
