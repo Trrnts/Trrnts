@@ -129,7 +129,7 @@ angular.module('trrntsApp.directives', [])
       map.bubbles(llStats, {
         popupTemplate: function (geo, data) {
           return '<div class="hoverinfo"> Total Number of Torrents: <strong>' + 
-                                              data.radius + '</strong></div>';
+                                              data.torrentsTotal + '</strong></div>';
         }
       });
     },
