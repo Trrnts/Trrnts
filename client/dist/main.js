@@ -288,15 +288,19 @@ angular.module('trrntsApp.main', [
   'trrntsApp.filters'
 ])
 .config(['$stateProvider',function ($stateProvider) {
+
+  // This is our default state, here we load the templates and the subviews
   $stateProvider
     .state('trrntsApp.main', {
       url: '',
       views:{
         '': {
           templateUrl: 'views/main.tpl.html',
-          controller: ['$scope', '$state', function( $scope, $state) {
-               $state.go('trrntsApp.main.top');
-          }],
+          // We need this line in order to set the default child view that
+          // will be inserted into <div ui-view></div> inside the main template
+          controller: ['$state', function($state) {
+            $state.go('trrntsApp.main.top');
+          }]
         },
 
         'searchMagnets@trrntsApp.main': {
@@ -310,6 +314,9 @@ angular.module('trrntsApp.main', [
         }
       }
     })
+
+  // Everything defined as 'trrntsApp.main.STATE_NAME' will
+  // become a child from trrntsApp.main
   .state('trrntsApp.main.top', {
     url:'/top',
     templateUrl: 'views/topMagnets.tpl.html',
