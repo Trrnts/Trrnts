@@ -34,16 +34,8 @@ angular.module('trrntsApp.controllers', [])
 
 .controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
   $scope.perPage = 10;
-  $scope.start = 1;
+  $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
-
-  $scope.hasPrev = function () {
-    return $scope.start > 1;
-  };
-
-  $scope.hasNext = function () {
-    return true;
-  };
 
   $scope.latest = [];
 
@@ -56,34 +48,13 @@ angular.module('trrntsApp.controllers', [])
   };
 
   update();
-
-  $scope.next = function () {
-    $scope.start += $scope.perPage;
-    $scope.stop += $scope.perPage;
-    update();
-  };
-
-  $scope.prev = function () {
-    $scope.start -= $scope.perPage;
-    $scope.stop -= $scope.perPage;
-    update();
-  };
 }])
 
 .controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
   $scope.perPage = 10;
-  $scope.start = 1;
+  $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
   $scope.top = [];
-
-  $scope.hasPrev = function () {
-    return $scope.start > 1;
-  };
-
-  $scope.hasNext = function () {
-    return $scope.top.length === $scope.perPage;
-  };
-
 
   var update = function () {
     MagnetLinksFactory.top($scope.start, $scope.stop).then(function (result) {
@@ -95,18 +66,6 @@ angular.module('trrntsApp.controllers', [])
   };
 
   update();
-
-  $scope.next = function () {
-    $scope.start += $scope.perPage;
-    $scope.stop += $scope.perPage;
-    update();
-  };
-
-  $scope.prev = function () {
-    $scope.start -= $scope.perPage;
-    $scope.stop -= $scope.perPage;
-    update();
-  };
 }])
 
 .controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
@@ -314,7 +273,7 @@ angular.module('trrntsApp.filters', [])
 .filter('agoFilter', function () {
   return function (timestamp) {
     timestamp = parseInt(timestamp);
-    return moment(timestamp).fromNow() + ' ago';
+    return moment(timestamp).fromNow();
   };
 });
 
