@@ -70,9 +70,33 @@ angular.module('trrntsApp.services', [])
     });
   };
 
+  var getCountry = function (amount) {
+    return $http({
+      method:'GET',
+      url:'api/locations',
+      params: {
+        query: 'Country',
+        number: amount
+      }
+    });
+  };
+
+  var getCity = function (amount) {
+    return $http({
+      method:'GET',
+      url:'api/locations',
+      params: {
+        query: 'City',
+        number: amount
+      }
+    });
+  };
+
 
   return {
-    getLatAndLong : getLL
+    getLatAndLong : getLL,
+    getCountries : getCountry,
+    getCities : getCity,
   };
 
 }]);

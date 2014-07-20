@@ -134,4 +134,75 @@ angular.module('trrntsApp.directives', [])
       });
     },
   };
+})
+
+.directive('donutChart', function () {
+  return {
+    restrict : 'A',
+    link : function (scope, element, attrs) {
+      element = element[0];
+      var data = [];
+      console.log(scope.countries, attrs.donutType);
+      var dataset = scope[attrs.donutType] || [10,20,30,40,50];
+      if (!Array.isArray(dataset) && typeof(dataset) === 'object') {
+        for (var key in dataset) {
+          if (key !== '?') {
+            data.push({
+                        'label' : key,
+                        'value' : dataset[key]
+                      });
+          }
+        }
+      } else {
+        data = dataset;
+      }
+
+      var radius = 200,
+          width = radius * 2,
+          height = radius * 2;
+          outerRadius = width / 2;
+          innerRadius = width / 3;
+      var pie = d3.layout.pie()
+                  .sort(null)
+                  .value(function (d) {
+                    return d.value || d;
+                  });
+
+      var arc = d3.svg.arc()
+                  .outerRadius(outerRadius)
+                  .innerRadius(innerRadius);
+
+      var svg = d3.select(element)
+                  .attr('width', width)
+                  .attr('height', height)
+                  .append("g")
+                  .attr("transform", "translate(" + 0 + "," +
+                                                    height / 6 + ")");
+
+      var color = d3.scale.category20();
+
+      var arcs = svg.selectAll('g.arc')
+         .data(pie(data))
+         .enter()
+         .append('g')
+         .attr('class', 'arc')
+         .attr('transform', 'translate(' + outerRadius + ',' +
+                                           innerRadius + ')');
+
+      arcs.append("path")
+          .attr("fill", function(d, i) {
+            return color(i);
+          })
+          .attr("d", arc);
+
+      arcs.append('text')
+          .attr('transform', function (d) {
+            return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr('text-anchor', 'middle')
+          .text(function (d) {
+            return d.data.label;
+          });
+    }
+  };
 });

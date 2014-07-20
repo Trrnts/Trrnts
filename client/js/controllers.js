@@ -150,7 +150,13 @@ angular.module('trrntsApp.controllers', [])
 
 .controller('WorldMapController', ['$scope', 'GeoFactory', function ($scope, GeoFactory) {
   $scope.latAndLong = {};
+  $scope.countries = {};
+  $scope.cities = {};
+
   $scope.gotLL = false;
+  $scope.gotCountries = false;
+  $scope.gotCities = false;
+
   $scope.getLatAndLong = function (amount) {
     GeoFactory.getLatAndLong(amount).then(function (results) {
       $scope.latAndLong = results.data;
@@ -160,5 +166,25 @@ angular.module('trrntsApp.controllers', [])
     });
   };
 
+  $scope.getCountries = function (amount) {
+    GeoFactory.getCountries(amount).then(function (results) {
+      $scope.countries = results.data;
+      $scope.gotCountries = true;
+    }).catch(function (err) {
+      console.log(err);
+    });
+  };
+
+  $scope.getCities = function (amount) {
+    GeoFactory.getCities(amount).then(function (results) {
+      $scope.cities = results.data;
+      $scope.gotCities = true;
+    }).catch(function (err) {
+      console.log(err);
+    });
+  };
+
   $scope.getLatAndLong(20);
+  $scope.getCountries(20);
+  $scope.getCities(10);
 }]);

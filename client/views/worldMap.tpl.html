@@ -1,3 +1,5 @@
 <section ng-controller="WorldMapController">  
-    <div world-map ng-if="gotLL" ng-model='latAndLong' style="height:600px"></div>  
+    <div world-map ng-if="gotLL" ng-model="latAndLong" style="height:600px"></div>  
+    <svg donut-chart donut-type="countries" ng-if="gotCountries" ng-model="countries"></svg>
+    <svg donut-chart donut-type="cities" ng-if="gotCities" ng-model="cities"></svg>
 </section>
