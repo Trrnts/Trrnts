@@ -62,13 +62,15 @@ magnets.create = function (ip, magnetURI, callback) {
       magnet.infoHash = parsedMagnetURI.infoHash;
       magnet.createdAt = _.now();
       magnet.magnetURI = magnetURI;
-      magnet.score = -1;
+      magnet.peers = -1;
 
       redis.hmset('magnet:' + magnet.infoHash, magnet);
-      redis.zadd('magnets:top', magnet.score, magnet.infoHash);
+      redis.zadd('magnets:top', magnet.peers, magnet.infoHash);
       redis.zadd('magnets:latest', magnet.createdAt, magnet.infoHash);
       redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
       redis.sadd('magnets:all', magnet.infoHash);
+
+      redis.rpush('magnets:crawl', magnet.infoHash);
 
       magnets.index(magnet);
       callback(null, magnet);
@@ -84,7 +86,32 @@ magnets.readList = function (list, start, stop, callback) {
 };
 
 // readMagnet('chkdewyduewdg') #=> get a single magnet link
-magnets.readMagnet = util.infoHashesToMagnets;
+magnets.readMagnet = function (infoHash, callback) {
+  util.infoHashesToMagnets(infoHash, function (err, magnets) {
+    var magnet = magnets[0];
+    if (magnet === undefined) {
+      return callback(new Error('Unknown magnet'));
+    }
+    redis.lrange('magnet:' + magnet.infoHash + ':comments', 0, -1, function (err, comments) {
+      magnet.comments = _.map(comments, JSON.parse);
+      callback(null, magnet);
+    });
+  });
+};
+
+// commentMagnet('erfienrfeor', '123.456.789.012', 'Great movie') #=> comment a magnet link
+magnets.commentMagnet = function (infoHash, ip, text, callback) {
+  redis.exists('magnet:' + infoHash, function (err, exists) {
+    if (!exists) {
+      return callback(new Error('Unknown magnet'));
+    }
+    redis.lpush('magnet:' + infoHash + ':comments', JSON.stringify({
+      ip: ip,
+      text: text,
+      createdAt: _.now()
+    }), callback);
+  });
+};
 
 // search('Game of Thrones') #=> get all torrents that have those words, case-sensitive
 magnets.search = function (query, start, stop, callback) {

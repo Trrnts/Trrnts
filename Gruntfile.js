@@ -45,9 +45,15 @@ module.exports = function(grunt) {
     },
 
     watch: {
-      scripts: {
+      options: {
+        livereload: true
+      },
+      controllers: {
         tasks: ['buildClient'],
         files: ['client/js/**/*.js']
+      },
+      templates: {
+        files:['client/views/**/*.tpl.html']
       }
     }
   });
