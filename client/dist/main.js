@@ -341,25 +341,13 @@ angular.module('trrntsApp.main', [
 .config(['$stateProvider',function ($stateProvider) {
   $stateProvider
     .state('trrntsApp.main', {
-      url: '/',
+      url: '',
       views:{
         '': {
-          templateUrl: 'views/main.tpl.html'
-        },
-
-        'submitMagnet@trrntsApp.main': {
-          templateUrl: 'views/submitMagnet.tpl.html',
-          controller: 'SubmitMagnetLinkController'
-        },
-
-        'topMagnets@trrntsApp.main': {
-          templateUrl: 'views/topMagnets.tpl.html',
-          controller: 'TopMagnetLinksController'
-        },
-
-        'latestMagnets@trrntsApp.main': {
-          templateUrl: 'views/latestMagnets.tpl.html',
-          controller: 'LatestMagnetLinksController'
+          templateUrl: 'views/main.tpl.html',
+          controller: ['$scope', '$state', function( $scope, $state) {
+               $state.go('trrntsApp.main.top');
+          }],
         },
 
         'searchMagnets@trrntsApp.main': {
@@ -367,13 +355,27 @@ angular.module('trrntsApp.main', [
           controller: 'SearchMagnetLinksController'
         },
 
-        'worldMap@trrntsApp.main': {
-          templateUrl: 'views/worldMap.tpl.html',
-          controller: 'WorldMapController'
+        'submitMagnet@trrntsApp.main': {
+          templateUrl: 'views/submitMagnet.tpl.html',
+          controller: 'SubmitMagnetLinkController'
         }
-
       }
-    });
+    })
+  .state('trrntsApp.main.top', {
+    url:'/top',
+    templateUrl: 'views/topMagnets.tpl.html',
+    controller: 'TopMagnetLinksController'
+  })
+  .state('trrntsApp.main.latest', {
+    url:'/latest',
+    templateUrl: 'views/latestMagnets.tpl.html',
+    controller: 'TopMagnetLinksController'
+  })
+  .state('trrntsApp.main.map', {
+    url:'/map',
+    templateUrl: 'views/worldMap.tpl.html',
+    controller: 'WorldMapController'
+  });
 }]);
 
 angular.module('trrntsApp.services', [])
