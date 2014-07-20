@@ -2,25 +2,25 @@ var locations = {},
     _ = require('lodash'),
     redis = require('../redis')();
 
-locations.getByLatAndLong = function (callback) {
+locations.getByLatAndLong = function (number, callback) {
   // get all lls 
-  getData('ll', callback);
+  getData('ll', number, callback);
 };
 
-locations.getByCountry = function (callback) {
-  getData('countries', callback);
+locations.getByCountry = function (number, callback) {
+  getData('countries', number, callback);
 };
 
-locations.getByRegion = function (callback) {
-  getData('regions', callback);
+locations.getByRegion = function (number, callback) {
+  getData('regions', number, callback);
 };
 
-locations.getByCity = function (callback) {
-  getData('cities', callback);
+locations.getByCity = function (number, callback) {
+  getData('cities', number, callback);
 };
 
-var getData = function(type, callback) {
-  redis.ZRANGE(['geo:' + type, 0, -1, 'WITHSCORES'], function (err, results) {
+var getData = function(type, number, callback) {
+  redis.ZRANGE(['geo:' + type, 0, number, 'WITHSCORES'], function (err, results) {
     if (err || results === null) {
       return callback(err, {});
     }
