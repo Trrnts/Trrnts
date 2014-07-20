@@ -151,8 +151,8 @@ angular.module('trrntsApp.controllers', [])
 .controller('WorldMapController', ['$scope', 'GeoFactory', function ($scope, GeoFactory) {
   $scope.latAndLong = {};
   $scope.gotLL = false;
-  $scope.getLatAndLong = function () {
-    GeoFactory.getLatAndLong().then(function (results) {
+  $scope.getLatAndLong = function (amount) {
+    GeoFactory.getLatAndLong(amount).then(function (results) {
       $scope.latAndLong = results.data;
       $scope.gotLL = true;
     }).catch(function (err) {
@@ -160,5 +160,5 @@ angular.module('trrntsApp.controllers', [])
     });
   };
 
-  $scope.getLatAndLong();
+  $scope.getLatAndLong(20);
 }]);
