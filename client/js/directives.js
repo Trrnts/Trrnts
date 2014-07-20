@@ -124,7 +124,12 @@ angular.module('trrntsApp.directives', [])
 
       // Generate Stats
       var llStats = generateStats(scope.location);
-      map.bubbles(llStats);
+      map.bubbles(llStats, {
+        popupTemplate: function (geo, data) {
+          return '<div class="hoverinfo"> Total Number of Torrents: <strong>' + 
+                                              data.radius + '</strong></div>';
+        }
+      });
     },
   };
 });

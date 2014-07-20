@@ -167,11 +167,14 @@ angular.module('trrntsApp.controllers', [])
 }])
 
 .controller('WorldMapController', ['$scope', 'GeoFactory', function ($scope, GeoFactory) {
-  $scope.locations = [];
-
+  $scope.latAndLong = {};
+  $scope.gotLL = false;
   $scope.getLatAndLong = function () {
     GeoFactory.getLatAndLong().then(function (results) {
-      $scope.locations.push(results.data);
+      $scope.latAndLong = results.data;
+      $scope.gotLL = true;
+    }).catch(function (err) {
+      console.log(err);
     });
   };
 
@@ -274,8 +277,8 @@ angular.module('trrntsApp.directives', [])
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {
-      console.log(scope);
-      var update = function (lls) {
+
+      var generateStats = function (lls) {
         var formatedLLs = [];
         for (var ll in lls) {
           var bubble = {
@@ -283,10 +286,10 @@ angular.module('trrntsApp.directives', [])
             radius :  lls[ll]
           };
 
-          var llArr = ll.split(',');
-          bubble.latitude = llArr[0];
-          bubble.longitude = llArr[1];
-          if (llArr.length > 1) {
+          var latAndLong = ll.split(',');
+          bubble.latitude = latAndLong[0];
+          bubble.longitude = latAndLong[1];
+          if (latAndLong.length > 1) {
             formatedLLs.push(bubble);
           }
         }
@@ -303,63 +306,15 @@ angular.module('trrntsApp.directives', [])
       });
 
       // Generate Stats
-      var llStats = update(scope.location);
-      console.log(llStats, "location");
-      map.bubbles(llStats);
+      var llStats = generateStats(scope.location);
+      map.bubbles(llStats, {
+        popupTemplate: function (geo, data) {
+          return '<div class="hoverinfo"> Total Number of Torrents: <strong>' + 
+                                              data.radius + '</strong></div>';
+        }
+      });
     },
   };
-})
-
-.directive('donutChart', function () {
-  return {
-    restrict : 'A',
-    link : function (scope, element, attrs) {    
-      element = element[0];
-      var dataset = scope[attrs.dataType] || [10,20,30,40,50];
-      var radius = 100,
-          width = radius * 2,
-          height = radius * 2;
-          outerRadius = width / 2;
-          innerRadius = width / 3;
-      var pie = d3.layout.pie()
-                  .sort(null)
-                  .value(function (d) { return d; });
-
-      var arc = d3.svg.arc()
-                  .outerRadius(outerRadius)
-                  .innerRadius(innerRadius);
-    
-      var svg = d3.select(element)
-                  .attr('width', width)
-                  .attr('height', height);
-      
-      var color = d3.scale.category10();
-
-      var arcs = svg.selectAll('g.arc')
-         .data(pie(dataset))
-         .enter()
-         .append('g')
-         .attr('class', 'arc')
-         .attr('transform', 'translate(' + outerRadius + ',' +
-                                           innerRadius + ')');
-
-      arcs.append("path")
-          .attr("fill", function(d, i) {
-            return color(i);
-          })
-          .attr("d", arc);   
-      
-      arcs.append('text')
-          .attr('transform', function (d) {
-            return "translate(" + arc.centroid(d) + ")";
-          })
-          .attr('text-anchor', 'middle')
-          .text(function (d) {
-            return d.value;
-          });
-    }
-
-  };  
 });
 
 angular.module('trrntsApp.filters', [])
