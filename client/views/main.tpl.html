@@ -11,6 +11,8 @@
   </div>
 </header>
 
+
+<!-- Here we add the routes that will be -->
 <nav class="navbar navbar-inverse" role="navigation">
     <ul class="nav navbar-nav">
         <li><a ui-sref=".top">Home</a></li>
@@ -21,10 +23,11 @@
 
 
 
-<!-- Add all the subviews you need  -->
+<!-- Add all the subviews you need, this is the order of how they will appear -->
 
 <div ui-view="searchMagnets"></div>
 
+<!-- This div will be filled up with whatever child view is selected -->
 <div ui-view></div>
 
 <div ui-view="submitMagnet"></div>
