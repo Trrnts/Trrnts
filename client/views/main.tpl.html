@@ -11,13 +11,22 @@
   </div>
 </header>
 
+<nav class="navbar navbar-inverse" role="navigation">
+    <ul class="nav navbar-nav">
+        <li><a ui-sref=".top">Home</a></li>
+        <li><a ui-sref=".latest">Latest Magnets</a></li>
+        <li><a ui-sref=".map">Map</a></li>
+    </ul>
+</nav>
+
+
 
 <!-- Add all the subviews you need  -->
 
 <div ui-view="searchMagnets"></div>
-<div ui-view="topMagnets"></div>
-<div ui-view="latestMagnets"></div>
-<div ui-view="worldMap"></div>
+
+<div ui-view></div>
+
 <div ui-view="submitMagnet"></div>
 
 <footer>The front page for the BitTorrent network, providing insights through interactive analytics and data visualizations that leverage the DHT protocol.</footer>
