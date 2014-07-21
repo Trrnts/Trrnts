@@ -389,8 +389,8 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
   background-color: #fff;
   box-shadow: 4px 4px 80px #000;
 
-  animation: slideInLeft 2s;
-  -webkit-animation: slideInLeft 2s;
+  animation: slideInLeft 1s;
+  -webkit-animation: slideInLeft 1s;
 }
 .ng-modal-dialog-content {
   padding:10px;
