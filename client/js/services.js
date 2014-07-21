@@ -55,4 +55,20 @@ angular.module('trrntsApp.services', [])
     top: top,
     search:search
   };
+}])
+.factory('SharedService', ['$rootScope', function($rootScope) {
+    var sharedService = {};
+
+    sharedService.selectedMagnet = 'default';
+
+    sharedService.prepForBroadcast = function(newMagnet) {
+        this.selectedMagnet = newMagnet;
+        this.broadcastItem();
+    };
+
+    sharedService.broadcastItem = function() {
+        $rootScope.$broadcast('handleBroadcast');
+    };
+
+    return sharedService;
 }]);
