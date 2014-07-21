@@ -178,12 +178,11 @@ article .score {
 
 article h3 {
   margin: 0;
+  font-weight: 600;
+  text-shadow: 1px 1px #eee;
 }
 
 article h3 a {
-  font-weight: 600;
-  margin: 0;
-  text-shadow: 1px 1px #eee;
   color: #444;
 }
 
@@ -326,8 +325,20 @@ At least it tries to...
 Style modal box.
 */
 .detailed {
+  padding: 0;
+}
+
+.detailed header {
+  padding: 1em;
+  margin: 0;
+  background: #f9f9f9;
+  border-bottom: 1px solid #eee;
+}
+
+.detailed dl {
   padding: 1em;
 }
+
 .ng-modal-overlay {
   /* A dark translucent div that covers the whole screen */
   position:fixed;
