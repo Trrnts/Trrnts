@@ -240,7 +240,7 @@ angular.module('trrntsApp.directives', [])
         .attr('class', 'd3-tip')
         .offset([-20-10, 0])
         .html(function(d) {
-          return '<div>Total Number of Torrents For Country: <strong> ' + d.value + '</strong></div>';
+          return '<div>Total Number of Torrents: <strong> ' + d.value + '</strong></div>';
         });
 
       var radius = attrs.donutRadius || 200,
