@@ -46,23 +46,27 @@ angular.module('trrntsApp.main', [
   // Everything defined as 'trrntsApp.main.STATE_NAME' will
   // become a child from trrntsApp.main
   .state('trrntsApp.main.top', {
-    url:'/top',
+    url: '/top',
     templateUrl: 'views/topMagnets.tpl.html',
     controller: 'TopMagnetLinksController'
   })
   .state('trrntsApp.main.latest', {
-    url:'/latest',
+    url: '/latest',
     templateUrl: 'views/latestMagnets.tpl.html',
     controller: 'TopMagnetLinksController'
   })
   .state('trrntsApp.main.stats', {
-    url:'/stats',
+    url: '/stats',
     templateUrl: 'views/worldMap.tpl.html',
     controller: 'WorldMapController'
   })
   .state('trrntsApp.main.submit', {
-    url:'/submit',
+    url: '/submit',
     templateUrl: 'views/submitMagnet.tpl.html',
     controller: 'SubmitMagnetLinkController'
+  })
+  .state('trrntsApp.main.about', {
+    url: '/about',
+    templateUrl: 'views/about.tpl.html'
   });
 }]);
