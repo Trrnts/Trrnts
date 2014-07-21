@@ -373,10 +373,12 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
 
   /* Center the dialog */
   top: 0%;
-  left: 30%;
-
+  left:30%;
   background-color: #fff;
   box-shadow: 4px 4px 80px #000;
+
+  animation: slideInLeft 2s;
+  -webkit-animation: slideInLeft 2s;
 }
 .ng-modal-dialog-content {
   padding:10px;
@@ -392,4 +394,25 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
   display: inline-block;
   font-weight: bold;
   font-family: 'arial', 'sans-serif';
+}
+
+@keyframes slideInLeft {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+
+@-webkit-keyframes slideInLeft {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+@-moz-keyframes slideInLeft {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+@-o-keyframes slideInLeft {
+  from { left:100%; }
+  to { left:30%; }
 }

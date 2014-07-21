@@ -169,12 +169,10 @@ angular.module('trrntsApp.directives', [])
 })
 .directive('donutChart', function () {
   return {
-
     restrict : 'A',
     link : function (scope, element, attrs) {
       element = element[0];
-      var data = [];
-      console.log(scope.countries, attrs.donutType);
+      var data = [];      
       var dataset = scope[attrs.donutType] || [10,20,30,40,50];
       if (!Array.isArray(dataset) && typeof(dataset) === 'object') {
         for (var key in dataset) {
