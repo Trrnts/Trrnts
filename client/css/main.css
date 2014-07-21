@@ -207,6 +207,14 @@ Style submission form.
   color: #555;
 }
 
+.success {
+  color: #669900;
+}
+
+.error {
+  color: #990000;
+}
+
 /*
 article {
   background: #fff;
