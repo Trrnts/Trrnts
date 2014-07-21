@@ -401,8 +401,8 @@ angular.module('trrntsApp.directives', [])
       scope.hideModal = function() {
         scope.animation = 'ng-modal-dialog-slide-out';
         // Need Timeout, to Allow animation to finish'
+        $state.go('^');
         $timeout(function () {
-          $state.go('^');
           scope.show = false;
         }, 1003);
       };
