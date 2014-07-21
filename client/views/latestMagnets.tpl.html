@@ -4,9 +4,7 @@
   </header>
   <div infinite-scroll="loadMore()" infinite-scroll-distance="2" infinite-scroll-disabled="busy">
     <article ng-repeat="magnet in latest" class="pure-g magnet-display">
-      <h1 class="pure-u-1-8 score">
-        {{magnet.peerCount}}
-      </h1>
+      <h1 class="pure-u-1-8 score" counter max="{{magnet.peerCount}}"></h1>
       <main class="pure-u-7-8">
         <h3>
           <a ng-click="openModal(magnet)" ui-sref='.detail'>{{magnet.name}}</a>
@@ -16,5 +14,5 @@
     </article>
   </div>
 
-  <div ui-view autoscroll='false'></div>
+  <div ui-view autoscroll="false"></div>
 </section>
