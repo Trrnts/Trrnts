@@ -62,9 +62,14 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('SearchResultsController', ['$scope', '$stateParams', 'MagnetLinksFactory', function ($scope, $stateParams, MagnetLinksFactory) {
+.controller('SearchResultsController', ['$scope', '$stateParams', 'MagnetLinksFactory', 'SharedService', function ($scope, $stateParams, MagnetLinksFactory, SharedService) {
   $scope.results = [];
   $scope.query = $stateParams.query;
+
+  $scope.openModal = function(selectedMagnet){
+    SharedService.prepForBroadcast(selectedMagnet);
+  };
+  
   MagnetLinksFactory.search($scope.query).then(function (results) {
     $scope.results = results.data;
   });
