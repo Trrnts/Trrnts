@@ -48,12 +48,16 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+.controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', 'SharedService', function ($scope, MagnetLinksFactory, SharedService) {
   $scope.perPage = 10;
   $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
 
   $scope.top = [];
+
+  $scope.openModal = function(selectedMagnet){
+    SharedService.prepForBroadcast(selectedMagnet);
+  };
 
   $scope.loadMore = function () {
     MagnetLinksFactory.top($scope.start, $scope.stop).then(function (results) {
@@ -64,7 +68,7 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+.controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory',  function ($scope, MagnetLinksFactory) {
   $scope.search = '';
   $scope.searchResults = [];
   $scope.showResults = [];
@@ -123,6 +127,18 @@ angular.module('trrntsApp.controllers', [])
 
 .controller('WorldMapController', ['$scope', function ($scope) {
 
+}])
+
+.controller('MyCtrl', ['$scope', 'SharedService', function($scope, SharedService) {
+  $scope.modalShown = false;
+  $scope.toggleModal = function() {
+
+  };
+
+  $scope.$on('handleBroadcast', function() {
+    $scope.selectedMagnet = SharedService.selectedMagnet;
+    $scope.modalShown = !$scope.modalShown;
+  });
 }]);
 
 angular.module('trrntsApp.directives', [])
@@ -262,6 +278,26 @@ angular.module('trrntsApp.directives', [])
       map.bubbles(fakePositions);
     },
   };
+}).directive('modalDialog', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      show: '='
+    },
+    replace: true, // Replace with the template below
+    transclude: true, // we want to insert custom content inside the directive
+    link: function(scope, element, attrs) {
+      scope.dialogStyle = {};
+      if (attrs.width)
+        scope.dialogStyle.width = attrs.width;
+      if (attrs.height)
+        scope.dialogStyle.height = attrs.height;
+      scope.hideModal = function() {
+        scope.show = false;
+      };
+    },
+    template: "<div class='ng-modal' ng-show='show'><div class='ng-modal-overlay' ng-click='hideModal()'></div><div class='ng-modal-dialog' ng-style='dialogStyle'><div class='ng-modal-close' ng-click='hideModal()'>X</div><div class='ng-modal-dialog-content' ng-transclude></div></div></div>"
+  };
 });
 
 angular.module('trrntsApp.filters', [])
@@ -299,10 +335,13 @@ angular.module('trrntsApp.main', [
             $state.go('trrntsApp.main.top');
           }]
         },
-
         'searchMagnets@trrntsApp.main': {
           templateUrl: 'views/searchMagnets.tpl.html',
           controller: 'SearchMagnetLinksController'
+        },
+        'modalView@trrntsApp.main': {
+          templateUrl: 'views/detail.tpl.html',
+          controller: 'MyCtrl'
         }
       }
     })
@@ -388,4 +427,20 @@ angular.module('trrntsApp.services', [])
     top: top,
     search:search
   };
+}])
+.factory('SharedService', ['$rootScope', function($rootScope) {
+    var sharedService = {};
+
+    sharedService.selectedMagnet = 'default';
+
+    sharedService.prepForBroadcast = function(newMagnet) {
+        this.selectedMagnet = newMagnet;
+        this.broadcastItem();
+    };
+
+    sharedService.broadcastItem = function() {
+        $rootScope.$broadcast('handleBroadcast');
+    };
+
+    return sharedService;
 }]);
