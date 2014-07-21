@@ -1,5 +1,39 @@
 angular.module('trrntsApp.directives', [])
 
+.directive('counter', function () {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      var max = parseInt(attrs.max);
+      var current = 0;
+      element = element[0];
+      current = -2;
+      if (max > 100) {
+        current = max - 100;
+      }
+      var animate = function () {
+        updateColor();
+        current += 1;
+        element.textContent = current;
+        if (current < max) {
+          setTimeout(animate, 1);
+        }
+      };
+      var updateColor = function () {
+        var optacity = current/1000;
+        if (optacity < 0.2) {
+          optacity = 0.2;
+        }
+        if (optacity > 1) {
+          optacity = 0.6;
+        }
+        element.style.color = 'rgba(0, 0, 0, ' + optacity + ')';
+      };
+      animate();
+    }
+  };
+})
+
 .directive('barChart', function () {
   return {
     restrict: 'A',
@@ -97,10 +131,19 @@ angular.module('trrntsApp.directives', [])
 
       var generateStats = function (lls) {
         var formatedLLs = [];
+        var highestValue = 0;
+
+        // get Highest Value
         for (var ll in lls) {
+          if (parseInt(lls[ll]) > highestValue) {
+            highestValue = parseInt(lls[ll]);
+          }
+        }
+
+        for (ll in lls) {
           var bubble = {
             fillKey : 'torrents',
-            radius :  lls[ll] * 0.2,
+            radius :  maintainRatio(50, highestValue, lls[ll]), // Control Size by Max
             torrentsTotal: lls[ll]
           };
 
@@ -115,6 +158,10 @@ angular.module('trrntsApp.directives', [])
         return formatedLLs;
       };
 
+      var maintainRatio = function (max, highestValue, value) {
+        return Math.floor((value/highestValue) * max);
+      };
+
       var map = new Datamap({
         'element': element[0],
         fills: {
@@ -124,7 +171,6 @@ angular.module('trrntsApp.directives', [])
       });
 
       // Generate Stats
-      console.log(scope.latAndLong);
       var llStats = generateStats(scope.latAndLong);
       map.bubbles(llStats, {
         popupTemplate: function (geo, data) {
@@ -161,6 +207,7 @@ angular.module('trrntsApp.directives', [])
 
 .directive('donutChart', function () {
   return {
+
     restrict : 'A',
     link : function (scope, element, attrs) {
       element = element[0];
@@ -198,9 +245,9 @@ angular.module('trrntsApp.directives', [])
       var svg = d3.select(element)
                   .attr('width', width)
                   .attr('height', height)
-                  .append("g")
-                  .attr("transform", "translate(" + 0 + "," +
-                                                height / 6 + ")");
+                  .append('g')
+                  .attr('transform', 'translate(' + 0 + ',' +
+                                                height / 6 + ')');
 
       var color = d3.scale.category20();
 
@@ -212,15 +259,15 @@ angular.module('trrntsApp.directives', [])
          .attr('transform', 'translate(' + outerRadius + ',' +
                                            innerRadius + ')');
 
-      arcs.append("path")
-          .attr("fill", function(d, i) {
+      arcs.append('path')
+          .attr('fill', function(d, i) {
             return color(i);
           })
-          .attr("d", arc);
+          .attr('d', arc);
 
       arcs.append('text')
           .attr('transform', function (d) {
-            return "translate(" + arc.centroid(d) + ")";
+            return 'translate(' + arc.centroid(d) + ')';
           })
           .attr('text-anchor', 'middle')
           .text(function (d) {
