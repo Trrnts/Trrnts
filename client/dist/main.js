@@ -129,7 +129,7 @@ angular.module('trrntsApp.controllers', [])
 
 }])
 
-.controller('MyCtrl', ['$scope', 'SharedService', function($scope, SharedService) {
+.controller('ModalViewController', ['$scope', 'SharedService', function($scope, SharedService) {
   $scope.modalShown = false;
   $scope.toggleModal = function() {
 
