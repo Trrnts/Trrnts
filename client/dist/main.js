@@ -32,18 +32,28 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+.controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', 'SharedService', function ($scope, MagnetLinksFactory, SharedService) {
   $scope.perPage = 10;
   $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
+  $scope.busy = false;
 
   $scope.latest = [];
 
+  $scope.openModal = function(selectedMagnet){
+    SharedService.prepForBroadcast(selectedMagnet);
+  };
+
   $scope.loadMore = function () {
+    if ($scope.busy) {
+      return;
+    }
+    $scope.busy = true;
     MagnetLinksFactory.latest($scope.start, $scope.stop).then(function (results) {
       $scope.latest = $scope.latest.concat(results.data);
       $scope.start += $scope.perPage;
       $scope.stop += $scope.perPage;
+      $scope.busy = false;
     });
   };
 }])
@@ -52,6 +62,7 @@ angular.module('trrntsApp.controllers', [])
   $scope.perPage = 10;
   $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
+  $scope.busy = false;
 
   $scope.top = [];
 
@@ -60,10 +71,15 @@ angular.module('trrntsApp.controllers', [])
   };
 
   $scope.loadMore = function () {
+    if ($scope.busy) {
+      return;
+    }
+    $scope.busy = true;
     MagnetLinksFactory.top($scope.start, $scope.stop).then(function (results) {
       $scope.top = $scope.top.concat(results.data);
       $scope.start += $scope.perPage;
       $scope.stop += $scope.perPage;
+      $scope.busy = false;
     });
   };
 }])
@@ -76,9 +92,14 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('SearchResultsController', ['$scope', '$stateParams', 'MagnetLinksFactory', function ($scope, $stateParams, MagnetLinksFactory) {
+.controller('SearchResultsController', ['$scope', '$stateParams', 'MagnetLinksFactory', 'SharedService', function ($scope, $stateParams, MagnetLinksFactory, SharedService) {
   $scope.results = [];
   $scope.query = $stateParams.query;
+
+  $scope.openModal = function(selectedMagnet){
+    SharedService.prepForBroadcast(selectedMagnet);
+  };
+
   MagnetLinksFactory.search($scope.query).then(function (results) {
     $scope.results = results.data;
   });

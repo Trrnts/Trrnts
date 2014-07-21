@@ -18,6 +18,7 @@ angular.module('trrntsApp.controllers', [])
   $scope.perPage = 10;
   $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
+  $scope.busy = false;
 
   $scope.latest = [];
 
@@ -26,10 +27,15 @@ angular.module('trrntsApp.controllers', [])
   };
 
   $scope.loadMore = function () {
+    if ($scope.busy) {
+      return;
+    }
+    $scope.busy = true;
     MagnetLinksFactory.latest($scope.start, $scope.stop).then(function (results) {
       $scope.latest = $scope.latest.concat(results.data);
       $scope.start += $scope.perPage;
       $scope.stop += $scope.perPage;
+      $scope.busy = false;
     });
   };
 }])
@@ -38,6 +44,7 @@ angular.module('trrntsApp.controllers', [])
   $scope.perPage = 10;
   $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
+  $scope.busy = false;
 
   $scope.top = [];
 
@@ -46,10 +53,15 @@ angular.module('trrntsApp.controllers', [])
   };
 
   $scope.loadMore = function () {
+    if ($scope.busy) {
+      return;
+    }
+    $scope.busy = true;
     MagnetLinksFactory.top($scope.start, $scope.stop).then(function (results) {
       $scope.top = $scope.top.concat(results.data);
       $scope.start += $scope.perPage;
       $scope.stop += $scope.perPage;
+      $scope.busy = false;
     });
   };
 }])
@@ -69,7 +81,7 @@ angular.module('trrntsApp.controllers', [])
   $scope.openModal = function(selectedMagnet){
     SharedService.prepForBroadcast(selectedMagnet);
   };
-  
+
   MagnetLinksFactory.search($scope.query).then(function (results) {
     $scope.results = results.data;
   });
