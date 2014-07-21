@@ -117,7 +117,7 @@ router.get('/magnets', function (req, res, next) {
 
 router.get('/locations', function (req, res, next) {
   var type = req.query.query;
-  var number = req.query.number || -1;
+  var number = req.query.number || -1; // if amount not specified, return everything
   if (['LatAndLong', 'Country', 'Region', 'City'].indexOf(type) === -1) {
     return next();
   }

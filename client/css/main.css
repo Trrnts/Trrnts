@@ -404,6 +404,7 @@ Style modal box.
 }
 
 
+/* Animations For Sliding In Modal View */
 @keyframes slide-in-left {
   from { left:100%; }
   to { left:30%; }
@@ -429,7 +430,7 @@ Style modal box.
   to { left:100%; }
 }
 
-
+/* Animations For Sliding Out Modal View */
 @keyframes slide-out-right {
   from { left:30%; }
   to { left:100%; }
