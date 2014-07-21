@@ -1,24 +1,16 @@
-<section class="search pure-g" ng-controller="SearchMagnetLinksController">
-  <form class="submit" ng-submit="submit()">
-    <input type="text" ng-model="search" placeholder="Search For A Torrent" required>
-    <button>Search</button><br>
-  </form>
-  <div class="search-results" ng-show="hasBeenSubmitted" ng-model="hasBeenSubmitted">
-    <header class="pure-u-1">
-      <h2>Search Results:</h2>
-    </header>
-    <article class="pure-u-1 pure-u-md-1-2" ng-repeat="magnet in showResults">
-      <h3><a href="{{magnet.magnetURI}}">{{magnet.name}}</a></h3>
-      <div class="pure-g">
-        <div class="pure-u-1-2"></div>
-        <div class="pure-u-1-2 ago">
-          <small>{{magnet.createdAt | agoFilter}}</small>
-        </div>
-      </div>
-    </article>
-    <nav class="pure-u-1 pagination">
-      <button ng-disabled="!hasPrev()" ng-click="prev()">← Previous</button>
-      <button ng-disabled="!hasNext()" ng-click="next()">Next →</button>
-    </nav>
-  </div>
+<section class="search-results" ng-controller="SearchResultsController">
+  <header>
+    <h2>Results for {{query}}</h2>
+  </header>
+  <article ng-repeat="magnet in results" class="pure-g">
+    <h1 class="pure-u-1-8 score">
+      {{magnet.peerCount}}
+    </h1>
+    <main class="pure-u-7-8">
+      <h3>
+        <a ng-click="openModal(magnet)" href="{{magnet.magnetURI}}">{{magnet.name}}</a>
+      </h3>
+      <small class="ago">submitted {{magnet.createdAt | agoFilter}}</small>
+    </main>
+  </article>
 </section>

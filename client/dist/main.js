@@ -68,62 +68,47 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory',  function ($scope, MagnetLinksFactory) {
-  $scope.search = '';
-  $scope.searchResults = [];
-  $scope.showResults = [];
-  $scope.perPage = 10;
-  $scope.start = 0;
-  $scope.hasBeenSubmitted = false;
-
-  var reset = function () {
-      $scope.start = 0;
-  };
-
-  $scope.hasPrev = function () {
-    return $scope.start > 1;
-  };
-
-  $scope.hasNext = function () {
-    return $scope.searchResults.length > $scope.start + $scope.perPage;
-  };
-
-  var update = function () {
-    var toShow = 0;
-    $scope.showResults = [];
-    if ($scope.hasNext()) {
-      toShow = $scope.perPage;
-    } else {
-      toShow = $scope.searchResults.length - $scope.start;
-    }
-
-    for (var i = 0 ; i < toShow; i++) {
-      $scope.showResults[i] = $scope.searchResults[$scope.start + i];
-    }
-  };
-
-  $scope.next = function () {
-    $scope.start += $scope.perPage;
-    update();
-  };
-
-  $scope.prev = function () {
-    $scope.start -= $scope.perPage;
-    update();
-  };
-
-  $scope.submit = function () {
-    MagnetLinksFactory.search($scope.search).then(function (result) {
-      $scope.searchResults = result.data;
-      console.log($scope.searchResults.length, "length");
-      reset();
-      update();
-    }).catch(function () {
-      $scope.showResults = [];
+.controller('SearchBoxController', ['$scope', '$state', function ($scope, $state) {
+  $scope.search = function () {
+    $state.go('trrntsApp.main.search', {
+      query: $scope.query
     });
-    $scope.hasBeenSubmitted = true;
   };
 }])
+
+.controller('SearchResultsController', ['$scope', '$stateParams', 'MagnetLinksFactory', function ($scope, $stateParams, MagnetLinksFactory) {
+  $scope.results = [];
+  $scope.query = $stateParams.query;
+  MagnetLinksFactory.search($scope.query).then(function (results) {
+    $scope.results = results.data;
+  });
+}])
+
+//
+// .controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', '$state', function ($scope, MagnetLinksFactory, $state) {
+//   // $scope.submit = function () {
+//   //   MagnetLinksFactory.search($scope.search).then(function (result) {
+//   //     $scope.searchResults = result.data;
+//   //     console.log($scope.searchResults.length, "length");
+//   //     reset();
+//   //     update();
+//   //   }).catch(function () {
+//   //     $scope.showResults = [];
+//   //   });
+//   //   $scope.hasBeenSubmitted = true;
+//   // };
+//
+//
+//   $scope.search = function () {
+//     console.log($scope.query);
+//     $state.go('trrntsApp.main.search', {
+//       query: $scope.query
+//     });
+//     // $state.href('/search', {
+//     //   query: $scope.query
+//     // });
+//   };
+// }])
 
 .controller('WorldMapController', ['$scope', 'GeoFactory', function ($scope, GeoFactory) {
   $scope.latAndLong = {};
@@ -487,6 +472,11 @@ angular.module('trrntsApp.main', [
   .state('trrntsApp.main.about', {
     url: '/about',
     templateUrl: 'views/about.tpl.html'
+  })
+  .state('trrntsApp.main.search', {
+    url: '/search?query',
+    templateUrl: 'views/searchMagnets.tpl.html',
+    controller: 'SearchResultsController'
   });
 }]);
 
@@ -527,8 +517,8 @@ angular.module('trrntsApp.services', [])
   };
 
   // Searches torrents whose titles contains input.
-  var search = function (input) {
-    if (typeof(input) !== 'string') {
+  var search = function (query) {
+    if (typeof(query) !== 'string') {
       return $q.defer().promise;
     }
 
@@ -536,7 +526,7 @@ angular.module('trrntsApp.services', [])
       method: 'GET',
       url:'api/magnets',
       params: {
-        query: input
+        query: query
       }
     });
   };
