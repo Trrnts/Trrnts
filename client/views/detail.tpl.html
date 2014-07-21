@@ -1,15 +1,18 @@
 <modal-dialog show="modalShown" width="70%" height="100%">
-  <h3>Details Of Torrent  {{selectedMagnet.name}} </h3>
-  <dl>
-    <dt class="modal-label">Name:</dt>
-      <dd> {{selectedMagnet.name}} </dd>
-    <dt class="modal-label">Score:</dt>
-      <dd> {{selectedMagnet.score}} </dd>
-    <dt class="modal-label">IP:</dt>
-      <dd> {{selectedMagnet.ip}} </dd>
-    <dt class="modal-label">infoHash:</dt>
-      <dd> {{selectedMagnet.infoHash}} </dd>
-    <dt class="modal-label">Magnet URI:</dt>
-      <dd> {{selectedMagnet.magnetURI}} </dd>
-  </dl>
+  <div class="detailed">
+    <h3>Torrent: {{selectedMagnet.name}} </h3>
+    <dl>
+      <dt class="modal-label">Name:</dt>
+        <dd> {{selectedMagnet.name}} </dd>
+      <dt class="modal-label">Score:</dt>
+        <dd> {{selectedMagnet.score}} </dd>
+      <dt class="modal-label">IP:</dt>
+        <dd> {{selectedMagnet.ip}} </dd>
+      <dt class="modal-label">infoHash:</dt>
+        <dd> {{selectedMagnet.infoHash}} </dd>
+      <dt class="modal-label">Magnet URI:</dt>
+        <dd> {{selectedMagnet.magnetURI}} </dd>
+    </dl>
+  </div>
+  <svg bar-chart bar-chart-height="120"></svg>
 </modal-dialog>

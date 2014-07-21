@@ -235,6 +235,10 @@ angular.module('trrntsApp.directives', [])
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {
+      if (scope.selectedMagnet === undefined) {
+        return;
+      }
+
       element = element[0];
       var barWidth = attrs.barWidth || 20;
       var barSpace = attrs.barSpace || 1;
@@ -245,7 +249,7 @@ angular.module('trrntsApp.directives', [])
       var chartHeight = attrs.barChartHeight || 70;
       var highlightHeightDiff = attrs.highlightHeightDiff || 20;
 
-      var data = scope.magnet.peers || {};
+      var data = scope.selectedMagnet.peers || {};
       var chart = d3.select(element);
 
       var formattedData = [];
