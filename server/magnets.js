@@ -115,7 +115,7 @@ magnets.commentMagnet = function (infoHash, ip, text, callback) {
   });
 };
 
-// search('Game of Thrones') #=> get all torrents that have those words, case-sensitive
+// search('Game of Thrones') #=> get all torrents that have those words, Not case-sensitive
 magnets.search = function (query, start, stop, callback) {
   var keyNames = _.map(query.toLowerCase().split(' '), function (word) {
     return 'search:' + word;
