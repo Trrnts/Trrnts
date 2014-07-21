@@ -14,12 +14,16 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+.controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', 'SharedService', function ($scope, MagnetLinksFactory, SharedService) {
   $scope.perPage = 10;
   $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
 
   $scope.latest = [];
+
+  $scope.openModal = function(selectedMagnet){
+    SharedService.prepForBroadcast(selectedMagnet);
+  };
 
   $scope.loadMore = function () {
     MagnetLinksFactory.latest($scope.start, $scope.stop).then(function (results) {
