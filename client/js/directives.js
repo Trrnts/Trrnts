@@ -169,6 +169,7 @@ angular.module('trrntsApp.directives', [])
 })
 .directive('donutChart', function () {
   return {
+
     restrict : 'A',
     link : function (scope, element, attrs) {
       element = element[0];
@@ -206,9 +207,9 @@ angular.module('trrntsApp.directives', [])
       var svg = d3.select(element)
                   .attr('width', width)
                   .attr('height', height)
-                  .append("g")
-                  .attr("transform", "translate(" + 0 + "," +
-                                                height / 6 + ")");
+                  .append('g')
+                  .attr('transform', 'translate(' + 0 + ',' +
+                                                height / 6 + ')');
 
       var color = d3.scale.category20();
 
@@ -220,15 +221,15 @@ angular.module('trrntsApp.directives', [])
          .attr('transform', 'translate(' + outerRadius + ',' +
                                            innerRadius + ')');
 
-      arcs.append("path")
-          .attr("fill", function(d, i) {
+      arcs.append('path')
+          .attr('fill', function(d, i) {
             return color(i);
           })
-          .attr("d", arc);
+          .attr('d', arc);
 
       arcs.append('text')
           .attr('transform', function (d) {
-            return "translate(" + arc.centroid(d) + ")";
+            return 'translate(' + arc.centroid(d) + ')';
           })
           .attr('text-anchor', 'middle')
           .text(function (d) {
