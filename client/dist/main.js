@@ -341,7 +341,7 @@ angular.module('trrntsApp.main', [
         },
         'modalView@trrntsApp.main': {
           templateUrl: 'views/detail.tpl.html',
-          controller: 'MyCtrl'
+          controller: 'ModalViewController'
         }
       }
     })
