@@ -3,7 +3,7 @@
     <h2>Latest submissions</h2>
   </header>
   <div infinite-scroll="loadMore()" infinite-scroll-distance="2" infinite-scroll-disabled="busy">
-    <article ng-repeat="magnet in latest" class="pure-g">
+    <article class="magnet-display" ng-repeat="magnet in latest" class="pure-g">
       <h1 class="pure-u-1-8 score">
         {{magnet.peerCount}}
       </h1>

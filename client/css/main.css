@@ -138,6 +138,12 @@ header {
   fill: #688688;
 }
 
+.magnet-display:hover {
+  background: #688688;
+  transition: .3s; /* delays for 1 second */
+  -webkit-transition: .3s; /* for Safari & Chrome */
+}
+
 nav a {
   color: #aaa;
 }
@@ -183,7 +189,6 @@ article h3 {
 article h3 a {
   font-weight: 600;
   margin: 0;
-  text-shadow: 1px 1px #eee;
   color: #444;
 }
 
