@@ -7,8 +7,14 @@ angular.module('trrntsApp.controllers', [])
     // base check: value not null
     if ($scope.magnetURI) {
       MagnetLinksFactory.create($scope.magnetURI)
-      .catch(function (err) {
-        console.error(err);
+      .then(function () {
+        $scope.error = null;
+        $scope.success = 'Yeah! Success!';
+        $scope.magnetURI = null;
+      })
+      .catch(function (response) {
+        $scope.success = null;
+        $scope.error = response.data.error;
       });
     }
   };
