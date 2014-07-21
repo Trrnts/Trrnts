@@ -77,24 +77,17 @@ socket.on('message', function (msg, rinfo) {
       if (peer && !jobs[infoHash].peers[peer]) {
         console.log('Found new peer ' + peer + ' for ' + infoHash);
         jobs[infoHash].peers[peer] = true;
-        process.nextTick(function () {
-          getPeers(infoHash, peer);
-        });
+        jobs[infoHash].queue.push(peer);
       }
     });
   }
   if (msg.r && msg.r.nodes && Buffer.isBuffer(msg.r.nodes)) {
-    var createGetPeers = function (node) {
-      return function () {
-        getPeers(infoHash, node);
-      };
-    };
     for (var i = 0; i < msg.r.nodes.length; i += 26) {
       var node = compact2string(msg.r.nodes.slice(i + 20, i + 26));
       if (node && !jobs[infoHash].peers[node]) {
         console.log('Found new node ' + node + ' for ' + infoHash);
         jobs[infoHash].nodes[node] = true;
-        process.nextTick(createGetPeers(node));
+        jobs[infoHash].queue.push(node);
       }
     }
   }
@@ -131,13 +124,26 @@ var crawl = function (infoHash, callback) {
     return callback(new Error('Crawljob already in progress'));
   }
 
+  var queue = [];
+
+  // Packages might get lost. This sends each get_peers request multiple times.
+  // Routers provided by BitTorrent, Inc. are sometimes down. This way we
+  // ensure that we correctly enter the DHT network. Otherwise, we might not get
+  // a single peer/ node.
+  _.times(5, function () {
+    queue = queue.concat(BOOTSTRAP_NODES);
+  });
+
   jobs[infoHash] = {
     peers: {},
-    nodes: {}
+    nodes: {},
+    queue: queue
   };
 
   setTimeout(function () {
     console.log('Done crawling ' + infoHash + '.');
+
+    clearInterval(crawling);
 
     var peers = _.keys(jobs[infoHash].peers);
     var nodes = _.keys(jobs[infoHash].nodes);
@@ -154,17 +160,9 @@ var crawl = function (infoHash, callback) {
     });
   }, ttl);
 
-  // Packages might get lost. This sends each get_peers request multiple times.
-  // Routers provided by BitTorrent, Inc. are sometimes down. This way we
-  // ensure that we corrently enter the DHT network. Otherwise, we might not get
-  // a single peer/ node.
-  var kickedOff = 0;
-  var kickOff = setInterval(function () {
-    _.each(BOOTSTRAP_NODES, function (addr) {
-        getPeers(infoHash, addr);
-    });
-    if (kickedOff++ === 5) {
-      clearInterval(kickOff);
+  var crawling = setInterval(function () {
+    if (jobs[infoHash].queue.length > 0) {
+      getPeers(infoHash, jobs[infoHash].queue.shift());
     }
   }, 1);
 };
