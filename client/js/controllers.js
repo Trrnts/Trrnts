@@ -7,8 +7,14 @@ angular.module('trrntsApp.controllers', [])
     // base check: value not null
     if ($scope.magnetURI) {
       MagnetLinksFactory.create($scope.magnetURI)
-      .catch(function (err) {
-        console.error(err);
+      .then(function () {
+        $scope.error = null;
+        $scope.success = 'Yeah! Success!';
+        $scope.magnetURI = null;
+      })
+      .catch(function (response) {
+        $scope.success = null;
+        $scope.error = response.data.error;
       });
     }
   };
@@ -158,12 +164,15 @@ angular.module('trrntsApp.controllers', [])
   $scope.getCities($scope.numberOfCities);
 
 }])
-.controller('ModalViewController', ['$scope', 'SharedService', function($scope, SharedService) {
-  $scope.modalShown = false;
-
-  $scope.$on('handleBroadcast', function() {
-    $scope.selectedMagnet = SharedService.selectedMagnet;
-    $scope.modalShown = !$scope.modalShown;
-  });
+.controller('ModalViewController', ['$scope', 'SharedService', '$location', '$state', function($scope, SharedService, $location, $state) {
+  $scope.modalShown = true;
+  console.log('Here');
+  $scope.selectedMagnet = SharedService.selectedMagnet;
+  // $scope.$on('handleBroadcast', function() {
+  //   $scope.selectedMagnet = SharedService.selectedMagnet;
+  //   // $state.go('.'+$scope.selectedMagnet.name.replace(' ', '_'));
+  //   // $location.path('top/'+$scope.selectedMagnet.name.replace(' ', '_'));
+  //   $scope.modalShown = !$scope.modalShown;
+  // });
 
 }]);

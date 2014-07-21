@@ -1,5 +1,39 @@
 angular.module('trrntsApp.directives', [])
 
+.directive('counter', function () {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      var max = parseInt(attrs.max);
+      var current = 0;
+      element = element[0];
+      current = -2;
+      if (max > 100) {
+        current = max - 100;
+      }
+      var animate = function () {
+        updateColor();
+        current += 1;
+        element.textContent = current;
+        if (current < max) {
+          setTimeout(animate, 1);
+        }
+      };
+      var updateColor = function () {
+        var optacity = current/1000;
+        if (optacity < 0.2) {
+          optacity = 0.2;
+        }
+        if (optacity > 1) {
+          optacity = 0.6;
+        }
+        element.style.color = 'rgba(0, 0, 0, ' + optacity + ')';
+      };
+      animate();
+    }
+  };
+})
+
 .directive('barChart', function () {
   return {
     restrict: 'A',
@@ -146,7 +180,9 @@ angular.module('trrntsApp.directives', [])
       });
     },
   };
-}).directive('modalDialog', function() {
+})
+
+.directive('modalDialog',['$state', function($state) {
   return {
     restrict: 'E',
     scope: {
@@ -161,12 +197,14 @@ angular.module('trrntsApp.directives', [])
       if (attrs.height)
         scope.dialogStyle.height = attrs.height;
       scope.hideModal = function() {
+        $state.go('^');
         scope.show = false;
       };
     },
     template: "<div class='ng-modal' ng-show='show'><div class='ng-modal-overlay' ng-click='hideModal()'></div><div class='ng-modal-dialog' ng-style='dialogStyle'><div class='ng-modal-close' ng-click='hideModal()'>X</div><div class='ng-modal-dialog-content' ng-transclude></div></div></div>"
   };
-})
+}])
+
 .directive('donutChart', function () {
   return {
     restrict : 'A',

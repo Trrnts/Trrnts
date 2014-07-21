@@ -118,6 +118,10 @@ header {
   font-weight: 300;
 }
 
+.footer {
+  font-style: italic;
+}
+
 .logo a {
   color: rgba(104, 134, 136, 0.67);
   font-weight: 700;
@@ -205,6 +209,14 @@ Style submission form.
 
 .submit p {
   color: #555;
+}
+
+.success {
+  color: #669900;
+}
+
+.error {
+  color: #990000;
 }
 
 /*
