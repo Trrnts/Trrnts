@@ -30,12 +30,16 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+.controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', 'SharedService', function ($scope, MagnetLinksFactory, SharedService) {
   $scope.perPage = 10;
   $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
 
   $scope.top = [];
+
+  $scope.openModal = function(selectedMagnet){
+    SharedService.prepForBroadcast(selectedMagnet);
+  };
 
   $scope.loadMore = function () {
     MagnetLinksFactory.top($scope.start, $scope.stop).then(function (results) {
@@ -46,7 +50,7 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+.controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory',  function ($scope, MagnetLinksFactory) {
   $scope.search = '';
   $scope.searchResults = [];
   $scope.showResults = [];
@@ -105,4 +109,16 @@ angular.module('trrntsApp.controllers', [])
 
 .controller('WorldMapController', ['$scope', function ($scope) {
 
+}])
+
+.controller('ModalViewController', ['$scope', 'SharedService', function($scope, SharedService) {
+  $scope.modalShown = false;
+  $scope.toggleModal = function() {
+
+  };
+
+  $scope.$on('handleBroadcast', function() {
+    $scope.selectedMagnet = SharedService.selectedMagnet;
+    $scope.modalShown = !$scope.modalShown;
+  });
 }]);
