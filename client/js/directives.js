@@ -219,11 +219,12 @@ angular.module('trrntsApp.directives', [])
     restrict : 'A',
     link : function (scope, element, attrs) {
       element = element[0];
-      var data = [];
-      var dataset = scope[attrs.donutType] || [10,20,30,40,50];
-      // var highlightHeightDiff = attrs.highlightHeightDiff || 20;
-      if (!Array.isArray(dataset) && typeof(dataset) === 'object') {
+      var data = []; // store formatted dataset for use in d3
+      var dataset = scope[attrs.donutType]; // store data received from server passed through scope
+
+      if (typeof(dataset) === 'object') {
         for (var key in dataset) {
+          // Check to ensure not using undefined locations
           if (key !== '?') {
             data.push({
               'label' : key,
@@ -231,8 +232,6 @@ angular.module('trrntsApp.directives', [])
             });
           }
         }
-      } else {
-        data = dataset;
       }
 
       // Initializes a new tooltip.
@@ -243,10 +242,12 @@ angular.module('trrntsApp.directives', [])
           return '<div>Total Number of Torrents: <strong> ' + d.value + '</strong></div>';
         });
 
+      // Define properties of Donut Chart - tweak outerRadius & innerRadius for thickness
+      // of donut
       var radius = attrs.donutRadius || 200,
           width = radius * 2,
-          height = radius * 2;
-          outerRadius = width / 2;
+          height = radius * 2,
+          outerRadius = width / 2,
           innerRadius = width / 3;
 
       var pie = d3.layout.pie()

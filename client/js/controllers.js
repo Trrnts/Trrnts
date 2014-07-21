@@ -120,9 +120,12 @@ angular.module('trrntsApp.controllers', [])
 // }])
 
 .controller('WorldMapController', ['$scope', 'GeoFactory', function ($scope, GeoFactory) {
+  // Used for storing and provided location data to directives.
   $scope.latAndLong = {};
   $scope.countries = {};
   $scope.cities = {};
+
+  // define amount of data to request & display
   $scope.numberOfCountries = 15;
   $scope.numberOfLatAndLongs = 100;
   $scope.numberOfCities = 10;
@@ -132,6 +135,7 @@ angular.module('trrntsApp.controllers', [])
   $scope.gotCountries = false;
   $scope.gotCities = false;
 
+  // Get specified amount of Latitute & Longitude coordinates
   $scope.getLatAndLong = function (amount) {
     GeoFactory.getLatAndLong(amount).then(function (results) {
       $scope.latAndLong = results.data;
@@ -141,6 +145,7 @@ angular.module('trrntsApp.controllers', [])
     });
   };
 
+  // Get specified amount of countries
   $scope.getCountries = function (amount) {
     GeoFactory.getCountries(amount).then(function (results) {
       $scope.countries = results.data;
@@ -150,6 +155,7 @@ angular.module('trrntsApp.controllers', [])
     });
   };
 
+  // Get specified amount of cities
   $scope.getCities = function (amount) {
     GeoFactory.getCities(amount).then(function (results) {
       $scope.cities = results.data;
@@ -158,6 +164,7 @@ angular.module('trrntsApp.controllers', [])
       console.log(err);
     });
   };
+
   // Get Location Data
   $scope.getLatAndLong($scope.numberOfLatAndLongs);
   $scope.getCountries($scope.numberOfCountries);
