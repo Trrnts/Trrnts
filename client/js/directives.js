@@ -129,7 +129,7 @@ angular.module('trrntsApp.directives', [])
       map.bubbles(llStats, {
         popupTemplate: function (geo, data) {
           return '<div class="hoverinfo"> Total Number of Torrents: <strong>' + 
-                                              data.torrentsTotal + '</strong></div>';
+                                        data.torrentsTotal + '</strong></div>';
         }
       });
     },
@@ -148,9 +148,9 @@ angular.module('trrntsApp.directives', [])
         for (var key in dataset) {
           if (key !== '?') {
             data.push({
-                        'label' : key,
-                        'value' : dataset[key]
-                      });
+              'label' : key,
+              'value' : dataset[key]
+            });
           }
         }
       } else {
@@ -177,7 +177,7 @@ angular.module('trrntsApp.directives', [])
                   .attr('height', height)
                   .append("g")
                   .attr("transform", "translate(" + 0 + "," +
-                                                    height / 6 + ")");
+                                                height / 6 + ")");
 
       var color = d3.scale.category20();
 
