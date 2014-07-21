@@ -7,25 +7,41 @@ angular.module('trrntsApp.controllers', [])
     // base check: value not null
     if ($scope.magnetURI) {
       MagnetLinksFactory.create($scope.magnetURI)
-      .catch(function (err) {
-        console.error(err);
+      .then(function () {
+        $scope.error = null;
+        $scope.success = 'Yeah! Success!';
+        $scope.magnetURI = null;
+      })
+      .catch(function (response) {
+        $scope.success = null;
+        $scope.error = response.data.error;
       });
     }
   };
 }])
 
-.controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+.controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', 'SharedService', function ($scope, MagnetLinksFactory, SharedService) {
   $scope.perPage = 10;
   $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
+  $scope.busy = false;
 
   $scope.latest = [];
 
+  $scope.openModal = function(selectedMagnet){
+    SharedService.prepForBroadcast(selectedMagnet);
+  };
+
   $scope.loadMore = function () {
+    if ($scope.busy) {
+      return;
+    }
+    $scope.busy = true;
     MagnetLinksFactory.latest($scope.start, $scope.stop).then(function (results) {
       $scope.latest = $scope.latest.concat(results.data);
       $scope.start += $scope.perPage;
       $scope.stop += $scope.perPage;
+      $scope.busy = false;
     });
   };
 }])
@@ -34,6 +50,7 @@ angular.module('trrntsApp.controllers', [])
   $scope.perPage = 10;
   $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
+  $scope.busy = false;
 
   $scope.top = [];
 
@@ -42,10 +59,15 @@ angular.module('trrntsApp.controllers', [])
   };
 
   $scope.loadMore = function () {
+    if ($scope.busy) {
+      return;
+    }
+    $scope.busy = true;
     MagnetLinksFactory.top($scope.start, $scope.stop).then(function (results) {
       $scope.top = $scope.top.concat(results.data);
       $scope.start += $scope.perPage;
       $scope.stop += $scope.perPage;
+      $scope.busy = false;
     });
   };
 }])
@@ -58,9 +80,14 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('SearchResultsController', ['$scope', '$stateParams', 'MagnetLinksFactory', function ($scope, $stateParams, MagnetLinksFactory) {
+.controller('SearchResultsController', ['$scope', '$stateParams', 'MagnetLinksFactory', 'SharedService', function ($scope, $stateParams, MagnetLinksFactory, SharedService) {
   $scope.results = [];
   $scope.query = $stateParams.query;
+
+  $scope.openModal = function(selectedMagnet){
+    SharedService.prepForBroadcast(selectedMagnet);
+  };
+
   MagnetLinksFactory.search($scope.query).then(function (results) {
     $scope.results = results.data;
   });
@@ -137,12 +164,15 @@ angular.module('trrntsApp.controllers', [])
   $scope.getCities($scope.numberOfCities);
 
 }])
-.controller('ModalViewController', ['$scope', 'SharedService', function($scope, SharedService) {
-  $scope.modalShown = false;
-
-  $scope.$on('handleBroadcast', function() {
-    $scope.selectedMagnet = SharedService.selectedMagnet;
-    $scope.modalShown = !$scope.modalShown;
-  });
+.controller('ModalViewController', ['$scope', 'SharedService', '$location', '$state', function($scope, SharedService, $location, $state) {
+  $scope.modalShown = true;
+  console.log('Here');
+  $scope.selectedMagnet = SharedService.selectedMagnet;
+  // $scope.$on('handleBroadcast', function() {
+  //   $scope.selectedMagnet = SharedService.selectedMagnet;
+  //   // $state.go('.'+$scope.selectedMagnet.name.replace(' ', '_'));
+  //   // $location.path('top/'+$scope.selectedMagnet.name.replace(' ', '_'));
+  //   $scope.modalShown = !$scope.modalShown;
+  // });
 
 }]);

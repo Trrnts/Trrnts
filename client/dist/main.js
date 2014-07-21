@@ -25,25 +25,41 @@ angular.module('trrntsApp.controllers', [])
     // base check: value not null
     if ($scope.magnetURI) {
       MagnetLinksFactory.create($scope.magnetURI)
-      .catch(function (err) {
-        console.error(err);
+      .then(function () {
+        $scope.error = null;
+        $scope.success = 'Yeah! Success!';
+        $scope.magnetURI = null;
+      })
+      .catch(function (response) {
+        $scope.success = null;
+        $scope.error = response.data.error;
       });
     }
   };
 }])
 
-.controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+.controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', 'SharedService', function ($scope, MagnetLinksFactory, SharedService) {
   $scope.perPage = 10;
   $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
+  $scope.busy = false;
 
   $scope.latest = [];
 
+  $scope.openModal = function(selectedMagnet){
+    SharedService.prepForBroadcast(selectedMagnet);
+  };
+
   $scope.loadMore = function () {
+    if ($scope.busy) {
+      return;
+    }
+    $scope.busy = true;
     MagnetLinksFactory.latest($scope.start, $scope.stop).then(function (results) {
       $scope.latest = $scope.latest.concat(results.data);
       $scope.start += $scope.perPage;
       $scope.stop += $scope.perPage;
+      $scope.busy = false;
     });
   };
 }])
@@ -52,6 +68,7 @@ angular.module('trrntsApp.controllers', [])
   $scope.perPage = 10;
   $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
+  $scope.busy = false;
 
   $scope.top = [];
 
@@ -60,10 +77,15 @@ angular.module('trrntsApp.controllers', [])
   };
 
   $scope.loadMore = function () {
+    if ($scope.busy) {
+      return;
+    }
+    $scope.busy = true;
     MagnetLinksFactory.top($scope.start, $scope.stop).then(function (results) {
       $scope.top = $scope.top.concat(results.data);
       $scope.start += $scope.perPage;
       $scope.stop += $scope.perPage;
+      $scope.busy = false;
     });
   };
 }])
@@ -76,9 +98,14 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('SearchResultsController', ['$scope', '$stateParams', 'MagnetLinksFactory', function ($scope, $stateParams, MagnetLinksFactory) {
+.controller('SearchResultsController', ['$scope', '$stateParams', 'MagnetLinksFactory', 'SharedService', function ($scope, $stateParams, MagnetLinksFactory, SharedService) {
   $scope.results = [];
   $scope.query = $stateParams.query;
+
+  $scope.openModal = function(selectedMagnet){
+    SharedService.prepForBroadcast(selectedMagnet);
+  };
+
   MagnetLinksFactory.search($scope.query).then(function (results) {
     $scope.results = results.data;
   });
@@ -155,17 +182,54 @@ angular.module('trrntsApp.controllers', [])
   $scope.getCities($scope.numberOfCities);
 
 }])
-.controller('ModalViewController', ['$scope', 'SharedService', function($scope, SharedService) {
-  $scope.modalShown = false;
-
-  $scope.$on('handleBroadcast', function() {
-    $scope.selectedMagnet = SharedService.selectedMagnet;
-    $scope.modalShown = !$scope.modalShown;
-  });
+.controller('ModalViewController', ['$scope', 'SharedService', '$location', '$state', function($scope, SharedService, $location, $state) {
+  $scope.modalShown = true;
+  console.log('Here');
+  $scope.selectedMagnet = SharedService.selectedMagnet;
+  // $scope.$on('handleBroadcast', function() {
+  //   $scope.selectedMagnet = SharedService.selectedMagnet;
+  //   // $state.go('.'+$scope.selectedMagnet.name.replace(' ', '_'));
+  //   // $location.path('top/'+$scope.selectedMagnet.name.replace(' ', '_'));
+  //   $scope.modalShown = !$scope.modalShown;
+  // });
 
 }]);
 
 angular.module('trrntsApp.directives', [])
+
+.directive('counter', function () {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      var max = parseInt(attrs.max);
+      var current = 0;
+      element = element[0];
+      current = -2;
+      if (max > 100) {
+        current = max - 100;
+      }
+      var animate = function () {
+        updateColor();
+        current += 1;
+        element.textContent = current;
+        if (current < max) {
+          setTimeout(animate, 1);
+        }
+      };
+      var updateColor = function () {
+        var optacity = current/1000;
+        if (optacity < 0.2) {
+          optacity = 0.2;
+        }
+        if (optacity > 1) {
+          optacity = 0.6;
+        }
+        element.style.color = 'rgba(0, 0, 0, ' + optacity + ')';
+      };
+      animate();
+    }
+  };
+})
 
 .directive('barChart', function () {
   return {
@@ -264,10 +328,19 @@ angular.module('trrntsApp.directives', [])
 
       var generateStats = function (lls) {
         var formatedLLs = [];
+        var highestValue = 0;
+
+        // get Highest Value
         for (var ll in lls) {
+          if (parseInt(lls[ll]) > highestValue) {
+            highestValue = parseInt(lls[ll]);
+          }
+        }
+
+        for (ll in lls) {
           var bubble = {
             fillKey : 'torrents',
-            radius :  lls[ll] * 0.2,
+            radius :  maintainRatio(50, highestValue, lls[ll]), // Control Size by Max
             torrentsTotal: lls[ll]
           };
 
@@ -282,6 +355,10 @@ angular.module('trrntsApp.directives', [])
         return formatedLLs;
       };
 
+      var maintainRatio = function (max, highestValue, value) {
+        return Math.floor((value/highestValue) * max);
+      };
+
       var map = new Datamap({
         'element': element[0],
         fills: {
@@ -291,7 +368,6 @@ angular.module('trrntsApp.directives', [])
       });
 
       // Generate Stats
-      console.log(scope.latAndLong);
       var llStats = generateStats(scope.latAndLong);
       map.bubbles(llStats, {
         popupTemplate: function (geo, data) {
@@ -301,7 +377,9 @@ angular.module('trrntsApp.directives', [])
       });
     },
   };
-}).directive('modalDialog', function() {
+})
+
+.directive('modalDialog',['$state', function($state) {
   return {
     restrict: 'E',
     scope: {
@@ -316,14 +394,17 @@ angular.module('trrntsApp.directives', [])
       if (attrs.height)
         scope.dialogStyle.height = attrs.height;
       scope.hideModal = function() {
+        $state.go('^');
         scope.show = false;
       };
     },
     template: "<div class='ng-modal' ng-show='show'><div class='ng-modal-overlay' ng-click='hideModal()'></div><div class='ng-modal-dialog' ng-style='dialogStyle'><div class='ng-modal-close' ng-click='hideModal()'>X</div><div class='ng-modal-dialog-content' ng-transclude></div></div></div>"
   };
-})
+}])
+
 .directive('donutChart', function () {
   return {
+
     restrict : 'A',
     link : function (scope, element, attrs) {
       element = element[0];
@@ -361,9 +442,9 @@ angular.module('trrntsApp.directives', [])
       var svg = d3.select(element)
                   .attr('width', width)
                   .attr('height', height)
-                  .append("g")
-                  .attr("transform", "translate(" + 0 + "," +
-                                                height / 6 + ")");
+                  .append('g')
+                  .attr('transform', 'translate(' + 0 + ',' +
+                                                height / 6 + ')');
 
       var color = d3.scale.category20();
 
@@ -375,15 +456,15 @@ angular.module('trrntsApp.directives', [])
          .attr('transform', 'translate(' + outerRadius + ',' +
                                            innerRadius + ')');
 
-      arcs.append("path")
-          .attr("fill", function(d, i) {
+      arcs.append('path')
+          .attr('fill', function(d, i) {
             return color(i);
           })
-          .attr("d", arc);
+          .attr('d', arc);
 
       arcs.append('text')
           .attr('transform', function (d) {
-            return "translate(" + arc.centroid(d) + ")";
+            return 'translate(' + arc.centroid(d) + ')';
           })
           .attr('text-anchor', 'middle')
           .text(function (d) {
@@ -438,11 +519,6 @@ angular.module('trrntsApp.main', [
         'searchMagnets@trrntsApp.main': {
           templateUrl: 'views/searchMagnets.tpl.html',
           controller: 'SearchMagnetLinksController'
-        },
-
-        'modalView@trrntsApp.main': {
-          templateUrl: 'views/detail.tpl.html',
-          controller: 'ModalViewController'
         }
       }
     })
@@ -477,6 +553,22 @@ angular.module('trrntsApp.main', [
     url: '/search?query',
     templateUrl: 'views/searchMagnets.tpl.html',
     controller: 'SearchResultsController'
+  })
+
+  .state('trrntsApp.main.top.detail', {
+    url: '/detail',
+    templateUrl: 'views/detail.tpl.html',
+    controller: 'ModalViewController'
+  })
+  .state('trrntsApp.main.latest.detail', {
+    url: '/detail/:magnetName',
+    templateUrl: 'views/detail.tpl.html',
+    controller: 'ModalViewController'
+  })
+  .state('trrntsApp.main.stats.detail', {
+    url: '/detail/:magnetName',
+    templateUrl: 'views/detail.tpl.html',
+    controller: 'ModalViewController'
   });
 }]);
 

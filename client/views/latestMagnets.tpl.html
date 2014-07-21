@@ -2,14 +2,13 @@
   <header>
     <h2>Latest submissions</h2>
   </header>
-  <div infinite-scroll="loadMore()" infinite-scroll-distance="2">
+  <div infinite-scroll="loadMore()" infinite-scroll-distance="2" infinite-scroll-disabled="busy">
     <article ng-repeat="magnet in latest" class="pure-g">
-      <h1 class="pure-u-1-8 score">
-        {{magnet.peerCount}}
+      <h1 class="pure-u-1-8 score" counter max="{{magnet.peerCount}}">
       </h1>
       <main class="pure-u-7-8">
         <h3>
-          <a href="{{magnet.magnetURI}}">{{magnet.name}}</a>
+          <a ng-click="openModal(magnet)" href="{{magnet.magnetURI}}">{{magnet.name}}</a>
         </h3>
         <small class="ago">submitted {{magnet.createdAt | agoFilter}}</small>
         <!-- <svg bar-chart bar-chart-height="70"></svg> -->
