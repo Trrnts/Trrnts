@@ -1,8 +1,6 @@
 <section class="top" ng-controller="TopMagnetLinksController">
   <header>
-    <h2>
-      Top submissions
-    </h2>
+    <h2>Top submissions</h2>
   </header>
   <div infinite-scroll="loadMore()" infinite-scroll-distance="2">
     <article ng-repeat="magnet in top" class="pure-g">

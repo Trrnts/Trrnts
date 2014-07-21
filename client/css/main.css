@@ -80,6 +80,29 @@ html {
 }
 
 /*
+Style header and nav.
+*/
+
+header {
+  margin-top: 1em;
+  font-weight: 300;
+}
+
+.logo {
+  color: #688688;
+  font-weight: 700;
+  border-bottom: 2px solid #688688;
+}
+
+header a {
+  color: #aaa;
+}
+
+nav span {
+  color: #ddd;
+}
+
+/*
 Style heading.
 */
 
@@ -90,6 +113,15 @@ h2 {
   text-transform: uppercase;
   font-weight: 300;
 }
+
+/*
+Style section.
+*/
+
+section {
+  margin-top: 1.5em;
+}
+
 /*
 Style top and latest. Styles are very similar and can be reused.
 */
@@ -117,6 +149,48 @@ article {
 
 article .ago {
   color: #aaa;
+}
+
+/*
+Style submission form.
+*/
+
+.submit form {
+  padding-top: 1em;
+}
+
+.submit input, .submit button {
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+}
+
+.submit input {
+  padding: 1em;
+  background: #f7f7f7;
+  border-top: 1px solid #c4c4c4;
+  border-bottom: 1px solid #e2e2e2;
+  border-left: 1px solid #dadada;
+  border-right: 1px solid #dadada;
+  width: 100%;
+}
+
+.submit button {
+  background: #688688;
+  font-weight: 300;
+  text-transform: uppercase;
+  margin-top: 1em;
+  border: 0;
+  color: #fff;
+  /*border-top: 1px solid #c4c4c4;
+  border-bottom: 1px solid #e2e2e2;
+  border-left: 1px solid #dadada;
+  border-right: 1px solid #dadada;*/
+  padding: 0.5em 1em;
+}
+
+.submit p {
+  color: #555;
 }
 
 /*
@@ -232,27 +306,16 @@ section {
   margin-top: 1.5em;
 }
 
-/*
-Style header and nav.
-*/
-
-header {
-  margin-top: 1em;
-  font-weight: 300;
+.donut-chart {
+  margin-left:5em;
+  display: inline-block;
 }
 
-.logo {
-  color: #688688;
-  font-weight: 700;
-  border-bottom: 2px solid #688688;
-}
-
-header a {
-  color: #aaa;
-}
-
-nav span {
-  color: #ddd;
+.donut-chart-label {
+  margin-right:28em;
+  text-decoration: underline;
+  font-weight:bold;
+  display: inline-block;
 }
 
 
@@ -272,7 +335,7 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
     margin: 0 auto;
   }
 
-  nav {
+  nav, .submit .pure-u-md-1-8 {
     text-align: right;
   }
 }
