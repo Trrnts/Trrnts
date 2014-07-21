@@ -34,122 +34,134 @@ angular.module('trrntsApp.controllers', [])
 
 .controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
   $scope.perPage = 10;
-  $scope.start = 1;
+  $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
-
-  $scope.hasPrev = function () {
-    return $scope.start > 1;
-  };
-
-  $scope.hasNext = function () {
-    return true;
-  };
 
   $scope.latest = [];
 
-  var update = function () {
-    MagnetLinksFactory.latest($scope.start, $scope.stop).then(function (result) {
-      $scope.latest = result.data;
-    }).catch(function () {
-      $scope.latest = [];
+  $scope.loadMore = function () {
+    MagnetLinksFactory.latest($scope.start, $scope.stop).then(function (results) {
+      $scope.latest = $scope.latest.concat(results.data);
+      $scope.start += $scope.perPage;
+      $scope.stop += $scope.perPage;
     });
-  };
-
-  update();
-
-  $scope.next = function () {
-    $scope.start += $scope.perPage;
-    $scope.stop += $scope.perPage;
-    update();
-  };
-
-  $scope.prev = function () {
-    $scope.start -= $scope.perPage;
-    $scope.stop -= $scope.perPage;
-    update();
   };
 }])
 
-.controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+.controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', 'SharedService', function ($scope, MagnetLinksFactory, SharedService) {
   $scope.perPage = 10;
-  $scope.start = 1;
+  $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
+
   $scope.top = [];
 
-  $scope.hasPrev = function () {
-    return $scope.start > 1;
+  $scope.openModal = function(selectedMagnet){
+    SharedService.prepForBroadcast(selectedMagnet);
   };
 
-  $scope.hasNext = function () {
-    return $scope.top.length === $scope.perPage;
-  };
-
-
-  var update = function () {
-    MagnetLinksFactory.top($scope.start, $scope.stop).then(function (result) {
-      $scope.top = result.data;
-
-    }).catch(function () {
-      $scope.top = [];
+  $scope.loadMore = function () {
+    MagnetLinksFactory.top($scope.start, $scope.stop).then(function (results) {
+      $scope.top = $scope.top.concat(results.data);
+      $scope.start += $scope.perPage;
+      $scope.stop += $scope.perPage;
     });
-  };
-
-  update();
-
-  $scope.next = function () {
-    $scope.start += $scope.perPage;
-    $scope.stop += $scope.perPage;
-    update();
-  };
-
-  $scope.prev = function () {
-    $scope.start -= $scope.perPage;
-    $scope.stop -= $scope.perPage;
-    update();
   };
 }])
 
-.controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
-  $scope.search = '';
-  $scope.searchResults = [];
-  $scope.perPage = 10;
-  $scope.start = 1;
-  $scope.stop = $scope.start + $scope.perPage - 1;
-
-  $scope.hasPrev = function () {
-    return $scope.start > 1;
-  };
-
-  $scope.hasNext = function () {
-    return $scope.searchResults.length === $scope.perPage;
-  };
-
-  var update = function () {
-    MagnetLinksFactory.search($scope.search, $scope.start, $scope.stop).then(function (result) {
-      $scope.searchResults = result.data;
-    }).catch(function () {
-      $scope.searchResults = [];
+.controller('SearchBoxController', ['$scope', '$state', function ($scope, $state) {
+  $scope.search = function () {
+    $state.go('trrntsApp.main.search', {
+      query: $scope.query
     });
-  };
-
-  $scope.next = function () {
-    $scope.start += $scope.perPage;
-    $scope.stop += $scope.perPage;
-    update();
-  };
-
-  $scope.prev = function () {
-    $scope.start -= $scope.perPage;
-    $scope.stop -= $scope.perPage;
-    update();
-  };
-
-  $scope.submit = function () {
-    update();
   };
 }])
 
-.controller('WorldMapController', ['$scope', function ($scope) {
+.controller('SearchResultsController', ['$scope', '$stateParams', 'MagnetLinksFactory', function ($scope, $stateParams, MagnetLinksFactory) {
+  $scope.results = [];
+  $scope.query = $stateParams.query;
+  MagnetLinksFactory.search($scope.query).then(function (results) {
+    $scope.results = results.data;
+  });
+}])
+
+//
+// .controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', '$state', function ($scope, MagnetLinksFactory, $state) {
+//   // $scope.submit = function () {
+//   //   MagnetLinksFactory.search($scope.search).then(function (result) {
+//   //     $scope.searchResults = result.data;
+//   //     console.log($scope.searchResults.length, "length");
+//   //     reset();
+//   //     update();
+//   //   }).catch(function () {
+//   //     $scope.showResults = [];
+//   //   });
+//   //   $scope.hasBeenSubmitted = true;
+//   // };
+//
+//
+//   $scope.search = function () {
+//     console.log($scope.query);
+//     $state.go('trrntsApp.main.search', {
+//       query: $scope.query
+//     });
+//     // $state.href('/search', {
+//     //   query: $scope.query
+//     // });
+//   };
+// }])
+
+.controller('WorldMapController', ['$scope', 'GeoFactory', function ($scope, GeoFactory) {
+  $scope.latAndLong = {};
+  $scope.countries = {};
+  $scope.cities = {};
+  $scope.numberOfCountries = 15;
+  $scope.numberOfLatAndLongs = 100;
+  $scope.numberOfCities = 10;
+
+  // Used to display data after it is received
+  $scope.gotLL = false;
+  $scope.gotCountries = false;
+  $scope.gotCities = false;
+
+  $scope.getLatAndLong = function (amount) {
+    GeoFactory.getLatAndLong(amount).then(function (results) {
+      $scope.latAndLong = results.data;
+      $scope.gotLL = true;
+    }).catch(function (err) {
+      console.log(err);
+    });
+  };
+
+  $scope.getCountries = function (amount) {
+    GeoFactory.getCountries(amount).then(function (results) {
+      $scope.countries = results.data;
+      $scope.gotCountries = true;
+    }).catch(function (err) {
+      console.log(err);
+    });
+  };
+
+  $scope.getCities = function (amount) {
+    GeoFactory.getCities(amount).then(function (results) {
+      $scope.cities = results.data;
+      $scope.gotCities = true;
+    }).catch(function (err) {
+      console.log(err);
+    });
+  };
+  // Get Location Data
+  $scope.getLatAndLong($scope.numberOfLatAndLongs);
+  $scope.getCountries($scope.numberOfCountries);
+  $scope.getCities($scope.numberOfCities);
+
+}])
+.controller('ModalViewController', ['$scope', 'SharedService', function($scope, SharedService) {
+  $scope.modalShown = false;
+
+  $scope.$on('handleBroadcast', function() {
+    $scope.selectedMagnet = SharedService.selectedMagnet;
+    $scope.modalShown = !$scope.modalShown;
+  });
 
 }]);
 
@@ -173,10 +185,10 @@ angular.module('trrntsApp.directives', [])
       var chart = d3.select(element);
 
       var formattedData = [];
-      for (var timestamp in data) {
-        formattedData.push({
-          peers: parseInt(data[timestamp]),
-          t: parseInt(timestamp)*1000
+      for (var i = 0; i < data.length; i += 2) {
+        formattedData.unshift({
+          peers: parseInt(data[i]),
+          t: parseInt(data[i+1])
         });
       }
 
@@ -193,7 +205,7 @@ angular.module('trrntsApp.directives', [])
         .attr('class', 'd3-tip')
         .offset([-highlightHeightDiff-10, 0])
         .html(function(d) {
-          return '<strong>' + d.peers + '</strong> peers <span>' + moment(parseInt(d.t)).fromNow() + ' ago</span>';
+          return '<strong>' + d.peers + '</strong> peers <span>' + moment(parseInt(d.t)).fromNow() + '</span>';
         });
 
       // Adds tooltip to chart.
@@ -221,7 +233,7 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
-        .ease('elastic')
+        .ease('bounce')
         .attr('y', function () { return chartHeight - y(d.peers) - highlightHeightDiff; })
         .attr('height', function () { return y(d.peers) + highlightHeightDiff; });
 
@@ -234,7 +246,7 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
-        .ease('elastic')
+        .ease('bounce')
         .attr('y', function (d, i) { return chartHeight - y(d.peers); })
         .attr('height', function (d) { return y(d.peers); });
 
@@ -249,31 +261,25 @@ angular.module('trrntsApp.directives', [])
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {
-      var generateFakePositions = function () {
-        var fakePositions = [];
-        var fakeLatAndLong = [[49.45045869, -65.15636998],
-                        [37.12726948, -17.72583572],
-                        [1.16322135, 127.68441455],
-                        [-25.38805351, 88.82525081],
-                        [-30.31687802, 25.57883445],
-                        [-26.46000555, -134.44309036],
-                        [-33.52151968, -82.46394689],
-                        [-24.96600279, -90.20244849],
-                        [-70.94843404, -146.08284954],
-                        [-27.03729112, 36.61236272]];
 
-        for (var i = 0; i < fakeLatAndLong.length; i++) {
-          var spot = {
-            radius: Math.floor(Math.random()*50),
-            fillKey: 'torrents'
+      var generateStats = function (lls) {
+        var formatedLLs = [];
+        for (var ll in lls) {
+          var bubble = {
+            fillKey : 'torrents',
+            radius :  lls[ll] * 0.2,
+            torrentsTotal: lls[ll]
           };
-          spot.latitude = fakeLatAndLong[i][0];
-          spot.longitude = fakeLatAndLong[i][1];
-          // console.log(fakeLatAndLong[i][0], fakeLatAndLong[i][1]);
-          fakePositions.push(spot);
+
+          var latAndLong = ll.split(',');
+          bubble.latitude = latAndLong[0];
+          bubble.longitude = latAndLong[1];
+          if (latAndLong.length > 1 && latAndLong[0] !== '?') {
+            formatedLLs.push(bubble);
+          }
         }
 
-        return fakePositions;
+        return formatedLLs;
       };
 
       var map = new Datamap({
@@ -284,11 +290,106 @@ angular.module('trrntsApp.directives', [])
         }
       });
 
-      // Generate Fake Stats
-      var fakePositions = generateFakePositions();
-      // console.log(fakePositions);
-      map.bubbles(fakePositions);
+      // Generate Stats
+      console.log(scope.latAndLong);
+      var llStats = generateStats(scope.latAndLong);
+      map.bubbles(llStats, {
+        popupTemplate: function (geo, data) {
+          return '<div class="hoverinfo"> Total Number of Torrents: <strong>' +
+                                        data.torrentsTotal + '</strong></div>';
+        }
+      });
     },
+  };
+}).directive('modalDialog', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      show: '='
+    },
+    replace: true, // Replace with the template below
+    transclude: true, // we want to insert custom content inside the directive
+    link: function(scope, element, attrs) {
+      scope.dialogStyle = {};
+      if (attrs.width)
+        scope.dialogStyle.width = attrs.width;
+      if (attrs.height)
+        scope.dialogStyle.height = attrs.height;
+      scope.hideModal = function() {
+        scope.show = false;
+      };
+    },
+    template: "<div class='ng-modal' ng-show='show'><div class='ng-modal-overlay' ng-click='hideModal()'></div><div class='ng-modal-dialog' ng-style='dialogStyle'><div class='ng-modal-close' ng-click='hideModal()'>X</div><div class='ng-modal-dialog-content' ng-transclude></div></div></div>"
+  };
+})
+.directive('donutChart', function () {
+  return {
+    restrict : 'A',
+    link : function (scope, element, attrs) {
+      element = element[0];
+      var data = [];
+      console.log(scope.countries, attrs.donutType);
+      var dataset = scope[attrs.donutType] || [10,20,30,40,50];
+      if (!Array.isArray(dataset) && typeof(dataset) === 'object') {
+        for (var key in dataset) {
+          if (key !== '?') {
+            data.push({
+              'label' : key,
+              'value' : dataset[key]
+            });
+          }
+        }
+      } else {
+        data = dataset;
+      }
+
+      var radius = attrs.donutRadius || 200,
+          width = radius * 2,
+          height = radius * 2;
+          outerRadius = width / 2;
+          innerRadius = width / 3;
+      var pie = d3.layout.pie()
+                  .sort(null)
+                  .value(function (d) {
+                    return d.value || d;
+                  });
+
+      var arc = d3.svg.arc()
+                  .outerRadius(outerRadius)
+                  .innerRadius(innerRadius);
+
+      var svg = d3.select(element)
+                  .attr('width', width)
+                  .attr('height', height)
+                  .append("g")
+                  .attr("transform", "translate(" + 0 + "," +
+                                                height / 6 + ")");
+
+      var color = d3.scale.category20();
+
+      var arcs = svg.selectAll('g.arc')
+         .data(pie(data))
+         .enter()
+         .append('g')
+         .attr('class', 'arc')
+         .attr('transform', 'translate(' + outerRadius + ',' +
+                                           innerRadius + ')');
+
+      arcs.append("path")
+          .attr("fill", function(d, i) {
+            return color(i);
+          })
+          .attr("d", arc);
+
+      arcs.append('text')
+          .attr('transform', function (d) {
+            return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr('text-anchor', 'middle')
+          .text(function (d) {
+            return d.data.label;
+          });
+    }
   };
 });
 
@@ -297,7 +398,7 @@ angular.module('trrntsApp.filters', [])
 .filter('agoFilter', function () {
   return function (timestamp) {
     timestamp = parseInt(timestamp);
-    return moment(timestamp).fromNow() + ' ago';
+    return moment(timestamp).fromNow();
   };
 });
 
@@ -309,30 +410,29 @@ angular.module('trrntsApp.main', [
   'trrntsApp.controllers',
   'trrntsApp.services',
   'trrntsApp.directives',
-  'trrntsApp.filters'
+  'trrntsApp.filters',
+  'infinite-scroll'
 ])
-.config(['$stateProvider',function ($stateProvider) {
+.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
+
+  // This is our default state, here we load the templates and the subviews
+  $urlRouterProvider.otherwise('');
+
   $stateProvider
     .state('trrntsApp.main', {
-      url: '/',
-      views:{
+      url: '',
+      views: {
         '': {
-          templateUrl: 'views/main.tpl.html'
-        },
-
-        'submitMagnet@trrntsApp.main': {
-          templateUrl: 'views/submitMagnet.tpl.html',
-          controller: 'SubmitMagnetLinkController'
-        },
-
-        'topMagnets@trrntsApp.main': {
-          templateUrl: 'views/topMagnets.tpl.html',
-          controller: 'TopMagnetLinksController'
-        },
-
-        'latestMagnets@trrntsApp.main': {
-          templateUrl: 'views/latestMagnets.tpl.html',
-          controller: 'LatestMagnetLinksController'
+          // We need this line in order to set the default child view that
+          // will be inserted into <div ui-view></div> inside the main template
+          templateUrl: 'views/main.tpl.html',
+          // We need this line in order to set the default child view that
+          // will be inserted into <div ui-view></div> inside the main template
+          controller: ['$state', function ($state) {
+            if ($state.current.url === '') {
+              $state.go('trrntsApp.main.top');
+            }
+          }]
         },
 
         'searchMagnets@trrntsApp.main': {
@@ -340,18 +440,49 @@ angular.module('trrntsApp.main', [
           controller: 'SearchMagnetLinksController'
         },
 
-        'worldMap@trrntsApp.main': {
-          templateUrl: 'views/worldMap.tpl.html',
-          controller: 'WorldMapController'
+        'modalView@trrntsApp.main': {
+          templateUrl: 'views/detail.tpl.html',
+          controller: 'ModalViewController'
         }
-
       }
-    });
+    })
+
+  // Everything defined as 'trrntsApp.main.STATE_NAME' will
+  // become a child from trrntsApp.main
+  .state('trrntsApp.main.top', {
+    url: '/top',
+    templateUrl: 'views/topMagnets.tpl.html',
+    controller: 'TopMagnetLinksController'
+  })
+  .state('trrntsApp.main.latest', {
+    url: '/latest',
+    templateUrl: 'views/latestMagnets.tpl.html',
+    controller: 'TopMagnetLinksController'
+  })
+  .state('trrntsApp.main.stats', {
+    url: '/stats',
+    templateUrl: 'views/worldMap.tpl.html',
+    controller: 'WorldMapController'
+  })
+  .state('trrntsApp.main.submit', {
+    url: '/submit',
+    templateUrl: 'views/submitMagnet.tpl.html',
+    controller: 'SubmitMagnetLinkController'
+  })
+  .state('trrntsApp.main.about', {
+    url: '/about',
+    templateUrl: 'views/about.tpl.html'
+  })
+  .state('trrntsApp.main.search', {
+    url: '/search?query',
+    templateUrl: 'views/searchMagnets.tpl.html',
+    controller: 'SearchResultsController'
+  });
 }]);
 
 angular.module('trrntsApp.services', [])
-
-.factory('MagnetLinksFactory', ['$http', function ($http) {
+// need promise library to pass back a blank promise if validation fails
+.factory('MagnetLinksFactory', ['$http', '$q', function ($http, $q) {
   // Submit Magnet URI
   var create = function (magnetURI) {
     return $http({
@@ -386,17 +517,16 @@ angular.module('trrntsApp.services', [])
   };
 
   // Searches torrents whose titles contains input.
-  var search = function (input, start, stop) {
-    if (!input && typeof(input) !== 'string') {
-      return;
+  var search = function (query) {
+    if (typeof(query) !== 'string') {
+      return $q.defer().promise;
     }
 
     return $http({
       method: 'GET',
-      url:'api/magnets/search/' + input,
+      url:'api/magnets',
       params: {
-        start: start || 1,
-        stop: stop || 30
+        query: query
       }
     });
   };
@@ -406,5 +536,65 @@ angular.module('trrntsApp.services', [])
     latest: latest,
     top: top,
     search:search
+  };
+}])
+.factory('SharedService', ['$rootScope', function($rootScope) {
+    var sharedService = {};
+
+    sharedService.selectedMagnet = 'default';
+
+    sharedService.prepForBroadcast = function(newMagnet) {
+        this.selectedMagnet = newMagnet;
+        this.broadcastItem();
+    };
+
+    sharedService.broadcastItem = function() {
+        $rootScope.$broadcast('handleBroadcast');
+    };
+
+    return sharedService;
+}])
+.factory('GeoFactory', ['$http', function ($http) {
+  // Return specified number of Lat&Long with the total number of peers for respective Lat&Long
+  var getLL = function (numberOfLls) {
+    return $http({
+      method:'GET',
+      url:'api/locations',
+      params: {
+        query: 'LatAndLong',
+        number: numberOfLls
+      }
+    });
+  };
+
+  // Return specified number of countries with the total number of peers for respective countries
+  var getCountry = function (amount) {
+    return $http({
+      method:'GET',
+      url:'api/locations',
+      params: {
+        query: 'Country',
+        number: amount
+      }
+    });
+  };
+
+  // Return specified number of cities with the total number of peers for respective cities
+  var getCity = function (amount) {
+    return $http({
+      method:'GET',
+      url:'api/locations',
+      params: {
+        query: 'City',
+        number: amount
+      }
+    });
+  };
+
+
+  return {
+    getLatAndLong : getLL,
+    getCountries : getCountry,
+    getCities : getCity,
   };
 }]);

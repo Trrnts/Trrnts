@@ -1,10 +1,17 @@
 var _ = require('lodash'),
     redis = require('../redis')(),
     parseMagnetURI = require('magnet-uri'),
-    magnets = {},
-    queue = require('../workers/queue');
+    magnets = {};
 
 var util = {};
+
+// Removes all non-alphanumeric charters from a string and removes multiple
+// whitespaces. This is needed for extracting the words as an array from a
+// string.
+util.extractWords = function (string) {
+  string = string.toLowerCase();
+  return string.replace(/\W/g, ' ').replace(/ +(?= )/g,'').split(' ');
+};
 
 // Converts a single infoHash/ an array of infoHashes into an array of magnet
 // objects.
@@ -15,30 +22,16 @@ util.infoHashesToMagnets = function (infoHashes, callback) {
   var multi = redis.multi();
   _.each(infoHashes, function (infoHash) {
     multi.hgetall('magnet:' + infoHash);
-    // TODO Caching
-    multi.zrevrange(['magnet:' + infoHash + ':peers', 0, 10000, 'WITHSCORES']);
+    multi.zrevrange(['magnet:' + infoHash + ':peers', 0, 50, 'WITHSCORES']);
   });
   multi.exec(function (err, results) {
     var magnets = [];
 
+
     // Every second result is the result of a ZREVRANGE (peer data for charts).
     _.each(_.range(0, results.length, 2), function (index) {
-      // Every second item in perrsWithScores is a score.
-      var peersWithScores = results[index+1];
-
-      results[index].peers = _.reduce(_.range(0, peersWithScores.length, 2), function (peers, index) {
-        // debugger;
-        var addr = peersWithScores[index];
-        var lastSeenAt = Math.floor((parseInt(peersWithScores[index+1])/1000)/1); // group by 1 second intervalls for testing
-        console.log(peers);
-        peers[lastSeenAt] = peers[lastSeenAt] || 0;
-        peers[lastSeenAt]++;
-        return peers;
-      }, {});
-
-      if (results[index].peers) {
-        console.log(results[index]);
-      }
+      results[index].peerCount = results[index].peers;
+      results[index].peers = results[index+1];
       magnets.push(results[index]);
     });
 
@@ -71,33 +64,17 @@ magnets.create = function (ip, magnetURI, callback) {
       magnet.infoHash = parsedMagnetURI.infoHash;
       magnet.createdAt = _.now();
       magnet.magnetURI = magnetURI;
-      magnet.score = -1;
+      magnet.peers = -1;
 
       redis.hmset('magnet:' + magnet.infoHash, magnet);
-      redis.zadd('magnets:top', magnet.score, magnet.infoHash);
+      redis.zadd('magnets:top', magnet.peers, magnet.infoHash);
       redis.zadd('magnets:latest', magnet.createdAt, magnet.infoHash);
       redis.sadd('magnets:ip:' + magnet.ip, magnet.infoHash);
+      redis.sadd('magnets:all', magnet.infoHash);
 
-      var job = queue.create('crawl', {
-        title: 'First time crawl of ' + magnet.infoHash,
-        infoHash: magnet.infoHash
-      }).save(function (err) {
-        if (err) {
-          console.error('Experienced error while creating new job (id: ' + job.id + '): ' + err.message);
-          console.error(err.stack);
-        }
-      });
+      redis.rpush('magnets:crawl', magnet.infoHash);
 
-      var job2 = queue.create('index', {
-        title: 'Indexing of ' + magnet.infoHash,
-        infoHash: magnet.infoHash
-      }).save(function (err) {
-        if (err) {
-          console.error('Experienced error while creating new job (id: ' + job2.id + '): ' + err.message);
-          console.error(err.stack);
-        }
-      });
-
+      magnets.index(magnet);
       callback(null, magnet);
     }
   });
@@ -105,37 +82,72 @@ magnets.create = function (ip, magnetURI, callback) {
 
 // readList('top', 10) #=> get top 10 magnets
 magnets.readList = function (list, start, stop, callback) {
-  redis.zrevrange('magnets:' + list, -stop, -start, function (err, infoHashes) {
+  redis.zrevrange('magnets:' + list, start, stop, function (err, infoHashes) {
     util.infoHashesToMagnets(infoHashes, callback);
   });
 };
 
 // readMagnet('chkdewyduewdg') #=> get a single magnet link
-magnets.readMagnet = util.infoHashesToMagnets;
+magnets.readMagnet = function (infoHash, callback) {
+  util.infoHashesToMagnets(infoHash, function (err, magnets) {
+    var magnet = magnets[0];
+    if (magnet === undefined) {
+      return callback(new Error('Unknown magnet'));
+    }
+    redis.lrange('magnet:' + magnet.infoHash + ':comments', 0, -1, function (err, comments) {
+      magnet.comments = _.map(comments, JSON.parse);
+      callback(null, magnet);
+    });
+  });
+};
 
+// commentMagnet('erfienrfeor', '123.456.789.012', 'Great movie') #=> comment a magnet link
+magnets.commentMagnet = function (infoHash, ip, text, callback) {
+  redis.exists('magnet:' + infoHash, function (err, exists) {
+    if (!exists) {
+      return callback(new Error('Unknown magnet'));
+    }
+    redis.lpush('magnet:' + infoHash + ':comments', JSON.stringify({
+      ip: ip,
+      text: text,
+      createdAt: _.now()
+    }), callback);
+  });
+};
 
 // search('Game of Thrones') #=> get all torrents that have those words, case-sensitive
-magnets.search = function (search, callback) {
-  // Format : 'search:' + word
-  // Convert Each Word into a key Format
-
-  var formattedWords = _.map(search.toLowerCase().split(' '), function (word) {
-    return 'search:'+ word;
+magnets.search = function (query, start, stop, callback) {
+  var keyNames = _.map(query.toLowerCase().split(' '), function (word) {
+    return 'search:' + word;
   });
 
-  // Get InfoHashes for set of words through intersect
-  redis.sinter(formattedWords, function (err, results) {
-    if (err) {
-      return callback(err, []);
-    }
+  var resultKeyName = 'search:query:' + query;
+  var zinterstoreQuery = [resultKeyName, keyNames.length + 1];
+  _.each(keyNames, function (keyName) {
+    zinterstoreQuery.push(keyName);
+  });
+  zinterstoreQuery.push('magnets:top');
+  zinterstoreQuery.push('AGGREGATE');
+  zinterstoreQuery.push('MAX');
 
-    // get magnetLinks for InfoHashes
-    var multi = redis.multi();
-    _.map(results, function (infoHash) {
-      multi.hgetall('magnet:' + infoHash);
+  redis.zinterstore(zinterstoreQuery, function (err) {
+    redis.zrevrange(resultKeyName, start, stop, function (err, infoHashes) {
+      util.infoHashesToMagnets(infoHashes, callback);
     });
-    multi.exec(callback);
   });
+};
+
+// index(m1) #=> creates an inverted search index for a magnet object created by
+// magnets.create(...).
+magnets.index = function (magnet) {
+  // This script indexes recently submitted magnets using an
+  // [inverted index](http://en.wikipedia.org/wiki/Inverted_index).
+  var words = util.extractWords(magnet.name);
+  var multi = redis.multi();
+  _.each(words, function (word) {
+    multi.sadd('search:' + word.toLowerCase(), magnet.infoHash);
+  });
+  multi.exec();
 };
 
 module.exports = exports = magnets;

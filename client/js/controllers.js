@@ -16,121 +16,133 @@ angular.module('trrntsApp.controllers', [])
 
 .controller('LatestMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
   $scope.perPage = 10;
-  $scope.start = 1;
+  $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
-
-  $scope.hasPrev = function () {
-    return $scope.start > 1;
-  };
-
-  $scope.hasNext = function () {
-    return true;
-  };
 
   $scope.latest = [];
 
-  var update = function () {
-    MagnetLinksFactory.latest($scope.start, $scope.stop).then(function (result) {
-      $scope.latest = result.data;
-    }).catch(function () {
-      $scope.latest = [];
+  $scope.loadMore = function () {
+    MagnetLinksFactory.latest($scope.start, $scope.stop).then(function (results) {
+      $scope.latest = $scope.latest.concat(results.data);
+      $scope.start += $scope.perPage;
+      $scope.stop += $scope.perPage;
     });
-  };
-
-  update();
-
-  $scope.next = function () {
-    $scope.start += $scope.perPage;
-    $scope.stop += $scope.perPage;
-    update();
-  };
-
-  $scope.prev = function () {
-    $scope.start -= $scope.perPage;
-    $scope.stop -= $scope.perPage;
-    update();
   };
 }])
 
-.controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+.controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', 'SharedService', function ($scope, MagnetLinksFactory, SharedService) {
   $scope.perPage = 10;
-  $scope.start = 1;
+  $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
+
   $scope.top = [];
 
-  $scope.hasPrev = function () {
-    return $scope.start > 1;
+  $scope.openModal = function(selectedMagnet){
+    SharedService.prepForBroadcast(selectedMagnet);
   };
 
-  $scope.hasNext = function () {
-    return $scope.top.length === $scope.perPage;
-  };
-
-
-  var update = function () {
-    MagnetLinksFactory.top($scope.start, $scope.stop).then(function (result) {
-      $scope.top = result.data;
-
-    }).catch(function () {
-      $scope.top = [];
+  $scope.loadMore = function () {
+    MagnetLinksFactory.top($scope.start, $scope.stop).then(function (results) {
+      $scope.top = $scope.top.concat(results.data);
+      $scope.start += $scope.perPage;
+      $scope.stop += $scope.perPage;
     });
-  };
-
-  update();
-
-  $scope.next = function () {
-    $scope.start += $scope.perPage;
-    $scope.stop += $scope.perPage;
-    update();
-  };
-
-  $scope.prev = function () {
-    $scope.start -= $scope.perPage;
-    $scope.stop -= $scope.perPage;
-    update();
   };
 }])
 
-.controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
-  $scope.search = '';
-  $scope.searchResults = [];
-  $scope.perPage = 10;
-  $scope.start = 1;
-  $scope.stop = $scope.start + $scope.perPage - 1;
-
-  $scope.hasPrev = function () {
-    return $scope.start > 1;
-  };
-
-  $scope.hasNext = function () {
-    return $scope.searchResults.length === $scope.perPage;
-  };
-
-  var update = function () {
-    MagnetLinksFactory.search($scope.search, $scope.start, $scope.stop).then(function (result) {
-      $scope.searchResults = result.data;
-    }).catch(function () {
-      $scope.searchResults = [];
+.controller('SearchBoxController', ['$scope', '$state', function ($scope, $state) {
+  $scope.search = function () {
+    $state.go('trrntsApp.main.search', {
+      query: $scope.query
     });
-  };
-
-  $scope.next = function () {
-    $scope.start += $scope.perPage;
-    $scope.stop += $scope.perPage;
-    update();
-  };
-
-  $scope.prev = function () {
-    $scope.start -= $scope.perPage;
-    $scope.stop -= $scope.perPage;
-    update();
-  };
-
-  $scope.submit = function () {
-    update();
   };
 }])
 
-.controller('WorldMapController', ['$scope', function ($scope) {
+.controller('SearchResultsController', ['$scope', '$stateParams', 'MagnetLinksFactory', function ($scope, $stateParams, MagnetLinksFactory) {
+  $scope.results = [];
+  $scope.query = $stateParams.query;
+  MagnetLinksFactory.search($scope.query).then(function (results) {
+    $scope.results = results.data;
+  });
+}])
+
+//
+// .controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', '$state', function ($scope, MagnetLinksFactory, $state) {
+//   // $scope.submit = function () {
+//   //   MagnetLinksFactory.search($scope.search).then(function (result) {
+//   //     $scope.searchResults = result.data;
+//   //     console.log($scope.searchResults.length, "length");
+//   //     reset();
+//   //     update();
+//   //   }).catch(function () {
+//   //     $scope.showResults = [];
+//   //   });
+//   //   $scope.hasBeenSubmitted = true;
+//   // };
+//
+//
+//   $scope.search = function () {
+//     console.log($scope.query);
+//     $state.go('trrntsApp.main.search', {
+//       query: $scope.query
+//     });
+//     // $state.href('/search', {
+//     //   query: $scope.query
+//     // });
+//   };
+// }])
+
+.controller('WorldMapController', ['$scope', 'GeoFactory', function ($scope, GeoFactory) {
+  $scope.latAndLong = {};
+  $scope.countries = {};
+  $scope.cities = {};
+  $scope.numberOfCountries = 15;
+  $scope.numberOfLatAndLongs = 100;
+  $scope.numberOfCities = 10;
+
+  // Used to display data after it is received
+  $scope.gotLL = false;
+  $scope.gotCountries = false;
+  $scope.gotCities = false;
+
+  $scope.getLatAndLong = function (amount) {
+    GeoFactory.getLatAndLong(amount).then(function (results) {
+      $scope.latAndLong = results.data;
+      $scope.gotLL = true;
+    }).catch(function (err) {
+      console.log(err);
+    });
+  };
+
+  $scope.getCountries = function (amount) {
+    GeoFactory.getCountries(amount).then(function (results) {
+      $scope.countries = results.data;
+      $scope.gotCountries = true;
+    }).catch(function (err) {
+      console.log(err);
+    });
+  };
+
+  $scope.getCities = function (amount) {
+    GeoFactory.getCities(amount).then(function (results) {
+      $scope.cities = results.data;
+      $scope.gotCities = true;
+    }).catch(function (err) {
+      console.log(err);
+    });
+  };
+  // Get Location Data
+  $scope.getLatAndLong($scope.numberOfLatAndLongs);
+  $scope.getCountries($scope.numberOfCountries);
+  $scope.getCities($scope.numberOfCities);
+
+}])
+.controller('ModalViewController', ['$scope', 'SharedService', function($scope, SharedService) {
+  $scope.modalShown = false;
+
+  $scope.$on('handleBroadcast', function() {
+    $scope.selectedMagnet = SharedService.selectedMagnet;
+    $scope.modalShown = !$scope.modalShown;
+  });
 
 }]);

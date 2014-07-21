@@ -58,9 +58,13 @@ input,
 select,
 textarea,
 .pure-g [class*='pure-u'] {
-  font: 400 14px/1.7 'Open Sans', 'Helvetica Neue', Helvetica, Arial sans-serif;
-  color: #222;
+  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial sans-serif;
   word-wrap: break-word;
+}
+
+a {
+  color: #222;
+  text-decoration: none;
 }
 
 /*
@@ -68,83 +72,154 @@ Use some whitespace for a smooth visual experience.
 */
 
 html {
+  line-height: 1.7;
+  font-size: 14px;
   padding: 0 0.5em;
-  background: #f9f9f9;
+  background: #fdfdfd;
+  color: #222;
 }
 
+/*
+Style basic form elements.
+*/
+
+input[type=text], button {
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+}
+
+input[type=text] {
+  padding: 1em;
+  background: #f7f7f7;
+  border-top: 1px solid #c4c4c4;
+  border-bottom: 1px solid #e2e2e2;
+  border-left: 1px solid #dadada;
+  border-right: 1px solid #dadada;
+}
+
+
+button {
+  background: #688688;
+  font-weight: 300;
+  text-transform: uppercase;
+  margin-top: 1em;
+  border: 0;
+  color: #fff;
+  padding: 0.5em 1em;
+}
+
+/*
+Style header and nav.
+*/
+
+header {
+  margin-top: 1em;
+  font-weight: 300;
+}
+
+.logo a {
+  color: rgba(104, 134, 136, 0.67);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.logo svg {
+  height: 50px;
+  width: 50px;
+  margin-bottom: -18px;
+}
+
+.logo path {
+  fill: #688688;
+}
+
+nav a {
+  color: #aaa;
+}
+
+nav span {
+  color: #ddd;
+}
+
+/*
+Style heading.
+*/
+
+h2 {
+  margin: 0;
+  font-size: 80%;
+  color: #ccc;
+  text-transform: uppercase;
+  font-weight: 300;
+}
+
+/*
+Style section.
+*/
+
 section {
-  margin-bottom: 2em;
+  margin-top: 1.5em;
 }
 
 /*
 Style top and latest. Styles are very similar and can be reused.
 */
 
-.top header,
-.latest header {
-  text-align: left;
-}
-
-.top h2,
-.latest h2,
-.search h2 {
+article .score {
+  color: #eee;
+  font-weight: 900;
   margin: 0;
-  font-size: 80%;
-  font-weight: 300;
-  color: #ccc;
-  text-transform: uppercase;
 }
 
-.top article,
-.latest article,
-.search article {
+article h3 {
+  margin: 0;
+}
+
+article h3 a {
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 1px 1px #eee;
+  color: #444;
+}
+
+article {
+  padding: 1em 0;
+}
+
+article .ago {
+  color: #aaa;
+}
+
+/*
+Style submission form.
+*/
+
+.submit form {
+  padding-top: 1em;
+}
+
+.submit input[type=text] {
+  width: 100%;
+}
+
+.submit p {
+  color: #555;
+}
+
+/*
+article {
   background: #fff;
   border: 1px solid #eee;
 }
 
-.top article {
+article {
   position: relative;
   height: 140px;
 }
 
 .latest article {
   border-bottom: 0;
-}
-
-.search article {
-
-}
-
-.latest .pagination {
-  border-top: 1px solid #eee;
-}
-
-.search .pagination {
-  border-top: 1px solid #eee;
-}
-
-.pagination {
-  padding: 0.5em 0;
-  text-align: right;
-}
-
-.pagination button {
-  font-weight: 300;
-  background: 0;
-  border: 1px solid #eee;
-  border-radius: 100px;
-  -moz-border-radius: 100px;
-  -webkit-border-radius: 100px;
-  padding: 0.5em 1em;
-  color: #999;
-}
-
-.pagination button:focus {
-  outline: 0;
-}
-
-.pagination button[disabled] {
-  color: #ccc;
 }
 
 .top article h3,
@@ -189,25 +264,28 @@ Style top and latest. Styles are very similar and can be reused.
   fill: #eee;
 }
 
-/* Chrome, Safari, Opera */
+
+/*
+
+/* Chrome, Safari, Opera
 @-webkit-keyframes highlight-bar {
   from {fill: #eee;}
   to {fill: #0066cc;}
 }
 
-/* Standard syntax */
+/* Standard syntax
 @keyframes highlight-bar {
   from {fill: #eee;}
   to {fill: #0066cc;}
 }
 
 .top article svg[bar-chart] .bar:hover {
-  -webkit-animation: highlight-bar 1s; /* Chrome, Safari, Opera */
+  -webkit-animation: highlight-bar 1s; /* Chrome, Safari, Opera
   animation: highlight-bar 1s;
   fill: #0066cc;
 }
 
-/* Tooltips for bar chart */
+/* Tooltips for bar chart
 .d3-tip {
   line-height: 1;
   padding: 12px;
@@ -217,7 +295,7 @@ Style top and latest. Styles are very similar and can be reused.
   border-radius: 2px;
 }
 
-/* Creates a small triangle extender for the tooltip */
+/* Creates a small triangle extender for the tooltip
 .d3-tip:after {
   box-sizing: border-box;
   display: inline;
@@ -230,49 +308,26 @@ Style top and latest. Styles are very similar and can be reused.
   text-align: center;
 }
 
-/* Style northward tooltips differently */
+/* Style northward tooltips differently
 .d3-tip.n:after {
   margin: -1px 0 0 0;
   top: 100%;
   left: 0;
+}*/
+
+
+.donut-chart {
+  margin-left:5em;
+  display: inline-block;
 }
 
-/*
-Style header and footer. Styles are very similar.
-*/
-
-ui-view > header {
-  padding-bottom: 0;
+.donut-chart-label {
+  margin-right:28em;
+  text-decoration: underline;
+  font-weight:bold;
+  display: inline-block;
 }
 
-header,
-footer {
-  padding: 0.5em;
-  text-align: center;
-}
-
-header a,
-footer a {
-  color: #222;
-  text-decoration: none;
-}
-
-header .logo {
-  font-weight: 700;
-  border-bottom: 2px solid #222;
-}
-
-header div:first-child {
-  text-align: left;
-}
-
-header div:last-child {
-  text-align: right;
-}
-
-footer {
-  text-align: left;
-}
 
 /*
 Make it responsive! These styles only apply on 'large' screens. This stylesheet
@@ -281,23 +336,60 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
 
 @media screen and (min-width: 48em) {
   html {
-    padding: 0 3em;
-  }
-  header,
-  footer {
-    padding: 1em;
+    text-align: center;
   }
 
-  .top article h3,
-  .latest article h3,
-  .search article h3 {
-    margin: 1em;
+  body {
+    max-width: 1000px;
+    text-align: left;
+    margin: 0 auto;
+  }
+
+  nav, .submit .pure-u-md-1-8 {
+    text-align: right;
   }
 }
 
-/* Style the world map. */
-.world-map {
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
-  height: 35em;
+/*
+
+
+*/
+.ng-modal-overlay {
+  /* A dark translucent div that covers the whole screen */
+  position:fixed;
+  z-index:9999;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background-color:#000000;
+  opacity: 0.5;
+}
+.ng-modal-dialog {
+  /* A centered div above the overlay with a box shadow. */
+  z-index:10000;
+  position: fixed;
+  width: 70%; /* Default */
+
+  /* Center the dialog */
+  top: 0%;
+  left: 30%;
+
+  background-color: #fff;
+  box-shadow: 4px 4px 80px #000;
+}
+.ng-modal-dialog-content {
+  padding:10px;
+  text-align: left;
+}
+.ng-modal-close {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  padding: 5px;
+  cursor: pointer;
+  font-size: 120%;
+  display: inline-block;
+  font-weight: bold;
+  font-family: 'arial', 'sans-serif';
 }

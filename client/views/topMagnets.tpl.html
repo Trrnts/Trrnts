@@ -1,14 +1,19 @@
-<section class="top pure-g" ng-controller="TopMagnetLinksController">
-  <header class="pure-u-1">
+<section class="top" ng-controller="TopMagnetLinksController">
+  <header>
     <h2>Top submissions</h2>
   </header>
-  <article class="pure-u-1 pure-u-md-1-2" ng-repeat="magnet in top">
-    <h3><a href="{{magnet.magnetURI}}">{{magnet.name}}</a></h3>
-    <svg bar-chart bar-chart-height="70"></svg>
-    <small class="ago">{{magnet.createdAt | agoFilter}}</small>
-  </article>
-  <nav class="pure-u-1 pagination">
-    <button ng-disabled="!hasPrev()" ng-click="prev()">← Previous</button>
-    <button ng-disabled="!hasNext()" ng-click="next()">Next →</button>
-  </nav>
+  <div infinite-scroll="loadMore()" infinite-scroll-distance="2">
+    <article ng-repeat="magnet in top" class="pure-g">
+      <h1 class="pure-u-1-8 score">
+        {{magnet.peerCount}}
+      </h1>
+      <main class="pure-u-7-8">
+        <h3>
+          <a ng-click="openModal(magnet)" href="{{magnet.magnetURI}}">{{magnet.name}}</a>
+        </h3>
+        <small class="ago">submitted {{magnet.createdAt | agoFilter}}</small>
+        <!-- <svg bar-chart bar-chart-height="70"></svg> -->
+      </main>
+    </article>
+  </div>
 </section>

@@ -51,7 +51,7 @@ var onResponse = function (err, resp, body) {
       }
     }, function (err, resp, body) {
       if (err) {
-        return console.log('Error inserting ' + resp);
+        return console.log('Error inserting: ' + err.message);
       }
     });
   });

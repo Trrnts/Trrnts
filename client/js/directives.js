@@ -18,10 +18,10 @@ angular.module('trrntsApp.directives', [])
       var chart = d3.select(element);
 
       var formattedData = [];
-      for (var timestamp in data) {
-        formattedData.push({
-          peers: parseInt(data[timestamp]),
-          t: parseInt(timestamp)*1000
+      for (var i = 0; i < data.length; i += 2) {
+        formattedData.unshift({
+          peers: parseInt(data[i]),
+          t: parseInt(data[i+1])
         });
       }
 
@@ -38,7 +38,7 @@ angular.module('trrntsApp.directives', [])
         .attr('class', 'd3-tip')
         .offset([-highlightHeightDiff-10, 0])
         .html(function(d) {
-          return '<strong>' + d.peers + '</strong> peers <span>' + moment(parseInt(d.t)).fromNow() + ' ago</span>';
+          return '<strong>' + d.peers + '</strong> peers <span>' + moment(parseInt(d.t)).fromNow() + '</span>';
         });
 
       // Adds tooltip to chart.
@@ -66,7 +66,7 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
-        .ease('elastic')
+        .ease('bounce')
         .attr('y', function () { return chartHeight - y(d.peers) - highlightHeightDiff; })
         .attr('height', function () { return y(d.peers) + highlightHeightDiff; });
 
@@ -79,7 +79,7 @@ angular.module('trrntsApp.directives', [])
           return k === i;
         })
         .transition()
-        .ease('elastic')
+        .ease('bounce')
         .attr('y', function (d, i) { return chartHeight - y(d.peers); })
         .attr('height', function (d) { return y(d.peers); });
 
@@ -94,31 +94,25 @@ angular.module('trrntsApp.directives', [])
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {
-      var generateFakePositions = function () {
-        var fakePositions = [];
-        var fakeLatAndLong = [[49.45045869, -65.15636998],
-                        [37.12726948, -17.72583572],
-                        [1.16322135, 127.68441455],
-                        [-25.38805351, 88.82525081],
-                        [-30.31687802, 25.57883445],
-                        [-26.46000555, -134.44309036],
-                        [-33.52151968, -82.46394689],
-                        [-24.96600279, -90.20244849],
-                        [-70.94843404, -146.08284954],
-                        [-27.03729112, 36.61236272]];
 
-        for (var i = 0; i < fakeLatAndLong.length; i++) {
-          var spot = {
-            radius: Math.floor(Math.random()*50),
-            fillKey: 'torrents'
+      var generateStats = function (lls) {
+        var formatedLLs = [];
+        for (var ll in lls) {
+          var bubble = {
+            fillKey : 'torrents',
+            radius :  lls[ll] * 0.2,
+            torrentsTotal: lls[ll]
           };
-          spot.latitude = fakeLatAndLong[i][0];
-          spot.longitude = fakeLatAndLong[i][1];
-          // console.log(fakeLatAndLong[i][0], fakeLatAndLong[i][1]);
-          fakePositions.push(spot);
+
+          var latAndLong = ll.split(',');
+          bubble.latitude = latAndLong[0];
+          bubble.longitude = latAndLong[1];
+          if (latAndLong.length > 1 && latAndLong[0] !== '?') {
+            formatedLLs.push(bubble);
+          }
         }
 
-        return fakePositions;
+        return formatedLLs;
       };
 
       var map = new Datamap({
@@ -129,10 +123,105 @@ angular.module('trrntsApp.directives', [])
         }
       });
 
-      // Generate Fake Stats
-      var fakePositions = generateFakePositions();
-      // console.log(fakePositions);
-      map.bubbles(fakePositions);
+      // Generate Stats
+      console.log(scope.latAndLong);
+      var llStats = generateStats(scope.latAndLong);
+      map.bubbles(llStats, {
+        popupTemplate: function (geo, data) {
+          return '<div class="hoverinfo"> Total Number of Torrents: <strong>' +
+                                        data.torrentsTotal + '</strong></div>';
+        }
+      });
     },
+  };
+}).directive('modalDialog', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      show: '='
+    },
+    replace: true, // Replace with the template below
+    transclude: true, // we want to insert custom content inside the directive
+    link: function(scope, element, attrs) {
+      scope.dialogStyle = {};
+      if (attrs.width)
+        scope.dialogStyle.width = attrs.width;
+      if (attrs.height)
+        scope.dialogStyle.height = attrs.height;
+      scope.hideModal = function() {
+        scope.show = false;
+      };
+    },
+    template: "<div class='ng-modal' ng-show='show'><div class='ng-modal-overlay' ng-click='hideModal()'></div><div class='ng-modal-dialog' ng-style='dialogStyle'><div class='ng-modal-close' ng-click='hideModal()'>X</div><div class='ng-modal-dialog-content' ng-transclude></div></div></div>"
+  };
+})
+.directive('donutChart', function () {
+  return {
+    restrict : 'A',
+    link : function (scope, element, attrs) {
+      element = element[0];
+      var data = [];
+      console.log(scope.countries, attrs.donutType);
+      var dataset = scope[attrs.donutType] || [10,20,30,40,50];
+      if (!Array.isArray(dataset) && typeof(dataset) === 'object') {
+        for (var key in dataset) {
+          if (key !== '?') {
+            data.push({
+              'label' : key,
+              'value' : dataset[key]
+            });
+          }
+        }
+      } else {
+        data = dataset;
+      }
+
+      var radius = attrs.donutRadius || 200,
+          width = radius * 2,
+          height = radius * 2;
+          outerRadius = width / 2;
+          innerRadius = width / 3;
+      var pie = d3.layout.pie()
+                  .sort(null)
+                  .value(function (d) {
+                    return d.value || d;
+                  });
+
+      var arc = d3.svg.arc()
+                  .outerRadius(outerRadius)
+                  .innerRadius(innerRadius);
+
+      var svg = d3.select(element)
+                  .attr('width', width)
+                  .attr('height', height)
+                  .append("g")
+                  .attr("transform", "translate(" + 0 + "," +
+                                                height / 6 + ")");
+
+      var color = d3.scale.category20();
+
+      var arcs = svg.selectAll('g.arc')
+         .data(pie(data))
+         .enter()
+         .append('g')
+         .attr('class', 'arc')
+         .attr('transform', 'translate(' + outerRadius + ',' +
+                                           innerRadius + ')');
+
+      arcs.append("path")
+          .attr("fill", function(d, i) {
+            return color(i);
+          })
+          .attr("d", arc);
+
+      arcs.append('text')
+          .attr('transform', function (d) {
+            return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr('text-anchor', 'middle')
+          .text(function (d) {
+            return d.data.label;
+          });
+    }
   };
 });
