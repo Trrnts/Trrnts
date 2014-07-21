@@ -235,6 +235,10 @@ angular.module('trrntsApp.directives', [])
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {
+      if (scope.selectedMagnet === undefined) {
+        return;
+      }
+
       element = element[0];
       var barWidth = attrs.barWidth || 20;
       var barSpace = attrs.barSpace || 1;
@@ -245,7 +249,7 @@ angular.module('trrntsApp.directives', [])
       var chartHeight = attrs.barChartHeight || 70;
       var highlightHeightDiff = attrs.highlightHeightDiff || 20;
 
-      var data = scope.magnet.peers || {};
+      var data = scope.selectedMagnet.peers || {};
       var chart = d3.select(element);
 
       var formattedData = [];
@@ -397,13 +401,13 @@ angular.module('trrntsApp.directives', [])
       scope.hideModal = function() {
         scope.animation = 'ng-modal-dialog-slide-out';
         // Need Timeout, to Allow animation to finish'
+        $state.go('^');
         $timeout(function () {
-          $state.go('^');
           scope.show = false;
         }, 1003);
       };
     },
-    template: "<div class='ng-modal' ng-show='show'><div class='ng-modal-overlay' ng-click='hideModal()'></div><div class='ng-modal-dialog' ng-class='animation' ng-style='dialogStyle'><div class='ng-modal-close' ng-click='hideModal()'>X</div><div class='ng-modal-dialog-content' ng-transclude></div></div></div>"
+    template: "<div class='ng-modal' ng-show='show'><div class='ng-modal-overlay' ng-click='hideModal()'></div><div class='ng-modal-dialog' ng-style='dialogStyle'><!--div class='ng-modal-close' ng-click='hideModal()'>X</div--><div class='ng-modal-dialog-content' ng-transclude></div></div></div>"
   };
 }])
 

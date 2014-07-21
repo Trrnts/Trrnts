@@ -184,12 +184,13 @@ article .score {
 
 article h3 {
   margin: 0;
+  font-weight: 600;
+  text-shadow: 1px 1px #eee;
 }
 
 article h3 a {
   font-weight: 600;
   margin: 0;
-  color: #444;
 }
 
 article {
@@ -225,94 +226,55 @@ Style submission form.
 }
 
 /*
-article {
-  background: #fff;
-  border: 1px solid #eee;
-}
+Style bar chart.
+*/
 
-article {
-  position: relative;
-  height: 140px;
-}
-
-.latest article {
-  border-bottom: 0;
-}
-
-.top article h3,
-.latest article h3,
-.search article h3 {
-  padding: 0;
-  margin: 0.5em;
-  font-weight: 600;
-}
-
-.top article h3 a,
-.latest article h3 a,
-.search article h3 a {
-  color: #222;
-  text-decoration: none;
-}
-
-.top .ago,
-.latest .ago,
-.search .ago {
-  padding: 0.5em;
-  font-weight: 300;
-  color: #d8d8d8;
-  text-align: right;
-}
-
-.top .ago {
-  position: absolute;
+svg[bar-chart] {
+  posiition: absolute;
+  bottom: 0;
+  left: 0;
   right: 0;
-  bottom: 0;
-}
-
-.top article svg[bar-chart] {
-  position: absolute;
-  bottom: 0;
   display: block;
-  height: 70px;
+  height: 120px;
+  width: 100%;
 }
 
-.top article svg[bar-chart] .bar {
+svg[bar-chart] .bar {
   cursor: pointer;
   fill: #eee;
 }
 
-
-/*
-
-/* Chrome, Safari, Opera
+/* Chrome, Safari, Opera */
 @-webkit-keyframes highlight-bar {
   from {fill: #eee;}
   to {fill: #0066cc;}
 }
 
-/* Standard syntax
+/* Standard syntax */
 @keyframes highlight-bar {
   from {fill: #eee;}
   to {fill: #0066cc;}
 }
 
-.top article svg[bar-chart] .bar:hover {
-  -webkit-animation: highlight-bar 1s; /* Chrome, Safari, Opera
+svg[bar-chart] .bar:hover {
+  -webkit-animation: highlight-bar 1s; /* Chrome, Safari, Opera */
   animation: highlight-bar 1s;
   fill: #0066cc;
 }
 
-/* Tooltips for bar chart
+/* Tooltips for bar chart */
 .d3-tip {
+  position: absolute;
   line-height: 1;
   padding: 12px;
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
   font-size: 80%;
+  z-index: 100000;
   border-radius: 2px;
 }
 
-/* Creates a small triangle extender for the tooltip
+/* Creates a small triangle extender for the tooltip */
 .d3-tip:after {
   box-sizing: border-box;
   display: inline;
@@ -325,13 +287,12 @@ article {
   text-align: center;
 }
 
-/* Style northward tooltips differently
+/* Style northward tooltips differently */
 .d3-tip.n:after {
   margin: -1px 0 0 0;
   top: 100%;
   left: 0;
-}*/
-
+}
 
 .donut-chart {
   margin-left:5em;
@@ -345,10 +306,10 @@ article {
   display: inline-block;
 }
 
-
 /*
 Make it responsive! These styles only apply on 'large' screens. This stylesheet
 leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
+At least it tries to...
 */
 
 @media screen and (min-width: 48em) {
@@ -368,9 +329,23 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
 }
 
 /*
-
-
+Style modal box.
 */
+.detailed {
+  padding: 0;
+}
+
+.detailed header {
+  padding: 1em;
+  margin: 0;
+  background: #f9f9f9;
+  border-bottom: 1px solid #eee;
+}
+
+.detailed dl {
+  padding: 1em;
+}
+
 .ng-modal-overlay {
   /* A dark translucent div that covers the whole screen */
   position:fixed;
@@ -379,10 +354,11 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
   left:0;
   width:100%;
   height:100%;
-  background-color:#000000;
+  background: #fff;
   opacity: 0.5;
 }
 .ng-modal-dialog {
+  height: 100%;
   /* A centered div above the overlay with a box shadow. */
   z-index:10000;
   position: fixed;
@@ -390,9 +366,12 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
 
   /* Center the dialog */
   top: 0%;
-  left:30%;
-  background-color: #fff;
-  box-shadow: 4px 4px 80px #000;
+  left: 30%;
+
+  background: #fff;
+  box-shadow: 0 0 20px rgba(0,0,0,0.25);
+  border-left: 1px solid rgba(0,0,0,0.1);
+  overflow: auto;
 }
 
 .ng-modal-dialog-slide-in {
@@ -408,11 +387,12 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
 }
 
 .ng-modal-dialog-content {
-  padding:10px;
+  /*padding: 1em 1em 0;*/
   text-align: left;
 }
 .ng-modal-close {
-  position: absolute;
+  display: none;
+  position: fixed;
   top: 3px;
   right: 5px;
   padding: 5px;
