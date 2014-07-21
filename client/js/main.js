@@ -12,7 +12,7 @@ angular.module('trrntsApp.main', [
 .config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
 
   // This is our default state, here we load the templates and the subviews
-  $urlRouterProvider.otherwise('/top');
+  $urlRouterProvider.otherwise('');
 
   $stateProvider
     .state('trrntsApp.main', {
@@ -22,6 +22,13 @@ angular.module('trrntsApp.main', [
           // We need this line in order to set the default child view that
           // will be inserted into <div ui-view></div> inside the main template
           templateUrl: 'views/main.tpl.html',
+          // We need this line in order to set the default child view that
+          // will be inserted into <div ui-view></div> inside the main template
+          controller: ['$state', function ($state) {
+            if ($state.current.url === '') {
+              $state.go('trrntsApp.main.top');
+            }
+          }]
         },
 
         'searchMagnets@trrntsApp.main': {
