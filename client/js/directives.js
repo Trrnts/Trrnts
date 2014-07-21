@@ -133,10 +133,10 @@ angular.module('trrntsApp.directives', [])
     restrict: 'A',
     link: function (scope, element, attrs) {
 
-      /* generate stats by creating an array of objects which are used to 
+      /* generate stats by creating an array of objects which are used to
          generate bubbles on the map. Each Element:
          obj = {
-            fillKey: colorPalette, // defautl color palette set for bubbles in maps is torrents                
+            fillKey: colorPalette, // defautl color palette set for bubbles in maps is torrents
             radius : number, // Size of Bubble
             torrentsTotal: number, // Number of Torrents at this location. Used for Displaying in Tool Tip
             latitude: number,
@@ -178,7 +178,7 @@ angular.module('trrntsApp.directives', [])
       var maintainRatio = function (max, highestValue, value) {
         return Math.floor((value/highestValue) * max);
       };
-      
+
       var map = new Datamap({
         'element': element[0],
         fills: {
