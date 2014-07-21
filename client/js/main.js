@@ -68,5 +68,10 @@ angular.module('trrntsApp.main', [
   .state('trrntsApp.main.about', {
     url: '/about',
     templateUrl: 'views/about.tpl.html'
+  })
+  .state('trrntsApp.main.search', {
+    url: '/search?query',
+    templateUrl: 'views/searchMagnets.tpl.html',
+    controller: 'SearchResultsController'
   });
 }]);
