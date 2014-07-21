@@ -68,23 +68,16 @@ socket.on('message', function (msg, rinfo) {
   msg = decode(msg);
   var transactionId = Buffer.isBuffer(msg.t) && msg.t.length === 2 && msg.t.readUInt16BE(0);
   var infoHash = transactions[transactionId];
-  if (transactionId === false) {
-    // console.log('Malformed message from ' + rinfo.address + ':' + rinfo.port + '.');
-    // console.log(msg);
-    return;
-  }
-  if (infoHash === undefined) {
-    // console.log('Unknown transaction for ' + transactionId + ' from ' + rinfo.address + ':' + rinfo.port + '.');
-    // console.log(msg);
+  if (transactionId === false || infoHash === undefined || jobs[infoHash] === undefined) {
     return;
   }
   if (msg.r && msg.r.values) {
     _.each(msg.r.values, function (peer) {
       peer = compact2string(peer);
-      if (peer && jobs[infoHash]) {
+      if (peer && !jobs[infoHash].peers[peer]) {
         console.log('Found new peer ' + peer + ' for ' + infoHash);
         jobs[infoHash].peers[peer] = true;
-        setImmediate(function () {
+        process.nextTick(function () {
           getPeers(infoHash, peer);
         });
       }
@@ -98,10 +91,10 @@ socket.on('message', function (msg, rinfo) {
     };
     for (var i = 0; i < msg.r.nodes.length; i += 26) {
       var node = compact2string(msg.r.nodes.slice(i + 20, i + 26));
-      if (node && jobs[infoHash]) {
+      if (node && !jobs[infoHash].peers[node]) {
         console.log('Found new node ' + node + ' for ' + infoHash);
         jobs[infoHash].nodes[node] = true;
-        setImmediate(createGetPeers(node));
+        process.nextTick(createGetPeers(node));
       }
     }
   }

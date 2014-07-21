@@ -51,36 +51,6 @@ crawl.init(function () {
         crawl(infoHash, onCrawled(infoHash));
       }
     });
-    redis.lpop('magnets:crawl', function (err, infoHash) {
-      redis.rpush('magnets:crawl', infoHash);
-      if (infoHash) {
-        crawl(infoHash, onCrawled(infoHash));
-      }
-    });
-    redis.lpop('magnets:crawl', function (err, infoHash) {
-      redis.rpush('magnets:crawl', infoHash);
-      if (infoHash) {
-        crawl(infoHash, onCrawled(infoHash));
-      }
-    });
-    redis.lpop('magnets:crawl', function (err, infoHash) {
-      redis.rpush('magnets:crawl', infoHash);
-      if (infoHash) {
-        crawl(infoHash, onCrawled(infoHash));
-      }
-    });
-    redis.lpop('magnets:crawl', function (err, infoHash) {
-      redis.rpush('magnets:crawl', infoHash);
-      if (infoHash) {
-        crawl(infoHash, onCrawled(infoHash));
-      }
-    });
-    redis.lpop('magnets:crawl', function (err, infoHash) {
-      redis.rpush('magnets:crawl', infoHash);
-      if (infoHash) {
-        crawl(infoHash, onCrawled(infoHash));
-      }
-    });
   };
   next();
   setInterval(next, 60*1000*1.1);
