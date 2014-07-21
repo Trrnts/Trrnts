@@ -27,8 +27,10 @@ util.infoHashesToMagnets = function (infoHashes, callback) {
   multi.exec(function (err, results) {
     var magnets = [];
 
+
     // Every second result is the result of a ZREVRANGE (peer data for charts).
     _.each(_.range(0, results.length, 2), function (index) {
+      results[index].peerCount = results[index].peers;
       results[index].peers = results[index+1];
       magnets.push(results[index]);
     });
