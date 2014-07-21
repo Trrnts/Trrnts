@@ -1,9 +1,47 @@
 angular.module('trrntsApp.directives', [])
 
+.directive('counter', function () {
+  return {
+    restrict: 'A',
+    link: function (scope, element, attrs) {
+      var max = parseInt(attrs.max);
+      var current = 0;
+      element = element[0];
+      current = -2;
+      if (max > 100) {
+        current = max - 100;
+      }
+      var animate = function () {
+        updateColor();
+        current += 1;
+        element.textContent = current;
+        if (current < max) {
+          setTimeout(animate, 1);
+        }
+      };
+      var updateColor = function () {
+        var optacity = current/1000;
+        if (optacity < 0.2) {
+          optacity = 0.2;
+        }
+        if (optacity > 1) {
+          optacity = 0.6;
+        }
+        element.style.color = 'rgba(0, 0, 0, ' + optacity + ')';
+      };
+      animate();
+    }
+  };
+})
+
 .directive('barChart', function () {
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {
+      if (scope.selectedMagnet === undefined) {
+        return;
+      }
+
       element = element[0];
       var barWidth = attrs.barWidth || 20;
       var barSpace = attrs.barSpace || 1;
@@ -12,10 +50,14 @@ angular.module('trrntsApp.directives', [])
       // Fx will throw crazy errors. Don't try to do something like
       // element.outerHeight. It won't work.
       var chartHeight = attrs.barChartHeight || 70;
+      var chartWidth = $(element).width();
       var highlightHeightDiff = attrs.highlightHeightDiff || 20;
 
-      var data = scope.magnet.peers || {};
+      var data = scope.selectedMagnet.peers || {};
       var chart = d3.select(element);
+
+      var maxBars = Math.floor(chartWidth/(barWidth + barSpace));
+      console.log(chartWidth);
 
       var formattedData = [];
       for (var i = 0; i < data.length; i += 2) {
@@ -26,6 +68,8 @@ angular.module('trrntsApp.directives', [])
       }
 
       data = formattedData;
+
+      data = data.slice(0, maxBars);
 
       var y = d3.scale.linear()
                 .domain([0, d3.max(data, function (d) {
@@ -146,7 +190,9 @@ angular.module('trrntsApp.directives', [])
       });
     },
   };
-}).directive('modalDialog', function() {
+})
+
+.directive('modalDialog',['$state', '$timeout', function($state, $timeout) {
   return {
     restrict: 'E',
     scope: {
@@ -155,26 +201,33 @@ angular.module('trrntsApp.directives', [])
     replace: true, // Replace with the template below
     transclude: true, // we want to insert custom content inside the directive
     link: function(scope, element, attrs) {
+      scope.animation = 'ng-modal-dialog-slide-in';
       scope.dialogStyle = {};
       if (attrs.width)
         scope.dialogStyle.width = attrs.width;
       if (attrs.height)
         scope.dialogStyle.height = attrs.height;
       scope.hideModal = function() {
-        scope.show = false;
+        scope.animation = 'ng-modal-dialog-slide-out';
+        // Need Timeout, to Allow animation to finish'
+        $state.go('^');
+        $timeout(function () {
+          scope.show = false;
+        }, 1003);
       };
     },
-    template: "<div class='ng-modal' ng-show='show'><div class='ng-modal-overlay' ng-click='hideModal()'></div><div class='ng-modal-dialog' ng-style='dialogStyle'><div class='ng-modal-close' ng-click='hideModal()'>X</div><div class='ng-modal-dialog-content' ng-transclude></div></div></div>"
+    template: "<div class='ng-modal' ng-show='show'><div class='ng-modal-overlay' ng-click='hideModal()'></div><div class='ng-modal-dialog' ng-style='dialogStyle'><!--div class='ng-modal-close' ng-click='hideModal()'>X</div--><div class='ng-modal-dialog-content' ng-transclude></div></div></div>"
   };
-})
+}])
+
 .directive('donutChart', function () {
   return {
     restrict : 'A',
     link : function (scope, element, attrs) {
       element = element[0];
       var data = [];
-      console.log(scope.countries, attrs.donutType);
       var dataset = scope[attrs.donutType] || [10,20,30,40,50];
+      // var highlightHeightDiff = attrs.highlightHeightDiff || 20;
       if (!Array.isArray(dataset) && typeof(dataset) === 'object') {
         for (var key in dataset) {
           if (key !== '?') {
@@ -188,11 +241,20 @@ angular.module('trrntsApp.directives', [])
         data = dataset;
       }
 
+      // Initializes a new tooltip.
+      var tip = d3.tip()
+        .attr('class', 'd3-tip')
+        .offset([-20-10, 0])
+        .html(function(d) {
+          return '<div>Total Number of Torrents: <strong> ' + d.value + '</strong></div>';
+        });
+
       var radius = attrs.donutRadius || 200,
           width = radius * 2,
           height = radius * 2;
           outerRadius = width / 2;
           innerRadius = width / 3;
+
       var pie = d3.layout.pie()
                   .sort(null)
                   .value(function (d) {
@@ -206,9 +268,9 @@ angular.module('trrntsApp.directives', [])
       var svg = d3.select(element)
                   .attr('width', width)
                   .attr('height', height)
-                  .append("g")
-                  .attr("transform", "translate(" + 0 + "," +
-                                                height / 6 + ")");
+                  .append('g')
+                  .attr('transform', 'translate(' + 0 + ',' +
+                                                height / 6 + ')');
 
       var color = d3.scale.category20();
 
@@ -218,22 +280,25 @@ angular.module('trrntsApp.directives', [])
          .append('g')
          .attr('class', 'arc')
          .attr('transform', 'translate(' + outerRadius + ',' +
-                                           innerRadius + ')');
+                                           innerRadius + ')').call(tip);
 
-      arcs.append("path")
-          .attr("fill", function(d, i) {
+      arcs.append('path')
+          .attr('fill', function(d, i) {
             return color(i);
           })
-          .attr("d", arc);
+          .attr('d', arc);
 
       arcs.append('text')
           .attr('transform', function (d) {
-            return "translate(" + arc.centroid(d) + ")";
+            return 'translate(' + arc.centroid(d) + ')';
           })
           .attr('text-anchor', 'middle')
           .text(function (d) {
             return d.data.label;
           });
+
+      arcs.on('mouseover', tip.show);
+      arcs.on('mouseleave', tip.hide);
     }
   };
 });

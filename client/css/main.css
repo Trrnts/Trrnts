@@ -118,6 +118,10 @@ header {
   font-weight: 300;
 }
 
+.footer {
+  font-style: italic;
+}
+
 .logo a {
   color: rgba(104, 134, 136, 0.67);
   font-weight: 700;
@@ -132,6 +136,12 @@ header {
 
 .logo path {
   fill: #688688;
+}
+
+.magnet-display:hover {
+  background: #AEBEC1;
+  transition: .3s; /* delays for 1 second */
+  -webkit-transition: .3s; /* for Safari & Chrome */
 }
 
 nav a {
@@ -174,17 +184,17 @@ article .score {
 
 article h3 {
   margin: 0;
+  font-weight: 600;
 }
 
 article h3 a {
   font-weight: 600;
   margin: 0;
-  text-shadow: 1px 1px #eee;
-  color: #444;
 }
 
 article {
   padding: 1em 0;
+  padding-left: 7px;
 }
 
 article .ago {
@@ -207,95 +217,63 @@ Style submission form.
   color: #555;
 }
 
+.success {
+  color: #669900;
+}
+
+.error {
+  color: #990000;
+}
+
 /*
-article {
-  background: #fff;
-  border: 1px solid #eee;
-}
+Style bar chart.
+*/
 
-article {
-  position: relative;
-  height: 140px;
-}
-
-.latest article {
-  border-bottom: 0;
-}
-
-.top article h3,
-.latest article h3,
-.search article h3 {
-  padding: 0;
-  margin: 0.5em;
-  font-weight: 600;
-}
-
-.top article h3 a,
-.latest article h3 a,
-.search article h3 a {
-  color: #222;
-  text-decoration: none;
-}
-
-.top .ago,
-.latest .ago,
-.search .ago {
-  padding: 0.5em;
-  font-weight: 300;
-  color: #d8d8d8;
-  text-align: right;
-}
-
-.top .ago {
+svg[bar-chart] {
   position: absolute;
+  bottom: 0;
   right: 0;
-  bottom: 0;
-}
-
-.top article svg[bar-chart] {
-  position: absolute;
-  bottom: 0;
   display: block;
-  height: 70px;
+  height: 150px;
+  width: 100%;
 }
 
-.top article svg[bar-chart] .bar {
+svg[bar-chart] .bar {
   cursor: pointer;
   fill: #eee;
 }
 
-
-/*
-
-/* Chrome, Safari, Opera
+/* Chrome, Safari, Opera */
 @-webkit-keyframes highlight-bar {
   from {fill: #eee;}
   to {fill: #0066cc;}
 }
 
-/* Standard syntax
+/* Standard syntax */
 @keyframes highlight-bar {
   from {fill: #eee;}
   to {fill: #0066cc;}
 }
 
-.top article svg[bar-chart] .bar:hover {
-  -webkit-animation: highlight-bar 1s; /* Chrome, Safari, Opera
+svg[bar-chart] .bar:hover {
+  -webkit-animation: highlight-bar 1s; /* Chrome, Safari, Opera */
   animation: highlight-bar 1s;
   fill: #0066cc;
 }
 
-/* Tooltips for bar chart
+/* Tooltips for bar chart */
 .d3-tip {
+  position: absolute;
   line-height: 1;
   padding: 12px;
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
   font-size: 80%;
+  z-index: 100000;
   border-radius: 2px;
 }
 
-/* Creates a small triangle extender for the tooltip
+/* Creates a small triangle extender for the tooltip */
 .d3-tip:after {
   box-sizing: border-box;
   display: inline;
@@ -308,13 +286,12 @@ article {
   text-align: center;
 }
 
-/* Style northward tooltips differently
+/* Style northward tooltips differently */
 .d3-tip.n:after {
   margin: -1px 0 0 0;
   top: 100%;
   left: 0;
-}*/
-
+}
 
 .donut-chart {
   margin-left:5em;
@@ -328,10 +305,10 @@ article {
   display: inline-block;
 }
 
-
 /*
 Make it responsive! These styles only apply on 'large' screens. This stylesheet
 leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
+At least it tries to...
 */
 
 @media screen and (min-width: 48em) {
@@ -351,9 +328,24 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
 }
 
 /*
-
-
+Style modal box.
 */
+.detailed {
+  padding: 0;
+  padding-bottom: 200px;
+}
+
+.detailed header {
+  padding: 1em;
+  margin: 0;
+  background: #f9f9f9;
+  border-bottom: 1px solid #eee;
+}
+
+.detailed dl {
+  padding: 1em;
+}
+
 .ng-modal-overlay {
   /* A dark translucent div that covers the whole screen */
   position:fixed;
@@ -362,10 +354,11 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
   left:0;
   width:100%;
   height:100%;
-  background-color:#000000;
+  background: #fff;
   opacity: 0.5;
 }
 .ng-modal-dialog {
+  height: 100%;
   /* A centered div above the overlay with a box shadow. */
   z-index:10000;
   position: fixed;
@@ -375,15 +368,31 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
   top: 0%;
   left: 30%;
 
-  background-color: #fff;
-  box-shadow: 4px 4px 80px #000;
+  background: #fff;
+  box-shadow: 0 0 20px rgba(0,0,0,0.25);
+  border-left: 1px solid rgba(0,0,0,0.1);
+  overflow: auto;
 }
+
+.ng-modal-dialog-slide-in {
+  left:30%;
+  animation: slide-in-left 1s;
+  -webkit-animation: slide-in-left 1s;
+}
+
+.ng-modal-dialog-slide-out {
+  left:100%;
+  animation: slide-out-right 1s;
+  -webkit-animation: slide-out-right 1s;
+}
+
 .ng-modal-dialog-content {
-  padding:10px;
+  /*padding: 1em 1em 0;*/
   text-align: left;
 }
 .ng-modal-close {
-  position: absolute;
+  display: none;
+  position: fixed;
   top: 3px;
   right: 5px;
   padding: 5px;
@@ -392,4 +401,51 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
   display: inline-block;
   font-weight: bold;
   font-family: 'arial', 'sans-serif';
+}
+
+
+@keyframes slide-in-left {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+@-webkit-keyframes slide-in-left {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+@-moz-keyframes slide-in-left {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+@-o-keyframes slide-in-left {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+@keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+
+@keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+@-webkit-keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+@-moz-keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+@-o-keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
 }
