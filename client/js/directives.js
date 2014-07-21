@@ -50,10 +50,14 @@ angular.module('trrntsApp.directives', [])
       // Fx will throw crazy errors. Don't try to do something like
       // element.outerHeight. It won't work.
       var chartHeight = attrs.barChartHeight || 70;
+      var chartWidth = $(element).width();
       var highlightHeightDiff = attrs.highlightHeightDiff || 20;
 
       var data = scope.selectedMagnet.peers || {};
       var chart = d3.select(element);
+
+      var maxBars = Math.floor(chartWidth/(barWidth + barSpace));
+      console.log(chartWidth);
 
       var formattedData = [];
       for (var i = 0; i < data.length; i += 2) {
@@ -64,6 +68,8 @@ angular.module('trrntsApp.directives', [])
       }
 
       data = formattedData;
+
+      data = data.slice(0, maxBars);
 
       var y = d3.scale.linear()
                 .domain([0, d3.max(data, function (d) {
