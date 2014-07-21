@@ -164,12 +164,15 @@ angular.module('trrntsApp.controllers', [])
   $scope.getCities($scope.numberOfCities);
 
 }])
-.controller('ModalViewController', ['$scope', 'SharedService', function($scope, SharedService) {
-  $scope.modalShown = false;
-
-  $scope.$on('handleBroadcast', function() {
-    $scope.selectedMagnet = SharedService.selectedMagnet;
-    $scope.modalShown = !$scope.modalShown;
-  });
+.controller('ModalViewController', ['$scope', 'SharedService', '$location', '$state', function($scope, SharedService, $location, $state) {
+  $scope.modalShown = true;
+  console.log('Here');
+  $scope.selectedMagnet = SharedService.selectedMagnet;
+  // $scope.$on('handleBroadcast', function() {
+  //   $scope.selectedMagnet = SharedService.selectedMagnet;
+  //   // $state.go('.'+$scope.selectedMagnet.name.replace(' ', '_'));
+  //   // $location.path('top/'+$scope.selectedMagnet.name.replace(' ', '_'));
+  //   $scope.modalShown = !$scope.modalShown;
+  // });
 
 }]);
