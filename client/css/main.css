@@ -347,7 +347,7 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
 */
 .ng-modal-overlay {
   /* A dark translucent div that covers the whole screen */
-  position:absolute;
+  position:fixed;
   z-index:9999;
   top:0;
   left:0;
@@ -359,7 +359,7 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
 .ng-modal-dialog {
   /* A centered div above the overlay with a box shadow. */
   z-index:10000;
-  position: absolute;
+  position: fixed;
   width: 70%; /* Default */
 
   /* Center the dialog */
