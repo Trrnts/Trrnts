@@ -186,7 +186,7 @@ angular.module('trrntsApp.directives', [])
   };
 })
 
-.directive('modalDialog',['$state', function($state) {
+.directive('modalDialog',['$state', '$timeout', function($state, $timeout) {
   return {
     restrict: 'E',
     scope: {
@@ -195,14 +195,19 @@ angular.module('trrntsApp.directives', [])
     replace: true, // Replace with the template below
     transclude: true, // we want to insert custom content inside the directive
     link: function(scope, element, attrs) {
+      scope.animation = 'ng-modal-dialog-slide-in';
       scope.dialogStyle = {};
       if (attrs.width)
         scope.dialogStyle.width = attrs.width;
       if (attrs.height)
         scope.dialogStyle.height = attrs.height;
       scope.hideModal = function() {
-        $state.go('^');
-        scope.show = false;
+        scope.animation = 'ng-modal-dialog-slide-out';
+        // Need Timeout, to Allow animation to finish'
+        $timeout(function () {
+          $state.go('^');
+          scope.show = false;
+        }, 1003);
       };
     },
     template: "<div class='ng-modal' ng-show='show'><div class='ng-modal-overlay' ng-click='hideModal()'></div><div class='ng-modal-dialog' ng-style='dialogStyle'><!--div class='ng-modal-close' ng-click='hideModal()'>X</div--><div class='ng-modal-dialog-content' ng-transclude></div></div></div>"
@@ -211,12 +216,10 @@ angular.module('trrntsApp.directives', [])
 
 .directive('donutChart', function () {
   return {
-
     restrict : 'A',
     link : function (scope, element, attrs) {
       element = element[0];
       var data = [];
-      console.log(scope.countries, attrs.donutType);
       var dataset = scope[attrs.donutType] || [10,20,30,40,50];
       if (!Array.isArray(dataset) && typeof(dataset) === 'object') {
         for (var key in dataset) {

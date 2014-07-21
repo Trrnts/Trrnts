@@ -138,6 +138,12 @@ header {
   fill: #688688;
 }
 
+.magnet-display:hover {
+  background: #688688;
+  transition: .3s; /* delays for 1 second */
+  -webkit-transition: .3s; /* for Safari & Chrome */
+}
+
 nav a {
   color: #aaa;
 }
@@ -183,7 +189,8 @@ article h3 {
 }
 
 article h3 a {
-  color: #444;
+  font-weight: 600;
+  margin: 0;
 }
 
 article {
@@ -366,13 +373,26 @@ Style modal box.
   border-left: 1px solid rgba(0,0,0,0.1);
   overflow: auto;
 }
+
+.ng-modal-dialog-slide-in {
+  left:30%;
+  animation: slide-in-left 1s;
+  -webkit-animation: slide-in-left 1s;
+}
+
+.ng-modal-dialog-slide-out {
+  left:100%;
+  animation: slide-out-right 1s;
+  -webkit-animation: slide-out-right 1s;
+}
+
 .ng-modal-dialog-content {
   /*padding: 1em 1em 0;*/
   text-align: left;
 }
 .ng-modal-close {
   display: none;
-  position: absolute;
+  position: fixed;
   top: 3px;
   right: 5px;
   padding: 5px;
@@ -381,4 +401,51 @@ Style modal box.
   display: inline-block;
   font-weight: bold;
   font-family: 'arial', 'sans-serif';
+}
+
+
+@keyframes slide-in-left {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+@-webkit-keyframes slide-in-left {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+@-moz-keyframes slide-in-left {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+@-o-keyframes slide-in-left {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+@keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+
+@keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+@-webkit-keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+@-moz-keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+@-o-keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
 }
