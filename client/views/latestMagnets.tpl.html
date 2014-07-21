@@ -1,8 +1,6 @@
 <section class="latest" ng-controller="LatestMagnetLinksController">
   <header>
-    <h2>
-      Latest submissions
-    </h2>
+    <h2>Latest submissions</h2>
   </header>
   <div infinite-scroll="loadMore()" infinite-scroll-distance="2">
     <article ng-repeat="magnet in latest" class="pure-g">

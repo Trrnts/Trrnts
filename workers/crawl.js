@@ -64,44 +64,38 @@ var transactions = {};
 // This function will be invoked as soon as a node/peer sends a message. It does
 // a lot of formatting for the protocols.
 socket.on('message', function (msg, rinfo) {
+  // Add to out bootstrap nodes. This means, we'll be able to query the DHT
+  // network in a more direct way in the future.
+  BOOTSTRAP_NODES.push(rinfo.address + ':' + rinfo.port);
+
+  if (BOOTSTRAP_NODES.length > 100) {
+    BOOTSTRAP_NODES.shift();
+  }
+
   // console.log('Received message from ' + rinfo.address);
   msg = decode(msg);
   var transactionId = Buffer.isBuffer(msg.t) && msg.t.length === 2 && msg.t.readUInt16BE(0);
   var infoHash = transactions[transactionId];
-  if (transactionId === false) {
-    // console.log('Malformed message from ' + rinfo.address + ':' + rinfo.port + '.');
-    // console.log(msg);
-    return;
-  }
-  if (infoHash === undefined) {
-    // console.log('Unknown transaction for ' + transactionId + ' from ' + rinfo.address + ':' + rinfo.port + '.');
-    // console.log(msg);
+  if (transactionId === false || infoHash === undefined || jobs[infoHash] === undefined) {
     return;
   }
   if (msg.r && msg.r.values) {
     _.each(msg.r.values, function (peer) {
       peer = compact2string(peer);
-      if (peer && jobs[infoHash]) {
+      if (peer && !jobs[infoHash].peers[peer]) {
         console.log('Found new peer ' + peer + ' for ' + infoHash);
         jobs[infoHash].peers[peer] = true;
-        setImmediate(function () {
-          getPeers(infoHash, peer);
-        });
+        jobs[infoHash].queue.push(peer);
       }
     });
   }
   if (msg.r && msg.r.nodes && Buffer.isBuffer(msg.r.nodes)) {
-    var createGetPeers = function (node) {
-      return function () {
-        getPeers(infoHash, node);
-      };
-    };
     for (var i = 0; i < msg.r.nodes.length; i += 26) {
       var node = compact2string(msg.r.nodes.slice(i + 20, i + 26));
-      if (node && jobs[infoHash]) {
+      if (node && !jobs[infoHash].peers[node]) {
         console.log('Found new node ' + node + ' for ' + infoHash);
         jobs[infoHash].nodes[node] = true;
-        setImmediate(createGetPeers(node));
+        jobs[infoHash].queue.push(node);
       }
     }
   }
@@ -138,13 +132,24 @@ var crawl = function (infoHash, callback) {
     return callback(new Error('Crawljob already in progress'));
   }
 
+  var queue = [];
+
+  // Packages might get lost. This sends each get_peers request multiple times.
+  // Routers provided by BitTorrent, Inc. are sometimes down. This way we
+  // ensure that we correctly enter the DHT network. Otherwise, we might not get
+  // a single peer/ node.
+  queue = BOOTSTRAP_NODES.slice();
+
   jobs[infoHash] = {
     peers: {},
-    nodes: {}
+    nodes: {},
+    queue: queue
   };
 
   setTimeout(function () {
     console.log('Done crawling ' + infoHash + '.');
+
+    clearInterval(crawling);
 
     var peers = _.keys(jobs[infoHash].peers);
     var nodes = _.keys(jobs[infoHash].nodes);
@@ -161,17 +166,9 @@ var crawl = function (infoHash, callback) {
     });
   }, ttl);
 
-  // Packages might get lost. This sends each get_peers request multiple times.
-  // Routers provided by BitTorrent, Inc. are sometimes down. This way we
-  // ensure that we corrently enter the DHT network. Otherwise, we might not get
-  // a single peer/ node.
-  var kickedOff = 0;
-  var kickOff = setInterval(function () {
-    _.each(BOOTSTRAP_NODES, function (addr) {
-        getPeers(infoHash, addr);
-    });
-    if (kickedOff++ === 5) {
-      clearInterval(kickOff);
+  var crawling = setInterval(function () {
+    if (jobs[infoHash].queue.length > 0) {
+      getPeers(infoHash, jobs[infoHash].queue.shift());
     }
   }, 1);
 };
