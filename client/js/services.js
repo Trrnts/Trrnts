@@ -58,18 +58,19 @@ angular.module('trrntsApp.services', [])
 }])
 
 .factory('GeoFactory', ['$http', function ($http) {
-  // Return All Lat&Long witht the total peers from respective Lat&Long
-  var getLL = function (amount) {
+  // Return specified number of Lat&Long with the total number of peers for respective Lat&Long
+  var getLL = function (numberOfLls) {
     return $http({
       method:'GET',
       url:'api/locations',
       params: {
         query: 'LatAndLong',
-        number: amount
+        number: numberOfLls
       }
     });
   };
 
+  // Return specified number of countries with the total number of peers for respective countries
   var getCountry = function (amount) {
     return $http({
       method:'GET',
@@ -81,6 +82,7 @@ angular.module('trrntsApp.services', [])
     });
   };
 
+  // Return specified number of cities with the total number of peers for respective cities
   var getCity = function (amount) {
     return $http({
       method:'GET',

@@ -111,7 +111,11 @@ angular.module('trrntsApp.controllers', [])
   $scope.latAndLong = {};
   $scope.countries = {};
   $scope.cities = {};
+  $scope.numberOfCountries = 15;
+  $scope.numberOfLatAndLongs = 100;
+  $scope.numberOfCities = 10;
 
+  // Used to display data after it is received
   $scope.gotLL = false;
   $scope.gotCountries = false;
   $scope.gotCities = false;
@@ -143,7 +147,8 @@ angular.module('trrntsApp.controllers', [])
     });
   };
 
-  $scope.getLatAndLong(100);
-  $scope.getCountries(20);
-  $scope.getCities(10);
+  // Get Location Data
+  $scope.getLatAndLong($scope.numberOfLatAndLongs);
+  $scope.getCountries($scope.numberOfCountries);
+  $scope.getCities($scope.numberOfCities);
 }]);

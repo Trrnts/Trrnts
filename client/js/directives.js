@@ -157,7 +157,7 @@ angular.module('trrntsApp.directives', [])
         data = dataset;
       }
 
-      var radius = 200,
+      var radius = attrs.donutRadius || 200,
           width = radius * 2,
           height = radius * 2;
           outerRadius = width / 2;
