@@ -88,14 +88,23 @@ header {
   font-weight: 300;
 }
 
-.logo {
-  color: #688688;
+.logo a {
+  color: rgba(104, 134, 136, 0.67);
   font-weight: 700;
-  border-bottom: 2px solid #688688;
   font-size: 18px;
 }
 
-header a {
+.logo svg {
+  height: 50px;
+  width: 50px;
+  margin-bottom: -18px;
+}
+
+.logo path {
+  fill: #688688;
+}
+
+nav a {
   color: #aaa;
 }
 
