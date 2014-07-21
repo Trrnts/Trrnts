@@ -11,38 +11,38 @@ crawl.init(function () {
       if (err) {
         return;
       }
-      // redis.zadd('magnet:' + infoHash + ':peers', _.now(), result.peers.length);
-      // redis.hset('magnet:' + infoHash, 'peers', result.peers.length);
-      // redis.zadd('magnets:top', result.peers.length, infoHash);
-      //
-      // var geoMulti = redis.multi();
-      //
-      // _.each(result.peers, function (peer) {
-      //   geoMulti.pfadd('peers', peer);
-      // });
-      //
-      // var geoIncrMulti = redis.multi();
-      //
-      // geoMulti.exec(function (err, addedArray) {
-      //   _.each(addedArray, function (added, index) {
-      //     if (added > 0) {
-      //       var peer = result.peers[index];
-      //       var ip = peer.split(':')[0];
-      //       var geo = geoip.lookup(ip) || {};
-      //       geo.country = geo.country || '?';
-      //       geo.region = geo.region || '?';
-      //       geo.city = geo.city || '?';
-      //       geo.ll = geo.ll || ['?', '?'];
-      //       geo.ll = geo.ll.join(',');
-      //
-      //       geoIncrMulti.zincrby('geo:countries', 1, geo.country);
-      //       geoIncrMulti.zincrby('geo:regions', 1, geo.region);
-      //       geoIncrMulti.zincrby('geo:cities', 1, geo.city);
-      //       geoIncrMulti.zincrby('geo:ll', 1, geo.ll);
-      //     }
-      //   });
-      //   geoIncrMulti.exec();
-      // });
+      redis.zadd('magnet:' + infoHash + ':peers', _.now(), result.peers.length);
+      redis.hset('magnet:' + infoHash, 'peers', result.peers.length);
+      redis.zadd('magnets:top', result.peers.length, infoHash);
+
+      var geoMulti = redis.multi();
+
+      _.each(result.peers, function (peer) {
+        geoMulti.pfadd('peers', peer);
+      });
+
+      var geoIncrMulti = redis.multi();
+
+      geoMulti.exec(function (err, addedArray) {
+        _.each(addedArray, function (added, index) {
+          if (added > 0) {
+            var peer = result.peers[index];
+            var ip = peer.split(':')[0];
+            var geo = geoip.lookup(ip) || {};
+            geo.country = geo.country || '?';
+            geo.region = geo.region || '?';
+            geo.city = geo.city || '?';
+            geo.ll = geo.ll || ['?', '?'];
+            geo.ll = geo.ll.join(',');
+
+            geoIncrMulti.zincrby('geo:countries', 1, geo.country);
+            geoIncrMulti.zincrby('geo:regions', 1, geo.region);
+            geoIncrMulti.zincrby('geo:cities', 1, geo.city);
+            geoIncrMulti.zincrby('geo:ll', 1, geo.ll);
+          }
+        });
+        geoIncrMulti.exec();
+      });
     };
   };
 
@@ -58,7 +58,8 @@ crawl.init(function () {
     });
   };
   next();
-  setInterval(next, ttl*1.05);
+  setInterval(next, ttl + 1000);
+  // One second should be enough to store the data to the DB.
 
 
   // Example usage:
