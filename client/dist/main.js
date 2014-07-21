@@ -424,6 +424,7 @@ angular.module('trrntsApp.directives', [])
       element = element[0];
       var data = [];
       var dataset = scope[attrs.donutType] || [10,20,30,40,50];
+      // var highlightHeightDiff = attrs.highlightHeightDiff || 20;
       if (!Array.isArray(dataset) && typeof(dataset) === 'object') {
         for (var key in dataset) {
           if (key !== '?') {
@@ -437,11 +438,20 @@ angular.module('trrntsApp.directives', [])
         data = dataset;
       }
 
+      // Initializes a new tooltip.
+      var tip = d3.tip()
+        .attr('class', 'd3-tip')
+        .offset([-20-10, 0])
+        .html(function(d) {
+          return '<div>Total Number of Torrents: <strong> ' + d.value + '</strong></div>';
+        });
+
       var radius = attrs.donutRadius || 200,
           width = radius * 2,
           height = radius * 2;
           outerRadius = width / 2;
           innerRadius = width / 3;
+
       var pie = d3.layout.pie()
                   .sort(null)
                   .value(function (d) {
@@ -467,7 +477,7 @@ angular.module('trrntsApp.directives', [])
          .append('g')
          .attr('class', 'arc')
          .attr('transform', 'translate(' + outerRadius + ',' +
-                                           innerRadius + ')');
+                                           innerRadius + ')').call(tip);
 
       arcs.append('path')
           .attr('fill', function(d, i) {
@@ -483,6 +493,9 @@ angular.module('trrntsApp.directives', [])
           .text(function (d) {
             return d.data.label;
           });
+
+      arcs.on('mouseover', tip.show);
+      arcs.on('mouseleave', tip.hide);
     }
   };
 });
