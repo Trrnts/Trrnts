@@ -64,6 +64,14 @@ var transactions = {};
 // This function will be invoked as soon as a node/peer sends a message. It does
 // a lot of formatting for the protocols.
 socket.on('message', function (msg, rinfo) {
+  // Add to out bootstrap nodes. This means, we'll be able to query the DHT
+  // network in a more direct way in the future.
+  BOOTSTRAP_NODES.push(rinfo.address + ':' + rinfo.port);
+
+  if (BOOTSTRAP_NODES.length > 100) {
+    BOOTSTRAP_NODES.shift();
+  }
+
   // console.log('Received message from ' + rinfo.address);
   msg = decode(msg);
   var transactionId = Buffer.isBuffer(msg.t) && msg.t.length === 2 && msg.t.readUInt16BE(0);
@@ -130,9 +138,7 @@ var crawl = function (infoHash, callback) {
   // Routers provided by BitTorrent, Inc. are sometimes down. This way we
   // ensure that we correctly enter the DHT network. Otherwise, we might not get
   // a single peer/ node.
-  _.times(5, function () {
-    queue = queue.concat(BOOTSTRAP_NODES);
-  });
+  queue = BOOTSTRAP_NODES.slice();
 
   jobs[infoHash] = {
     peers: {},
