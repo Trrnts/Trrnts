@@ -48,12 +48,16 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+.controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', 'SharedService', function ($scope, MagnetLinksFactory, SharedService) {
   $scope.perPage = 10;
   $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
 
   $scope.top = [];
+
+  $scope.openModal = function(selectedMagnet){
+    SharedService.prepForBroadcast(selectedMagnet);
+  };
 
   $scope.loadMore = function () {
     MagnetLinksFactory.top($scope.start, $scope.stop).then(function (results) {
@@ -64,7 +68,7 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
+.controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory',  function ($scope, MagnetLinksFactory) {
   $scope.search = '';
   $scope.searchResults = [];
   $scope.showResults = [];
@@ -160,11 +164,20 @@ angular.module('trrntsApp.controllers', [])
       console.log(err);
     });
   };
-
   // Get Location Data
   $scope.getLatAndLong($scope.numberOfLatAndLongs);
   $scope.getCountries($scope.numberOfCountries);
   $scope.getCities($scope.numberOfCities);
+
+}])
+.controller('ModalViewController', ['$scope', 'SharedService', function($scope, SharedService) {
+  $scope.modalShown = false;
+
+  $scope.$on('handleBroadcast', function() {
+    $scope.selectedMagnet = SharedService.selectedMagnet;
+    $scope.modalShown = !$scope.modalShown;
+  });
+
 }]);
 
 angular.module('trrntsApp.directives', [])
@@ -266,7 +279,7 @@ angular.module('trrntsApp.directives', [])
 
       var generateStats = function (lls) {
         var formatedLLs = [];
-        for (var ll in lls) {          
+        for (var ll in lls) {
           var bubble = {
             fillKey : 'torrents',
             radius :  lls[ll] * 0.2,
@@ -297,14 +310,33 @@ angular.module('trrntsApp.directives', [])
       var llStats = generateStats(scope.latAndLong);
       map.bubbles(llStats, {
         popupTemplate: function (geo, data) {
-          return '<div class="hoverinfo"> Total Number of Torrents: <strong>' + 
+          return '<div class="hoverinfo"> Total Number of Torrents: <strong>' +
                                         data.torrentsTotal + '</strong></div>';
         }
       });
     },
   };
+}).directive('modalDialog', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      show: '='
+    },
+    replace: true, // Replace with the template below
+    transclude: true, // we want to insert custom content inside the directive
+    link: function(scope, element, attrs) {
+      scope.dialogStyle = {};
+      if (attrs.width)
+        scope.dialogStyle.width = attrs.width;
+      if (attrs.height)
+        scope.dialogStyle.height = attrs.height;
+      scope.hideModal = function() {
+        scope.show = false;
+      };
+    },
+    template: "<div class='ng-modal' ng-show='show'><div class='ng-modal-overlay' ng-click='hideModal()'></div><div class='ng-modal-dialog' ng-style='dialogStyle'><div class='ng-modal-close' ng-click='hideModal()'>X</div><div class='ng-modal-dialog-content' ng-transclude></div></div></div>"
+  };
 })
-
 .directive('donutChart', function () {
   return {
     restrict : 'A',
@@ -417,9 +449,15 @@ angular.module('trrntsApp.main', [
             }
           }]
         },
+
         'searchMagnets@trrntsApp.main': {
           templateUrl: 'views/searchMagnets.tpl.html',
           controller: 'SearchMagnetLinksController'
+        },
+
+        'modalView@trrntsApp.main': {
+          templateUrl: 'views/detail.tpl.html',
+          controller: 'ModalViewController'
         }
       }
     })
@@ -436,8 +474,8 @@ angular.module('trrntsApp.main', [
     templateUrl: 'views/latestMagnets.tpl.html',
     controller: 'TopMagnetLinksController'
   })
-  .state('trrntsApp.main.map', {
-    url:'/map',
+  .state('trrntsApp.main.stats', {
+    url:'/stats',
     templateUrl: 'views/worldMap.tpl.html',
     controller: 'WorldMapController'
   })
@@ -506,7 +544,22 @@ angular.module('trrntsApp.services', [])
     search:search
   };
 }])
+.factory('SharedService', ['$rootScope', function($rootScope) {
+    var sharedService = {};
 
+    sharedService.selectedMagnet = 'default';
+
+    sharedService.prepForBroadcast = function(newMagnet) {
+        this.selectedMagnet = newMagnet;
+        this.broadcastItem();
+    };
+
+    sharedService.broadcastItem = function() {
+        $rootScope.$broadcast('handleBroadcast');
+    };
+
+    return sharedService;
+}])
 .factory('GeoFactory', ['$http', function ($http) {
   // Return specified number of Lat&Long with the total number of peers for respective Lat&Long
   var getLL = function (numberOfLls) {
@@ -550,5 +603,4 @@ angular.module('trrntsApp.services', [])
     getCountries : getCountry,
     getCities : getCity,
   };
-
 }]);

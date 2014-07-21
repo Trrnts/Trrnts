@@ -30,9 +30,15 @@ angular.module('trrntsApp.main', [
             }
           }]
         },
+
         'searchMagnets@trrntsApp.main': {
           templateUrl: 'views/searchMagnets.tpl.html',
           controller: 'SearchMagnetLinksController'
+        },
+
+        'modalView@trrntsApp.main': {
+          templateUrl: 'views/detail.tpl.html',
+          controller: 'ModalViewController'
         }
       }
     })
@@ -49,8 +55,8 @@ angular.module('trrntsApp.main', [
     templateUrl: 'views/latestMagnets.tpl.html',
     controller: 'TopMagnetLinksController'
   })
-  .state('trrntsApp.main.map', {
-    url:'/map',
+  .state('trrntsApp.main.stats', {
+    url:'/stats',
     templateUrl: 'views/worldMap.tpl.html',
     controller: 'WorldMapController'
   })

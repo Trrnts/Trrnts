@@ -97,7 +97,7 @@ angular.module('trrntsApp.directives', [])
 
       var generateStats = function (lls) {
         var formatedLLs = [];
-        for (var ll in lls) {          
+        for (var ll in lls) {
           var bubble = {
             fillKey : 'torrents',
             radius :  lls[ll] * 0.2,
@@ -128,14 +128,33 @@ angular.module('trrntsApp.directives', [])
       var llStats = generateStats(scope.latAndLong);
       map.bubbles(llStats, {
         popupTemplate: function (geo, data) {
-          return '<div class="hoverinfo"> Total Number of Torrents: <strong>' + 
+          return '<div class="hoverinfo"> Total Number of Torrents: <strong>' +
                                         data.torrentsTotal + '</strong></div>';
         }
       });
     },
   };
+}).directive('modalDialog', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      show: '='
+    },
+    replace: true, // Replace with the template below
+    transclude: true, // we want to insert custom content inside the directive
+    link: function(scope, element, attrs) {
+      scope.dialogStyle = {};
+      if (attrs.width)
+        scope.dialogStyle.width = attrs.width;
+      if (attrs.height)
+        scope.dialogStyle.height = attrs.height;
+      scope.hideModal = function() {
+        scope.show = false;
+      };
+    },
+    template: "<div class='ng-modal' ng-show='show'><div class='ng-modal-overlay' ng-click='hideModal()'></div><div class='ng-modal-dialog' ng-style='dialogStyle'><div class='ng-modal-close' ng-click='hideModal()'>X</div><div class='ng-modal-dialog-content' ng-transclude></div></div></div>"
+  };
 })
-
 .directive('donutChart', function () {
   return {
     restrict : 'A',

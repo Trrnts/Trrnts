@@ -56,7 +56,22 @@ angular.module('trrntsApp.services', [])
     search:search
   };
 }])
+.factory('SharedService', ['$rootScope', function($rootScope) {
+    var sharedService = {};
 
+    sharedService.selectedMagnet = 'default';
+
+    sharedService.prepForBroadcast = function(newMagnet) {
+        this.selectedMagnet = newMagnet;
+        this.broadcastItem();
+    };
+
+    sharedService.broadcastItem = function() {
+        $rootScope.$broadcast('handleBroadcast');
+    };
+
+    return sharedService;
+}])
 .factory('GeoFactory', ['$http', function ($http) {
   // Return specified number of Lat&Long with the total number of peers for respective Lat&Long
   var getLL = function (numberOfLls) {
@@ -100,5 +115,4 @@ angular.module('trrntsApp.services', [])
     getCountries : getCountry,
     getCities : getCity,
   };
-
 }]);
