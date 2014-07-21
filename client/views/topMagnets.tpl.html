@@ -3,6 +3,7 @@
     <h2>Top submissions</h2>
   </header>
   <div infinite-scroll="loadMore()" infinite-scroll-distance="2" infinite-scroll-disabled="busy">
+
     <article ng-repeat="magnet in top" class="pure-g">
       <h1 class="pure-u-1-8 score" counter max="{{magnet.peerCount}}">
       </h1>
@@ -14,7 +15,8 @@
         <!-- <svg bar-chart bar-chart-height="70"></svg> -->
       </main>
     </article>
-  </div>
-</section>
 
-<div ui-view></div>
+  </div>
+
+  <div ui-view autoscroll='false'></div>
+</section>
