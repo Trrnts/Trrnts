@@ -118,6 +118,10 @@ header {
   font-weight: 300;
 }
 
+.footer {
+  font-style: italic;
+}
+
 .logo a {
   color: rgba(104, 134, 136, 0.67);
   font-weight: 700;
