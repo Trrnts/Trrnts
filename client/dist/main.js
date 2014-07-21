@@ -254,7 +254,6 @@ angular.module('trrntsApp.directives', [])
       var chart = d3.select(element);
 
       var maxBars = Math.floor(chartWidth/(barWidth + barSpace));
-      console.log(chartWidth);
 
       var formattedData = [];
       for (var i = 0; i < data.length; i += 2) {
@@ -264,9 +263,9 @@ angular.module('trrntsApp.directives', [])
         });
       }
 
-      data = formattedData;
-
+      data = formattedData.reverse();
       data = data.slice(0, maxBars);
+      data = data.reverse();
 
       var y = d3.scale.linear()
                 .domain([0, d3.max(data, function (d) {
