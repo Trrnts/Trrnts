@@ -2,116 +2,450 @@
 Apply a natural box layout model to all elements. See
 http://www.paulirish.com/2012/box-sizing-border-box-ftw/ for details.
 */
-*, *:before, *:after {
-  -moz-box-sizing: border-box;
+
+*,
+*:before,
+*:after {
   -webkit-box-sizing: border-box;
-  box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 /*
 Change placholder color. See http://stackoverflow.com/a/2610741/3773544 for
 details
 */
-::-webkit-input-placeholder { /* WebKit browsers */
-  font-weight: 300;
-  color: #ccc;
-}
-:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-  font-weight: 300;
-  color: #ccc;
-  opacity: 1;
-}
-::-moz-placeholder { /* Mozilla Firefox 19+ */
-  font-weight: 300;
-  color: #ccc;
-  opacity: 1;
-}
-:-ms-input-placeholder { /* Internet Explorer 10+ */
+
+::-webkit-input-placeholder {
+  /* WebKit browsers */
+
   font-weight: 300;
   color: #ccc;
 }
 
+:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+
+  font-weight: 300;
+  color: #ccc;
+  opacity: 1;
+}
+
+::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+
+  font-weight: 300;
+  color: #ccc;
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  /* Internet Explorer 10+ */
+
+  font-weight: 300;
+  color: #ccc;
+}
 
 /*
 When setting the primary font stack, apply it to the Pure grid units along
 with `html`, `button`, `input`, `select`, and `textarea`. Pure Grids use
 specific font stacks to ensure the greatest OS/browser compatibility.
 */
-html, button, input, select, textarea, .pure-g [class *= "pure-u"] {
-  font: 400 14px/1.7 "Open Sans", "Helvetica Neue", Helvetica, Arial sans-serif;
-  color: #222;
+
+html,
+button,
+input,
+select,
+textarea,
+.pure-g [class*='pure-u'] {
+  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial sans-serif;
   word-wrap: break-word;
 }
 
-html {
-  padding: 0 0.5em;
-  background: #f9f9f9;
-}
-
-header, footer {
-  padding: 1em;
-  text-align: center;
-}
-
-header a {
+a {
   color: #222;
   text-decoration: none;
 }
 
-.logo {
+/*
+Use some whitespace for a smooth visual experience.
+*/
+
+html {
+  line-height: 1.7;
+  font-size: 14px;
+  padding: 0 0.5em;
+  background: #fdfdfd;
+  color: #222;
+}
+
+/*
+Style basic form elements.
+*/
+
+input[type=text], button {
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+}
+
+input[type=text] {
+  padding: 1em;
+  background: #f7f7f7;
+  border-top: 1px solid #c4c4c4;
+  border-bottom: 1px solid #e2e2e2;
+  border-left: 1px solid #dadada;
+  border-right: 1px solid #dadada;
+}
+
+
+button {
+  background: #688688;
+  font-weight: 300;
+  text-transform: uppercase;
+  margin-top: 1em;
+  border: 0;
+  color: #fff;
+  padding: 0.5em 1em;
+}
+
+/*
+Style header and nav.
+*/
+
+header {
+  margin-top: 1em;
+  font-weight: 300;
+}
+
+.footer {
+  font-style: italic;
+}
+
+.logo a {
+  color: rgba(104, 134, 136, 0.67);
   font-weight: 700;
-  border-bottom: 2px solid #222;
+  font-size: 18px;
 }
 
-header div:first-child {
-  text-align: left;
+.logo svg {
+  height: 50px;
+  width: 50px;
+  margin-bottom: -18px;
 }
 
-header div:last-child {
-  text-align: right;
+.logo path {
+  fill: #688688;
 }
 
-article {
-  background: #fff;
-  position: relative;
-  border: 1px solid #eee;
-  height: 140px;
+.magnet-display:hover {
+  background: #AEBEC1;
+  transition: .3s; /* delays for 1 second */
+  -webkit-transition: .3s; /* for Safari & Chrome */
+}
+
+nav a {
+  color: #aaa;
+}
+
+nav span {
+  color: #ddd;
+}
+
+/*
+Style heading.
+*/
+
+h2 {
+  margin: 0;
+  font-size: 80%;
+  color: #ccc;
+  text-transform: uppercase;
+  font-weight: 300;
+}
+
+/*
+Style section.
+*/
+
+section {
+  margin-top: 1.5em;
+}
+
+/*
+Style top and latest. Styles are very similar and can be reused.
+*/
+
+article .score {
+  color: #eee;
+  font-weight: 900;
+  margin: 0;
 }
 
 article h3 {
-  padding: 0;
-  margin: 1em;
+  margin: 0;
   font-weight: 600;
 }
 
 article h3 a {
-  color: #222;
-  text-decoration: none;
+  font-weight: 600;
+  margin: 0;
 }
 
-footer {
-  text-align: left;
+article {
+  padding: 1em 0;
+  padding-left: 7px;
 }
+
+article .ago {
+  color: #aaa;
+}
+
+/*
+Style submission form.
+*/
+
+.submit form {
+  padding-top: 1em;
+}
+
+.submit input[type=text] {
+  width: 100%;
+}
+
+.submit p {
+  color: #555;
+}
+
+.success {
+  color: #669900;
+}
+
+.error {
+  color: #990000;
+}
+
+/*
+Style bar chart.
+*/
+
+svg[bar-chart] {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: block;
+  height: 150px;
+  width: 100%;
+}
+
+svg[bar-chart] .bar {
+  cursor: pointer;
+  fill: #eee;
+}
+
+/* Chrome, Safari, Opera */
+@-webkit-keyframes highlight-bar {
+  from {fill: #eee;}
+  to {fill: #0066cc;}
+}
+
+/* Standard syntax */
+@keyframes highlight-bar {
+  from {fill: #eee;}
+  to {fill: #0066cc;}
+}
+
+svg[bar-chart] .bar:hover {
+  -webkit-animation: highlight-bar 1s; /* Chrome, Safari, Opera */
+  animation: highlight-bar 1s;
+  fill: #0066cc;
+}
+
+/* Tooltips for bar chart */
+.d3-tip {
+  position: absolute;
+  line-height: 1;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 80%;
+  z-index: 100000;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: '\25BC';
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+.donut-chart {
+  margin-left:5em;
+  display: inline-block;
+}
+
+.donut-chart-label {
+  margin-right:28em;
+  text-decoration: underline;
+  font-weight:bold;
+  display: inline-block;
+}
+
+/*
+Make it responsive! These styles only apply on 'large' screens. This stylesheet
+leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
+At least it tries to...
+*/
 
 @media screen and (min-width: 48em) {
   html {
-    padding: 0 3em;
+    text-align: center;
   }
-  header, footer {
-    padding: 1em;
+
+  body {
+    max-width: 1000px;
+    text-align: left;
+    margin: 0 auto;
   }
-  article h3 {
-    margin: 0.5em;
+
+  nav, .submit .pure-u-md-1-8 {
+    text-align: right;
   }
 }
 
-article svg[bar-chart] {
-  height: 70px;
-  display: block;
-  position: absolute;
-  bottom: 0;
+/*
+Style modal box.
+*/
+.detailed {
+  padding: 0;
+  padding-bottom: 200px;
 }
 
-article svg[bar-chart] .bar {
-  fill: #eee;
+.detailed header {
+  padding: 1em;
+  margin: 0;
+  background: #f9f9f9;
+  border-bottom: 1px solid #eee;
+}
+
+.detailed dl {
+  padding: 1em;
+}
+
+.ng-modal-overlay {
+  /* A dark translucent div that covers the whole screen */
+  position:fixed;
+  z-index:9999;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: #fff;
+  opacity: 0.5;
+}
+.ng-modal-dialog {
+  height: 100%;
+  /* A centered div above the overlay with a box shadow. */
+  z-index:10000;
+  position: fixed;
+  width: 70%; /* Default */
+
+  /* Center the dialog */
+  top: 0%;
+  left: 30%;
+
+  background: #fff;
+  box-shadow: 0 0 20px rgba(0,0,0,0.25);
+  border-left: 1px solid rgba(0,0,0,0.1);
+  overflow: auto;
+}
+
+.ng-modal-dialog-slide-in {
+  left:30%;
+  animation: slide-in-left 1s;
+  -webkit-animation: slide-in-left 1s;
+}
+
+.ng-modal-dialog-slide-out {
+  left:100%;
+  animation: slide-out-right 1s;
+  -webkit-animation: slide-out-right 1s;
+}
+
+.ng-modal-dialog-content {
+  /*padding: 1em 1em 0;*/
+  text-align: left;
+}
+.ng-modal-close {
+  display: none;
+  position: fixed;
+  top: 3px;
+  right: 5px;
+  padding: 5px;
+  cursor: pointer;
+  font-size: 120%;
+  display: inline-block;
+  font-weight: bold;
+  font-family: 'arial', 'sans-serif';
+}
+
+
+@keyframes slide-in-left {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+@-webkit-keyframes slide-in-left {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+@-moz-keyframes slide-in-left {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+@-o-keyframes slide-in-left {
+  from { left:100%; }
+  to { left:30%; }
+}
+
+@keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+
+@keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+@-webkit-keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+@-moz-keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+@-o-keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
 }

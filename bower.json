@@ -2,8 +2,7 @@
   "name": "Trrnts",
   "version": "0.0.0",
   "homepage": "https://github.com/Trrnts/Trrnts",
-  "authors": [
-  ],
+  "authors": [],
   "license": "MIT",
   "ignore": [
     "**/.*",
@@ -13,6 +12,11 @@
     "tests"
   ],
   "dependencies": {
-    "angular-ui-router": "~0.2.10"
+    "angular-ui-router": "~0.2.10",
+    "moment": "~2.7.0",
+    "d3": "~3.4.10",
+    "datamaps": "~0.3.3",
+    "d3-tip": "~0.6.4",
+    "jquery": "~2.1.1"
   }
 }

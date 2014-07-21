@@ -1,0 +1,16 @@
+<modal-dialog show="modalShown" width="70%" height="100%">
+  <article class="detailed">
+    <header>
+      <h3><strong>{{selectedMagnet.name}}</strong></h3>
+    </header>
+    <dl>
+      <dt class="modal-label"><strong>Peers found on last crawl job:</strong></dt>
+        <dd> {{selectedMagnet.peerCount}} </dd>
+      <dt class="modal-label"><strong>infoHash:</strong></dt>
+        <dd> {{selectedMagnet.infoHash}} </dd>
+      <dt class="modal-label"><strong>Magnet URI:</strong></dt>
+        <dd><a href="{{selectedMagnet.magnetURI}}">{{selectedMagnet.magnetURI}}</a></dd>
+    </dl>
+    <svg bar-chart bar-chart-height="150"></svg>
+  </article>
+</modal-dialog>

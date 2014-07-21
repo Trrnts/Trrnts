@@ -1,0 +1,9 @@
+<section ng-controller="WorldMapController">
+    <div world-map ng-if="gotLL" ng-model="latAndLong" style="height:600px"></div>
+    <div>  
+      <div class="donut-chart-label">Top {{ numberOfCountries }} Countries</div>
+      <div class="donut-chart-label">Top {{ numberOfCities }} Cities</div>
+    </div>
+      <svg donut-chart class="donut-chart"donut-type="countries" donut-radius="200" ng-if="gotCountries" ng-model="countries"></svg>
+      <svg donut-chart class="donut-chart" donut-type="cities" donut-radius="200"ng-if="gotCities" ng-model="cities"></svg>
+</section>

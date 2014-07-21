@@ -1,0 +1,17 @@
+<section class="search-results" ng-controller="SearchResultsController">
+  <header>
+    <h2>Results for “{{query}}”</h2>
+  </header>
+  <article ng-repeat="magnet in results" class="pure-g">
+    <h1 class="pure-u-1-8 score" counter max="{{magnet.peerCount}}">
+    </h1>
+    <main class="pure-u-7-8">
+      <h3>
+        <a ng-click="openModal(magnet)" ui-sref='.detail'>{{magnet.name}}</a>
+      </h3>
+      <small class="ago">submitted {{magnet.createdAt | agoFilter}}</small>
+    </main>
+  </article>
+
+  <div ui-view autoscroll='false'></div>
+</section>
