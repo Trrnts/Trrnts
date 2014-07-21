@@ -97,10 +97,19 @@ angular.module('trrntsApp.directives', [])
 
       var generateStats = function (lls) {
         var formatedLLs = [];
+        var highestValue = 0;
+
+        // get Highest Value
         for (var ll in lls) {
+          if (parseInt(lls[ll]) > highestValue) {
+            highestValue = parseInt(lls[ll]);
+          }
+        }
+
+        for (ll in lls) {
           var bubble = {
             fillKey : 'torrents',
-            radius :  lls[ll] * 0.2,
+            radius :  maintainRatio(50, highestValue, lls[ll]), // Control Size by Max
             torrentsTotal: lls[ll]
           };
 
@@ -115,6 +124,10 @@ angular.module('trrntsApp.directives', [])
         return formatedLLs;
       };
 
+      var maintainRatio = function (max, highestValue, value) {
+        return Math.floor((value/highestValue) * max);
+      };
+
       var map = new Datamap({
         'element': element[0],
         fills: {
@@ -124,7 +137,6 @@ angular.module('trrntsApp.directives', [])
       });
 
       // Generate Stats
-      console.log(scope.latAndLong);
       var llStats = generateStats(scope.latAndLong);
       map.bubbles(llStats, {
         popupTemplate: function (geo, data) {
