@@ -134,7 +134,9 @@ angular.module('trrntsApp.directives', [])
       });
     },
   };
-}).directive('modalDialog', function() {
+})
+
+.directive('modalDialog',['$state', function($state) {
   return {
     restrict: 'E',
     scope: {
@@ -149,12 +151,14 @@ angular.module('trrntsApp.directives', [])
       if (attrs.height)
         scope.dialogStyle.height = attrs.height;
       scope.hideModal = function() {
+        $state.go('^');
         scope.show = false;
       };
     },
     template: "<div class='ng-modal' ng-show='show'><div class='ng-modal-overlay' ng-click='hideModal()'></div><div class='ng-modal-dialog' ng-style='dialogStyle'><div class='ng-modal-close' ng-click='hideModal()'>X</div><div class='ng-modal-dialog-content' ng-transclude></div></div></div>"
   };
-})
+}])
+
 .directive('donutChart', function () {
   return {
     restrict : 'A',

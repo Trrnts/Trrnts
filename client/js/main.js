@@ -34,11 +34,6 @@ angular.module('trrntsApp.main', [
         'searchMagnets@trrntsApp.main': {
           templateUrl: 'views/searchMagnets.tpl.html',
           controller: 'SearchMagnetLinksController'
-        },
-
-        'modalView@trrntsApp.main': {
-          templateUrl: 'views/detail.tpl.html',
-          controller: 'ModalViewController'
         }
       }
     })
@@ -73,5 +68,21 @@ angular.module('trrntsApp.main', [
     url: '/search?query',
     templateUrl: 'views/searchMagnets.tpl.html',
     controller: 'SearchResultsController'
+  })
+
+  .state('trrntsApp.main.top.detail', {
+    url: '/detail',
+    templateUrl: 'views/detail.tpl.html',
+    controller: 'ModalViewController'
+  })
+  .state('trrntsApp.main.latest.detail', {
+    url: '/detail/:magnetName',
+    templateUrl: 'views/detail.tpl.html',
+    controller: 'ModalViewController'
+  })
+  .state('trrntsApp.main.stats.detail', {
+    url: '/detail/:magnetName',
+    templateUrl: 'views/detail.tpl.html',
+    controller: 'ModalViewController'
   });
 }]);
