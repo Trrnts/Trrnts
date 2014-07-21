@@ -395,7 +395,7 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
   text-align: left;
 }
 .ng-modal-close {
-  position: absolute;
+  position: fixed;
   top: 3px;
   right: 5px;
   padding: 5px;
