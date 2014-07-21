@@ -3,6 +3,8 @@ var crawl = require('./crawl'),
     redis = require('../redis')(),
     geoip = require('geoip-lite');
 
+var ttl = 20*1000;
+
 crawl.init(function () {
   var onCrawled = function (infoHash) {
     return function (err, result) {
@@ -45,25 +47,19 @@ crawl.init(function () {
   };
 
   var next = function () {
+    // Crawl 4 infoHashes at a time.
     _.times(4, function () {
       redis.lpop('magnets:crawl', function (err, infoHash) {
         if (infoHash) {
           redis.rpush('magnets:crawl', infoHash);
-          crawl(infoHash, onCrawled(infoHash));
+          crawl(infoHash, ttl, onCrawled(infoHash));
         }
       });
     });
   };
   next();
-  setInterval(next, 60*1000*1.1);
-  // next();
-  // setInterval(next, 60*1000*1.1);
-  // next();
-  // setInterval(next, 60*1000*1.1);
-  // next();
-  // setInterval(next, 60*1000*1.1);
-  // next();
-  // setInterval(next, 60*1000*1.1);
+  setInterval(next, ttl + 1000);
+  // One second should be enough to store the data to the DB.
 
 
   // Example usage:

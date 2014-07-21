@@ -31,9 +31,6 @@ var idToBuffer = makeSafe(function (id) {
   return new Buffer(id, 'hex');
 });
 
-// Time in ms for a crawlJob to live.
-var ttl = 60*1000;
-
 var decode = makeSafe(bencode.decode, {}),
     encode = makeSafe(bencode.encode, {});
 
@@ -79,6 +76,7 @@ socket.on('message', function (msg, rinfo) {
   if (transactionId === false || infoHash === undefined || jobs[infoHash] === undefined) {
     return;
   }
+  delete transactions[transactionId];
   if (msg.r && msg.r.values) {
     _.each(msg.r.values, function (peer) {
       peer = compact2string(peer);
@@ -113,6 +111,11 @@ var getPeers = function (infoHash, addr) {
   // var transactionId = _.random(Math.pow(2, 16));
   var transactionId = _.random(Math.pow(2, 12));
   transactions[transactionId] = infoHash;
+  setTimeout(function () {
+    // Delete transaction after five seconds, if we didn't get a response.
+    // This is extremely important. Otherwise we might get a memory leak.
+    delete transactions[transactionId];
+  }, 5000);
   var message = encode({
     t: transactionIdToBuffer(transactionId),
     y: 'q',
@@ -125,7 +128,7 @@ var getPeers = function (infoHash, addr) {
   socket.send(message, 0, message.length, port, ip);
 };
 
-var crawl = function (infoHash, callback) {
+var crawl = function (infoHash, ttl, callback) {
   console.log('Crawling ' + infoHash + '...');
 
   if (jobs[infoHash]) {
@@ -138,7 +141,9 @@ var crawl = function (infoHash, callback) {
   // Routers provided by BitTorrent, Inc. are sometimes down. This way we
   // ensure that we correctly enter the DHT network. Otherwise, we might not get
   // a single peer/ node.
-  queue = BOOTSTRAP_NODES.slice();
+  _.times(5, function () {
+    queue = queue.concat(BOOTSTRAP_NODES);
+  });
 
   jobs[infoHash] = {
     peers: {},
@@ -149,6 +154,7 @@ var crawl = function (infoHash, callback) {
   setTimeout(function () {
     console.log('Done crawling ' + infoHash + '.');
 
+    // Clear interval. Don't mess up the event loop!
     clearInterval(crawling);
 
     var peers = _.keys(jobs[infoHash].peers);
@@ -157,6 +163,8 @@ var crawl = function (infoHash, callback) {
     console.log('Found ' + peers.length + ' peers for ' + infoHash + '.');
     console.log('Found ' + nodes.length + ' nodes for ' + infoHash + '.');
 
+    // Delete the job! This is for future crawling and in order to prevent
+    // memory leaks very important!
     delete jobs[infoHash];
     console.log('Successfully deleted crawl job for ' + infoHash + '.');
 
@@ -164,8 +172,11 @@ var crawl = function (infoHash, callback) {
       peers: peers,
       nodes: nodes
     });
+    // Time in ms for a job to live.
   }, ttl);
 
+  // We limit the number of outgoing UDP requests to 1000 packages per second.
+  // We clear this interval in the setTimeout function above.
   var crawling = setInterval(function () {
     if (jobs[infoHash].queue.length > 0) {
       getPeers(infoHash, jobs[infoHash].queue.shift());

@@ -80,6 +80,36 @@ html {
 }
 
 /*
+Style basic form elements.
+*/
+
+input[type=text], button {
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+}
+
+input[type=text] {
+  padding: 1em;
+  background: #f7f7f7;
+  border-top: 1px solid #c4c4c4;
+  border-bottom: 1px solid #e2e2e2;
+  border-left: 1px solid #dadada;
+  border-right: 1px solid #dadada;
+}
+
+
+button {
+  background: #688688;
+  font-weight: 300;
+  text-transform: uppercase;
+  margin-top: 1em;
+  border: 0;
+  color: #fff;
+  padding: 0.5em 1em;
+}
+
+/*
 Style header and nav.
 */
 
@@ -169,34 +199,8 @@ Style submission form.
   padding-top: 1em;
 }
 
-.submit input, .submit button {
-  border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-}
-
-.submit input {
-  padding: 1em;
-  background: #f7f7f7;
-  border-top: 1px solid #c4c4c4;
-  border-bottom: 1px solid #e2e2e2;
-  border-left: 1px solid #dadada;
-  border-right: 1px solid #dadada;
+.submit input[type=text] {
   width: 100%;
-}
-
-.submit button {
-  background: #688688;
-  font-weight: 300;
-  text-transform: uppercase;
-  margin-top: 1em;
-  border: 0;
-  color: #fff;
-  /*border-top: 1px solid #c4c4c4;
-  border-bottom: 1px solid #e2e2e2;
-  border-left: 1px solid #dadada;
-  border-right: 1px solid #dadada;*/
-  padding: 0.5em 1em;
 }
 
 .submit p {
@@ -311,10 +315,6 @@ article {
   left: 0;
 }*/
 
-
-section {
-  margin-top: 1.5em;
-}
 
 .donut-chart {
   margin-left:5em;
