@@ -46,8 +46,8 @@ crawl.init(function () {
 
   var next = function () {
     redis.lpop('magnets:crawl', function (err, infoHash) {
-      redis.rpush('magnets:crawl', infoHash);
       if (infoHash) {
+        redis.rpush('magnets:crawl', infoHash);
         crawl(infoHash, onCrawled(infoHash));
       }
     });
