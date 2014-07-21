@@ -6,24 +6,23 @@ angular.module('trrntsApp.main', [
   'trrntsApp.controllers',
   'trrntsApp.services',
   'trrntsApp.directives',
-  'trrntsApp.filters'
+  'trrntsApp.filters',
+  'infinite-scroll'
 ])
-.config(['$stateProvider',function ($stateProvider) {
+.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
 
   // This is our default state, here we load the templates and the subviews
+  $urlRouterProvider.otherwise('/top');
+
   $stateProvider
     .state('trrntsApp.main', {
       url: '',
-      views:{
+      views: {
         '': {
-          templateUrl: 'views/main.tpl.html',
           // We need this line in order to set the default child view that
           // will be inserted into <div ui-view></div> inside the main template
-          controller: ['$state', function($state) {
-            $state.go('trrntsApp.main.top');
-          }]
+          templateUrl: 'views/main.tpl.html',
         },
-
         'searchMagnets@trrntsApp.main': {
           templateUrl: 'views/searchMagnets.tpl.html',
           controller: 'SearchMagnetLinksController'

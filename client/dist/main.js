@@ -39,33 +39,29 @@ angular.module('trrntsApp.controllers', [])
 
   $scope.latest = [];
 
-  var update = function () {
-    MagnetLinksFactory.latest($scope.start, $scope.stop).then(function (result) {
-      $scope.latest = result.data;
-    }).catch(function () {
-      $scope.latest = [];
+  $scope.loadMore = function () {
+    MagnetLinksFactory.latest($scope.start, $scope.stop).then(function (results) {
+      $scope.latest = $scope.latest.concat(results.data);
+      $scope.start += $scope.perPage;
+      $scope.stop += $scope.perPage;
     });
   };
-
-  update();
 }])
 
 .controller('TopMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
   $scope.perPage = 10;
   $scope.start = 0;
   $scope.stop = $scope.start + $scope.perPage - 1;
+
   $scope.top = [];
 
-  var update = function () {
-    MagnetLinksFactory.top($scope.start, $scope.stop).then(function (result) {
-      $scope.top = result.data;
-
-    }).catch(function () {
-      $scope.top = [];
+  $scope.loadMore = function () {
+    MagnetLinksFactory.top($scope.start, $scope.stop).then(function (results) {
+      $scope.top = $scope.top.concat(results.data);
+      $scope.start += $scope.perPage;
+      $scope.stop += $scope.perPage;
     });
   };
-
-  update();
 }])
 
 .controller('SearchMagnetLinksController', ['$scope', 'MagnetLinksFactory', function ($scope, MagnetLinksFactory) {
@@ -302,7 +298,7 @@ angular.module('trrntsApp.directives', [])
       map.bubbles(llStats, {
         popupTemplate: function (geo, data) {
           return '<div class="hoverinfo"> Total Number of Torrents: <strong>' + 
-                                              data.torrentsTotal + '</strong></div>';
+                                        data.torrentsTotal + '</strong></div>';
         }
       });
     },
@@ -321,9 +317,9 @@ angular.module('trrntsApp.directives', [])
         for (var key in dataset) {
           if (key !== '?') {
             data.push({
-                        'label' : key,
-                        'value' : dataset[key]
-                      });
+              'label' : key,
+              'value' : dataset[key]
+            });
           }
         }
       } else {
@@ -350,7 +346,7 @@ angular.module('trrntsApp.directives', [])
                   .attr('height', height)
                   .append("g")
                   .attr("transform", "translate(" + 0 + "," +
-                                                    height / 6 + ")");
+                                                height / 6 + ")");
 
       var color = d3.scale.category20();
 
@@ -397,24 +393,23 @@ angular.module('trrntsApp.main', [
   'trrntsApp.controllers',
   'trrntsApp.services',
   'trrntsApp.directives',
-  'trrntsApp.filters'
+  'trrntsApp.filters',
+  'infinite-scroll'
 ])
-.config(['$stateProvider',function ($stateProvider) {
+.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, $urlRouterProvider) {
 
   // This is our default state, here we load the templates and the subviews
+  $urlRouterProvider.otherwise('/top');
+
   $stateProvider
     .state('trrntsApp.main', {
       url: '',
-      views:{
+      views: {
         '': {
-          templateUrl: 'views/main.tpl.html',
           // We need this line in order to set the default child view that
           // will be inserted into <div ui-view></div> inside the main template
-          controller: ['$state', function($state) {
-            $state.go('trrntsApp.main.top');
-          }]
+          templateUrl: 'views/main.tpl.html',
         },
-
         'searchMagnets@trrntsApp.main': {
           templateUrl: 'views/searchMagnets.tpl.html',
           controller: 'SearchMagnetLinksController'
