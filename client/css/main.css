@@ -388,10 +388,20 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
   left:30%;
   background-color: #fff;
   box-shadow: 4px 4px 80px #000;
-
-  animation: slideInLeft 1s;
-  -webkit-animation: slideInLeft 1s;
 }
+
+.ng-modal-dialog-slide-in {
+  left:30%;
+  animation: slide-in-left 1s;
+  -webkit-animation: slide-in-left 1s;
+}
+
+.ng-modal-dialog-slide-out {
+  left:100%;
+  animation: slide-out-right 1s;
+  -webkit-animation: slide-out-right 1s;
+}
+
 .ng-modal-dialog-content {
   padding:10px;
   text-align: left;
@@ -408,23 +418,49 @@ leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
   font-family: 'arial', 'sans-serif';
 }
 
-@keyframes slideInLeft {
+
+@keyframes slide-in-left {
   from { left:100%; }
   to { left:30%; }
 }
 
-
-@-webkit-keyframes slideInLeft {
+@-webkit-keyframes slide-in-left {
   from { left:100%; }
   to { left:30%; }
 }
 
-@-moz-keyframes slideInLeft {
+@-moz-keyframes slide-in-left {
   from { left:100%; }
   to { left:30%; }
 }
 
-@-o-keyframes slideInLeft {
+@-o-keyframes slide-in-left {
   from { left:100%; }
   to { left:30%; }
+}
+
+@keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+
+@keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+@-webkit-keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+@-moz-keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
+}
+
+@-o-keyframes slide-out-right {
+  from { left:30%; }
+  to { left:100%; }
 }
