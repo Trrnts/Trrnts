@@ -24,10 +24,13 @@ angular.module('trrntsApp.main', [
             $state.go('trrntsApp.main.top');
           }]
         },
-
         'searchMagnets@trrntsApp.main': {
           templateUrl: 'views/searchMagnets.tpl.html',
           controller: 'SearchMagnetLinksController'
+        },
+        'modalView@trrntsApp.main': {
+          templateUrl: 'views/detail.tpl.html',
+          controller: 'ModalViewController'
         }
       }
     })
