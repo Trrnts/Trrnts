@@ -121,8 +121,50 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('WorldMapController', ['$scope', function ($scope) {
+.controller('WorldMapController', ['$scope', 'GeoFactory', function ($scope, GeoFactory) {
+  $scope.latAndLong = {};
+  $scope.countries = {};
+  $scope.cities = {};
+  $scope.numberOfCountries = 15;
+  $scope.numberOfLatAndLongs = 100;
+  $scope.numberOfCities = 10;
 
+  // Used to display data after it is received
+  $scope.gotLL = false;
+  $scope.gotCountries = false;
+  $scope.gotCities = false;
+
+  $scope.getLatAndLong = function (amount) {
+    GeoFactory.getLatAndLong(amount).then(function (results) {
+      $scope.latAndLong = results.data;
+      $scope.gotLL = true;
+    }).catch(function (err) {
+      console.log(err);
+    });
+  };
+
+  $scope.getCountries = function (amount) {
+    GeoFactory.getCountries(amount).then(function (results) {
+      $scope.countries = results.data;
+      $scope.gotCountries = true;
+    }).catch(function (err) {
+      console.log(err);
+    });
+  };
+
+  $scope.getCities = function (amount) {
+    GeoFactory.getCities(amount).then(function (results) {
+      $scope.cities = results.data;
+      $scope.gotCities = true;
+    }).catch(function (err) {
+      console.log(err);
+    });
+  };
+
+  // Get Location Data
+  $scope.getLatAndLong($scope.numberOfLatAndLongs);
+  $scope.getCountries($scope.numberOfCountries);
+  $scope.getCities($scope.numberOfCities);
 }]);
 
 angular.module('trrntsApp.directives', [])
@@ -221,31 +263,25 @@ angular.module('trrntsApp.directives', [])
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {
-      var generateFakePositions = function () {
-        var fakePositions = [];
-        var fakeLatAndLong = [[49.45045869, -65.15636998],
-                        [37.12726948, -17.72583572],
-                        [1.16322135, 127.68441455],
-                        [-25.38805351, 88.82525081],
-                        [-30.31687802, 25.57883445],
-                        [-26.46000555, -134.44309036],
-                        [-33.52151968, -82.46394689],
-                        [-24.96600279, -90.20244849],
-                        [-70.94843404, -146.08284954],
-                        [-27.03729112, 36.61236272]];
 
-        for (var i = 0; i < fakeLatAndLong.length; i++) {
-          var spot = {
-            radius: Math.floor(Math.random()*50),
-            fillKey: 'torrents'
+      var generateStats = function (lls) {
+        var formatedLLs = [];
+        for (var ll in lls) {          
+          var bubble = {
+            fillKey : 'torrents',
+            radius :  lls[ll] * 0.2,
+            torrentsTotal: lls[ll]
           };
-          spot.latitude = fakeLatAndLong[i][0];
-          spot.longitude = fakeLatAndLong[i][1];
-          // console.log(fakeLatAndLong[i][0], fakeLatAndLong[i][1]);
-          fakePositions.push(spot);
+
+          var latAndLong = ll.split(',');
+          bubble.latitude = latAndLong[0];
+          bubble.longitude = latAndLong[1];
+          if (latAndLong.length > 1 && latAndLong[0] !== '?') {
+            formatedLLs.push(bubble);
+          }
         }
 
-        return fakePositions;
+        return formatedLLs;
       };
 
       var map = new Datamap({
@@ -256,11 +292,87 @@ angular.module('trrntsApp.directives', [])
         }
       });
 
-      // Generate Fake Stats
-      var fakePositions = generateFakePositions();
-      // console.log(fakePositions);
-      map.bubbles(fakePositions);
+      // Generate Stats
+      console.log(scope.latAndLong);
+      var llStats = generateStats(scope.latAndLong);
+      map.bubbles(llStats, {
+        popupTemplate: function (geo, data) {
+          return '<div class="hoverinfo"> Total Number of Torrents: <strong>' + 
+                                        data.torrentsTotal + '</strong></div>';
+        }
+      });
     },
+  };
+})
+
+.directive('donutChart', function () {
+  return {
+    restrict : 'A',
+    link : function (scope, element, attrs) {
+      element = element[0];
+      var data = [];
+      console.log(scope.countries, attrs.donutType);
+      var dataset = scope[attrs.donutType] || [10,20,30,40,50];
+      if (!Array.isArray(dataset) && typeof(dataset) === 'object') {
+        for (var key in dataset) {
+          if (key !== '?') {
+            data.push({
+              'label' : key,
+              'value' : dataset[key]
+            });
+          }
+        }
+      } else {
+        data = dataset;
+      }
+
+      var radius = attrs.donutRadius || 200,
+          width = radius * 2,
+          height = radius * 2;
+          outerRadius = width / 2;
+          innerRadius = width / 3;
+      var pie = d3.layout.pie()
+                  .sort(null)
+                  .value(function (d) {
+                    return d.value || d;
+                  });
+
+      var arc = d3.svg.arc()
+                  .outerRadius(outerRadius)
+                  .innerRadius(innerRadius);
+
+      var svg = d3.select(element)
+                  .attr('width', width)
+                  .attr('height', height)
+                  .append("g")
+                  .attr("transform", "translate(" + 0 + "," +
+                                                height / 6 + ")");
+
+      var color = d3.scale.category20();
+
+      var arcs = svg.selectAll('g.arc')
+         .data(pie(data))
+         .enter()
+         .append('g')
+         .attr('class', 'arc')
+         .attr('transform', 'translate(' + outerRadius + ',' +
+                                           innerRadius + ')');
+
+      arcs.append("path")
+          .attr("fill", function(d, i) {
+            return color(i);
+          })
+          .attr("d", arc);
+
+      arcs.append('text')
+          .attr('transform', function (d) {
+            return "translate(" + arc.centroid(d) + ")";
+          })
+          .attr('text-anchor', 'middle')
+          .text(function (d) {
+            return d.data.label;
+          });
+    }
   };
 });
 
@@ -386,4 +498,50 @@ angular.module('trrntsApp.services', [])
     top: top,
     search:search
   };
+}])
+
+.factory('GeoFactory', ['$http', function ($http) {
+  // Return specified number of Lat&Long with the total number of peers for respective Lat&Long
+  var getLL = function (numberOfLls) {
+    return $http({
+      method:'GET',
+      url:'api/locations',
+      params: {
+        query: 'LatAndLong',
+        number: numberOfLls
+      }
+    });
+  };
+
+  // Return specified number of countries with the total number of peers for respective countries
+  var getCountry = function (amount) {
+    return $http({
+      method:'GET',
+      url:'api/locations',
+      params: {
+        query: 'Country',
+        number: amount
+      }
+    });
+  };
+
+  // Return specified number of cities with the total number of peers for respective cities
+  var getCity = function (amount) {
+    return $http({
+      method:'GET',
+      url:'api/locations',
+      params: {
+        query: 'City',
+        number: amount
+      }
+    });
+  };
+
+
+  return {
+    getLatAndLong : getLL,
+    getCountries : getCountry,
+    getCities : getCity,
+  };
+
 }]);

@@ -55,4 +55,50 @@ angular.module('trrntsApp.services', [])
     top: top,
     search:search
   };
+}])
+
+.factory('GeoFactory', ['$http', function ($http) {
+  // Return specified number of Lat&Long with the total number of peers for respective Lat&Long
+  var getLL = function (numberOfLls) {
+    return $http({
+      method:'GET',
+      url:'api/locations',
+      params: {
+        query: 'LatAndLong',
+        number: numberOfLls
+      }
+    });
+  };
+
+  // Return specified number of countries with the total number of peers for respective countries
+  var getCountry = function (amount) {
+    return $http({
+      method:'GET',
+      url:'api/locations',
+      params: {
+        query: 'Country',
+        number: amount
+      }
+    });
+  };
+
+  // Return specified number of cities with the total number of peers for respective cities
+  var getCity = function (amount) {
+    return $http({
+      method:'GET',
+      url:'api/locations',
+      params: {
+        query: 'City',
+        number: amount
+      }
+    });
+  };
+
+
+  return {
+    getLatAndLong : getLL,
+    getCountries : getCountry,
+    getCities : getCity,
+  };
+
 }]);

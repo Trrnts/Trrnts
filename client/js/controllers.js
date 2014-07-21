@@ -103,6 +103,48 @@ angular.module('trrntsApp.controllers', [])
   };
 }])
 
-.controller('WorldMapController', ['$scope', function ($scope) {
+.controller('WorldMapController', ['$scope', 'GeoFactory', function ($scope, GeoFactory) {
+  $scope.latAndLong = {};
+  $scope.countries = {};
+  $scope.cities = {};
+  $scope.numberOfCountries = 15;
+  $scope.numberOfLatAndLongs = 100;
+  $scope.numberOfCities = 10;
 
+  // Used to display data after it is received
+  $scope.gotLL = false;
+  $scope.gotCountries = false;
+  $scope.gotCities = false;
+
+  $scope.getLatAndLong = function (amount) {
+    GeoFactory.getLatAndLong(amount).then(function (results) {
+      $scope.latAndLong = results.data;
+      $scope.gotLL = true;
+    }).catch(function (err) {
+      console.log(err);
+    });
+  };
+
+  $scope.getCountries = function (amount) {
+    GeoFactory.getCountries(amount).then(function (results) {
+      $scope.countries = results.data;
+      $scope.gotCountries = true;
+    }).catch(function (err) {
+      console.log(err);
+    });
+  };
+
+  $scope.getCities = function (amount) {
+    GeoFactory.getCities(amount).then(function (results) {
+      $scope.cities = results.data;
+      $scope.gotCities = true;
+    }).catch(function (err) {
+      console.log(err);
+    });
+  };
+
+  // Get Location Data
+  $scope.getLatAndLong($scope.numberOfLatAndLongs);
+  $scope.getCountries($scope.numberOfCountries);
+  $scope.getCities($scope.numberOfCities);
 }]);

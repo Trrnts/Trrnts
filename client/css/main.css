@@ -302,6 +302,23 @@ article {
 }*/
 
 
+section {
+  margin-top: 1.5em;
+}
+
+.donut-chart {
+  margin-left:5em;
+  display: inline-block;
+}
+
+.donut-chart-label {
+  margin-right:28em;
+  text-decoration: underline;
+  font-weight:bold;
+  display: inline-block;
+}
+
+
 /*
 Make it responsive! These styles only apply on 'large' screens. This stylesheet
 leverages an approach called 'mobile first' (http://zurb.com/word/mobile-first).
