@@ -139,7 +139,7 @@ header {
 }
 
 .magnet-display:hover {
-  background: #688688;
+  background: #AEBEC1;
   transition: .3s; /* delays for 1 second */
   -webkit-transition: .3s; /* for Safari & Chrome */
 }
@@ -185,7 +185,6 @@ article .score {
 article h3 {
   margin: 0;
   font-weight: 600;
-  text-shadow: 1px 1px #eee;
 }
 
 article h3 a {
@@ -195,6 +194,7 @@ article h3 a {
 
 article {
   padding: 1em 0;
+  padding-left: 7px;
 }
 
 article .ago {
