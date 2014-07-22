@@ -10,6 +10,9 @@ It is similar to The Pirate Bay, except there is no actual uploading or download
 If you want to have a look at this awesome project check out our deployed app at
 http://trrnts.azurewebsites.net
 
+Check out the screencast on basic usage:
+https://www.youtube.com/watch?v=hDtmQcjm81c
+
 Getting started
 ---------------
 
@@ -91,7 +94,7 @@ Understanding the code
 
 ### Directory strucure
 
-* Highish level description of all the back-end things:
+* HIGHISH LEVEL DESCRIPTION OF ALL THE BACK-END THINGS FOR THE NEXT GROUP:
 
   The BitTorrent network is not as crazy as you probably think it is. We learned about graphs and hash tables and that's basically all it is.
 
@@ -145,7 +148,7 @@ Understanding the code
 
 ### A word about Redis
 
-[Redis](http://redis.io) is a key-value store. It is incredible fast, but quite
+[Redis](http://redis.io) is a key-value store. It is incredibly fast, but quite
 dumb (compared to MongoDB). You can think of it as a POJO. It supports some
 really sophisticated data-structures, like
 [HyperLogLog](http://antirez.com/news/75). We use HyperLogLog in order to
@@ -200,4 +203,3 @@ Authors
 - Antonio Grimaldo: [GitHub](https://github.com/grimi94)
 - Josh Wyatt: [GitHub](https://github.com/joshWyatt)
 - Salman Khan: [GitHub](https://github.com/smk1992)
->>>>>>> f7ff2480721cd8ac29eb15ed05982f7abdc52e79
