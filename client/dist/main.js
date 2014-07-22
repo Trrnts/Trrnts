@@ -138,9 +138,12 @@ angular.module('trrntsApp.controllers', [])
 // }])
 
 .controller('WorldMapController', ['$scope', 'GeoFactory', function ($scope, GeoFactory) {
+  // Used for storing and provided location data to directives.
   $scope.latAndLong = {};
   $scope.countries = {};
   $scope.cities = {};
+
+  // define amount of data to request & display
   $scope.numberOfCountries = 15;
   $scope.numberOfLatAndLongs = 100;
   $scope.numberOfCities = 10;
@@ -150,6 +153,7 @@ angular.module('trrntsApp.controllers', [])
   $scope.gotCountries = false;
   $scope.gotCities = false;
 
+  // Get specified amount of Latitute & Longitude coordinates
   $scope.getLatAndLong = function (amount) {
     GeoFactory.getLatAndLong(amount).then(function (results) {
       $scope.latAndLong = results.data;
@@ -159,6 +163,7 @@ angular.module('trrntsApp.controllers', [])
     });
   };
 
+  // Get specified amount of countries
   $scope.getCountries = function (amount) {
     GeoFactory.getCountries(amount).then(function (results) {
       $scope.countries = results.data;
@@ -168,6 +173,7 @@ angular.module('trrntsApp.controllers', [])
     });
   };
 
+  // Get specified amount of cities
   $scope.getCities = function (amount) {
     GeoFactory.getCities(amount).then(function (results) {
       $scope.cities = results.data;
@@ -176,6 +182,7 @@ angular.module('trrntsApp.controllers', [])
       console.log(err);
     });
   };
+
   // Get Location Data
   $scope.getLatAndLong($scope.numberOfLatAndLongs);
   $scope.getCountries($scope.numberOfCountries);
@@ -335,28 +342,40 @@ angular.module('trrntsApp.directives', [])
     restrict: 'A',
     link: function (scope, element, attrs) {
 
+      /* generate stats by creating an array of objects which are used to
+         generate bubbles on the map. Each Element:
+         obj = {
+            fillKey: colorPalette, // defautl color palette set for bubbles in maps is torrents
+            radius : number, // Size of Bubble
+            torrentsTotal: number, // Number of Torrents at this location. Used for Displaying in Tool Tip
+            latitude: number,
+            longitude: number
+          }
+      */
       var generateStats = function (lls) {
         var formatedLLs = [];
         var highestValue = 0;
 
-        // get Highest Value
+        // get highest number of torrents for the set of Longitute & Latitude
         for (var ll in lls) {
           if (parseInt(lls[ll]) > highestValue) {
-            highestValue = parseInt(lls[ll]);
+            highestValue = parseInt(lls[ll]); //parseInt, because value is string
           }
         }
 
         for (ll in lls) {
           var bubble = {
             fillKey : 'torrents',
-            radius :  maintainRatio(50, highestValue, lls[ll]), // Control Size by Max
+            radius :  maintainRatio(50, highestValue, lls[ll]), // max size of Bubbles currently 50
             torrentsTotal: lls[ll]
           };
 
           var latAndLong = ll.split(',');
           bubble.latitude = latAndLong[0];
           bubble.longitude = latAndLong[1];
-          if (latAndLong.length > 1 && latAndLong[0] !== '?') {
+
+          // Check to ensure if not undefined Lat & Long
+          if (latAndLong.length > 1 && latAndLong[0] !== '?' && latAndLong[1] !== '?') {
             formatedLLs.push(bubble);
           }
         }
@@ -364,6 +383,7 @@ angular.module('trrntsApp.directives', [])
         return formatedLLs;
       };
 
+      // Limit Max Size of Bubbles & Maintain value ratio for the data set
       var maintainRatio = function (max, highestValue, value) {
         return Math.floor((value/highestValue) * max);
       };
@@ -371,8 +391,8 @@ angular.module('trrntsApp.directives', [])
       var map = new Datamap({
         'element': element[0],
         fills: {
-          defaultFill: '#ccc',
-          torrents: '#222'
+          defaultFill: '#ccc', // Default Color of Each Country
+          torrents: '#222' // Defaut Color of Each Bubble
         }
       });
 
@@ -421,11 +441,12 @@ angular.module('trrntsApp.directives', [])
     restrict : 'A',
     link : function (scope, element, attrs) {
       element = element[0];
-      var data = [];
-      var dataset = scope[attrs.donutType] || [10,20,30,40,50];
-      // var highlightHeightDiff = attrs.highlightHeightDiff || 20;
-      if (!Array.isArray(dataset) && typeof(dataset) === 'object') {
+      var data = []; // store formatted dataset for use in d3
+      var dataset = scope[attrs.donutType]; // store data received from server passed through scope
+
+      if (typeof(dataset) === 'object') {
         for (var key in dataset) {
+          // Check to ensure not using undefined locations
           if (key !== '?') {
             data.push({
               'label' : key,
@@ -433,8 +454,6 @@ angular.module('trrntsApp.directives', [])
             });
           }
         }
-      } else {
-        data = dataset;
       }
 
       // Initializes a new tooltip.
@@ -445,10 +464,12 @@ angular.module('trrntsApp.directives', [])
           return '<div>Total Number of Torrents: <strong> ' + d.value + '</strong></div>';
         });
 
+      // Define properties of Donut Chart - tweak outerRadius & innerRadius for thickness
+      // of donut
       var radius = attrs.donutRadius || 200,
           width = radius * 2,
-          height = radius * 2;
-          outerRadius = width / 2;
+          height = radius * 2,
+          outerRadius = width / 2,
           innerRadius = width / 3;
 
       var pie = d3.layout.pie()
