@@ -94,7 +94,7 @@ Understanding the code
 
 ### Directory strucure
 
-* HIGHISH LEVEL DESCRIPTION OF ALL THE BACK-END THINGS FOR THE NEXT GROUP:
+* High-level description of back-end infrastructure:
 
   The BitTorrent network is not as crazy as you probably think it is. We learned about graphs and hash tables and that's basically all it is.
 
