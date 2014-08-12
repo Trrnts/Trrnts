@@ -184,11 +184,11 @@ The stack
 
 We are currently using "_A NERD_"-stack:
 
-- **A**ngular
-- **N**odeJS
-- **E**xpress
-- **R**edis
-- **D**3
+- **A** ngular
+- **N** odeJS
+- **E** xpress
+- **R** edis
+- **D** 3
 
 Contributions
 -------------
