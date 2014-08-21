@@ -7,9 +7,6 @@ The project is currently being developed at Hack Reactor.
 
 It is similar to The Pirate Bay, except there is no actual uploading or downloading of files. There is only information on what other people on the BitTorrent network are doing.
 
-If you want to have a look at this awesome project check out our deployed app at
-http://trrnts.azurewebsites.net
-
 Check out the screencast on basic usage:
 https://www.youtube.com/watch?v=hDtmQcjm81c
 
