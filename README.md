@@ -190,13 +190,12 @@ We are currently using "_A NERD_"-stack:
 Contributions
 -------------
 
-To make everyone's life easier we have created some guidelines  
-[here](https://github.com/Trrnts/Trrnts/blob/master/CONTRIBUTING.md)
+To make everyone's life easier we have created some [guidelines](https://github.com/Trrnts/Trrnts/blob/master/CONTRIBUTING.md).
 
 Authors
 -------
 
-- Alexander Gugel: [GitHub](https://github.com/alexanderGugel)
-- Antonio Grimaldo: [GitHub](https://github.com/grimi94)
-- Josh Wyatt: [GitHub](https://github.com/joshWyatt)
-- Salman Khan: [GitHub](https://github.com/smk1992)
+- Alexander Gugel [GitHub](https://github.com/alexanderGugel)
+- Antonio Grimaldo [GitHub](https://github.com/grimi94)
+- Josh Wyatt [GitHub](https://github.com/joshWyatt)
+- Salman Khan [GitHub](https://github.com/smk1992)
