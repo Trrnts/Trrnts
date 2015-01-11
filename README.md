@@ -176,6 +176,8 @@ and don't fit our use-case, since they don't really crawl the network for all
 peers, but try to find a certain number of them (like a BitTorrent client
 usually would).
 
+![Sample benchmark](http://i.imgur.com/YkgClkU.png)
+
 The stack
 ---------
 
