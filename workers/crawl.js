@@ -90,7 +90,7 @@ socket.on('message', function (msg, rinfo) {
   if (msg.r && msg.r.nodes && Buffer.isBuffer(msg.r.nodes)) {
     for (var i = 0; i < msg.r.nodes.length; i += 26) {
       var node = compact2string(msg.r.nodes.slice(i + 20, i + 26));
-      if (node && !jobs[infoHash].peers[node]) {
+      if (node && !jobs[infoHash].nodes[node]) {
         console.log('Found new node ' + node + ' for ' + infoHash);
         jobs[infoHash].nodes[node] = true;
         jobs[infoHash].queue.push(node);
